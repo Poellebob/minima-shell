@@ -1,0 +1,23 @@
+[DetailsMode]
+PreviewSize=22
+
+[ExtractDialog]
+1671x1114 screen: Height=1080
+1671x1114 screen: Width=856
+1920x1080 screen: Height=1050
+1920x1080 screen: Width=955
+2 screens: Height=1045
+2 screens: Width=1135
+DirHistory[$e]=$HOME/Downloads/,$HOME/Desktop/,$HOME/Desktop/cp2077 mods/mods/,$HOME/Desktop/cp2077 mods/
+
+[General]
+LockPanels=false
+Version=202
+ViewPropsTimestamp=2024,9,1,17,40,23.966
+
+[KFileDialog Settings]
+Places Icons Auto-resize=false
+Places Icons Static Size=22
+
+[MainWindow]
+MenuBar=Disabled
