@@ -1,0 +1,8 @@
+*
+!.gitignore
+
+!profiles.ini
+!Profile/
+!Profile/prefs.js
+!Profile/chrome
+!Profile/chrome/**
