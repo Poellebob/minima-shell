@@ -1,0 +1,184 @@
+[ColorEffects:Disabled]
+ChangeSelectionColor=
+Color=56,56,56
+ColorAmount=0
+ColorEffect=0
+ContrastAmount=0.65
+ContrastEffect=1
+Enable=
+IntensityAmount=0.1
+IntensityEffect=2
+
+[ColorEffects:Inactive]
+ChangeSelectionColor=true
+Color=112,111,110
+ColorAmount=0.025
+ColorEffect=2
+ContrastAmount=0.1
+ContrastEffect=2
+Enable=false
+IntensityAmount=0
+IntensityEffect=0
+
+[Colors:Button]
+BackgroundAlternate=174,155,45
+BackgroundNormal=41,44,48
+DecorationFocus=232,203,45
+DecorationHover=232,203,45
+ForegroundActive=232,203,45
+ForegroundInactive=161,169,177
+ForegroundLink=232,203,45
+ForegroundNegative=218,68,83
+ForegroundNeutral=246,116,0
+ForegroundNormal=252,252,252
+ForegroundPositive=39,174,96
+ForegroundVisited=155,89,182
+
+[Colors:Complementary]
+BackgroundAlternate=30,87,116
+BackgroundNormal=32,35,38
+DecorationFocus=232,203,45
+DecorationHover=232,203,45
+ForegroundActive=232,203,45
+ForegroundInactive=161,169,177
+ForegroundLink=232,203,45
+ForegroundNegative=218,68,83
+ForegroundNeutral=246,116,0
+ForegroundNormal=252,252,252
+ForegroundPositive=39,174,96
+ForegroundVisited=155,89,182
+
+[Colors:Header]
+BackgroundAlternate=32,35,38
+BackgroundNormal=41,44,48
+DecorationFocus=232,203,45
+DecorationHover=232,203,45
+ForegroundActive=232,203,45
+ForegroundInactive=161,169,177
+ForegroundLink=232,203,45
+ForegroundNegative=218,68,83
+ForegroundNeutral=246,116,0
+ForegroundNormal=252,252,252
+ForegroundPositive=39,174,96
+ForegroundVisited=155,89,182
+
+[Colors:Header][Inactive]
+BackgroundAlternate=41,44,48
+BackgroundNormal=32,35,38
+DecorationFocus=61,174,233
+DecorationHover=61,174,233
+ForegroundActive=61,174,233
+ForegroundInactive=161,169,177
+ForegroundLink=29,153,243
+ForegroundNegative=218,68,83
+ForegroundNeutral=246,116,0
+ForegroundNormal=252,252,252
+ForegroundPositive=39,174,96
+ForegroundVisited=155,89,182
+
+[Colors:Selection]
+BackgroundAlternate=168,148,38
+BackgroundNormal=168,148,38
+DecorationFocus=232,203,45
+DecorationHover=232,203,45
+ForegroundActive=232,203,45
+ForegroundInactive=0,0,0
+ForegroundLink=254,231,139
+ForegroundNegative=176,55,69
+ForegroundNeutral=198,92,0
+ForegroundNormal=0,0,0
+ForegroundPositive=23,104,57
+ForegroundVisited=155,89,182
+
+[Colors:Tooltip]
+BackgroundAlternate=32,35,38
+BackgroundNormal=41,44,48
+DecorationFocus=232,203,45
+DecorationHover=232,203,45
+ForegroundActive=232,203,45
+ForegroundInactive=161,169,177
+ForegroundLink=232,203,45
+ForegroundNegative=218,68,83
+ForegroundNeutral=246,116,0
+ForegroundNormal=252,252,252
+ForegroundPositive=39,174,96
+ForegroundVisited=155,89,182
+
+[Colors:View]
+BackgroundAlternate=29,31,34
+BackgroundNormal=20,22,24
+DecorationFocus=232,203,45
+DecorationHover=232,203,45
+ForegroundActive=232,203,45
+ForegroundInactive=161,169,177
+ForegroundLink=232,203,45
+ForegroundNegative=218,68,83
+ForegroundNeutral=246,116,0
+ForegroundNormal=252,252,252
+ForegroundPositive=39,174,96
+ForegroundVisited=155,89,182
+
+[Colors:Window]
+BackgroundAlternate=41,44,48
+BackgroundNormal=32,35,38
+DecorationFocus=232,203,45
+DecorationHover=232,203,45
+ForegroundActive=232,203,45
+ForegroundInactive=161,169,177
+ForegroundLink=232,203,45
+ForegroundNegative=218,68,83
+ForegroundNeutral=246,116,0
+ForegroundNormal=252,252,252
+ForegroundPositive=39,174,96
+ForegroundVisited=155,89,182
+
+[DirSelect Dialog]
+DirSelectDialog Size=1664,1080
+History Items[$e]=file:$HOME/Documents/obsidian/skole-noter,file:$HOME/roms/ps3,file:$HOME/Documents/Obsidian/skole-noter,file:$HOME/Documents/HELLO WORLD!,file:$HOME/Documents/HELLO WORLD!,file:$HOME/Desktop,file:$HOME/Onedrive Personal/Dokumenter/mat/tidevande project,file:$HOME/roms/NX/The Legend of Zelda Tears of the Kingdom [NSP + UPDATE 1.2.1]/RomSF,file:$HOME/.steam/,file:$HOME/.steam/steam/steamapps/common/wallpaper_engine/,file:$HOME/.steam/steam/steamapps/common/wallpaper_engine/,file:$HOME/.steam/,file:$HOME/Desktop,file:$HOME/Desktop,file:///mnt/google_drive_personal,file:///mnt/onedrive_personal,file:$HOME/Videos,file:$HOME/roms/NX,file:$HOME/roms/wbfs,file:///,file:$HOME/roms/NX,file:$HOME/roms/NX,file:///run/media/viggokh/One Touch
+Splitter State=\x00\x00\x00\xff\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\xa5\x00\x00\x02\xc4\x00\xff\xff\xff\xff\x01\x00\x00\x00\x01\x00
+
+[General]
+AccentColor=232,203,45
+BrowserApplication=google-chrome.desktop
+ColorSchemeHash=2c3f86428c11011a7c64ee1e7f47c274d498ff10
+LastUsedCustomAccentColor=232,203,45
+TerminalApplication=kitty
+TerminalService=kitty.desktop
+UseSystemBell=true
+
+[Icons]
+Theme=Papirus-Dark
+
+[KDE]
+LookAndFeelPackage=org.kde.breezedark.desktop
+widgetStyle=Breeze
+
+[KFileDialog Settings]
+Allow Expansion=false
+Automatically select filename extension=true
+Breadcrumb Navigation=false
+Decoration position=2
+LocationCombo Completionmode=5
+PathCombo Completionmode=5
+Show Full Path=false
+Show Inline Previews=true
+Show Preview=false
+Show Speedbar=true
+Show hidden files=true
+Sort by=Name
+Sort directories first=true
+Sort hidden files last=false
+Sort reversed=false
+Speedbar Width=140
+View Style=DetailTree
+
+[Sounds]
+Enable=false
+
+[WM]
+activeBackground=39,44,49
+activeBlend=252,252,252
+activeForeground=252,252,252
+inactiveBackground=32,36,40
+inactiveBlend=161,169,177
+inactiveForeground=161,169,177
