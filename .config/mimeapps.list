@@ -3,12 +3,6 @@ application/octet-stream=org.kde.kate.desktop;
 application/pdf=zen.desktop;
 application/x-7z-compressed=org.kde.dolphin.desktop;
 application/x-bittorrent=org.qbittorrent.qBittorrent.desktop;
-application/x-extension-htm=zen.desktop;
-application/x-extension-html=zen.desktop;
-application/x-extension-shtml=zen.desktop;
-application/x-extension-xht=zen.desktop;
-application/x-extension-xhtml=zen.desktop;
-application/xhtml+xml=zen.desktop;
 application/zip=org.kde.ark.desktop;org.kde.dolphin.desktop;
 inode/directory=code.desktop;
 text/html=zen.desktop;
@@ -17,9 +11,9 @@ text/plain=nvim.desktop;
 text/x-lua=nvim.desktop;
 video/mp4=mpv.desktop;
 video/x-matroska=mpv.desktop;
-x-scheme-handler/chrome=zen.desktop;
 x-scheme-handler/http=zen.desktop;
 x-scheme-handler/https=zen.desktop;
+x-scheme-handler/chrome=zen.desktop;
 
 [Default Applications]
 application/octet-stream=nvim.desktop;
