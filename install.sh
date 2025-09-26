@@ -1,3 +1,9 @@
 #!/bin/sh
 
-echo "this is not a finished project, install it manually"
+touch_minima() {
+  touch ~/.config/hypr/config.conf
+
+  cat ./defaults/hypr.conf > ~/.config/hypr/config.conf
+}
+
+

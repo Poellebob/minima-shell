@@ -1,33 +1,27 @@
 #!/bin/bash
 
-# Script to set Xft.dpi based on a monitor's width ratio to 1920 (1080p width)
-# Usage: ./set_xft_dpi.sh <monitor_name>
-
-# Check if monitor name is provided
 if [ -z "$1" ]; then
-    echo "Usage: $0 <monitor_name>"
+    echo "Usage: $0 \"<monitor_definition>\""
     exit 1
 fi
 
-MONITOR_NAME="$1"
+INPUT="$1"
+MONITOR_NAME="${INPUT%%,*}"
+SCALE_FACTOR=$(echo "$INPUT" | awk -F',' '{print $4}')
 
-# Extract resolution for the given monitor
+[ -z "$SCALE_FACTOR" ] && SCALE_FACTOR=1
+
+if [ -z "$MONITOR_NAME" ]; then
+    MONITOR_NAME=$(hyprctl monitors | awk 'NR==1{print $2}')
+    [ -z "$MONITOR_NAME" ] && { echo "Error: No monitors detected." >&2; exit 1; }
+fi
+
 resolution=$(hyprctl monitors | awk -v monitor="$MONITOR_NAME" '$2 == monitor {getline; print $1}')
 
-# Check if resolution was found
-if [ -z "$resolution" ]; then
-    echo "Error: Monitor '$MONITOR_NAME' not found." >&2
-    exit 1
-fi
+[ -z "$resolution" ] && { echo "Error: Monitor '$MONITOR_NAME' not found." >&2; exit 1; }
 
-# Extract width
 width=${resolution%x*}
+dpi=$(echo "scale=2; 96 * ($width / 1920) * $SCALE_FACTOR" | bc)
 
-# Base width for 1080p
-base_width=1920
-
-# Calculate DPI (96 * width_ratio)
-dpi=$(echo "scale=2; 96 * ($width / $base_width)" | bc)
-
-# Apply the new DPI setting to xrdb
 echo "Xft.dpi: $dpi" | xrdb -merge
+echo "Set Xft.dpi to $dpi for monitor '$MONITOR_NAME' (scale: $SCALE_FACTOR)"

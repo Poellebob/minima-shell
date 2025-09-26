@@ -21,6 +21,7 @@ Item {
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.top: parent.top
+      height: panel.format.big_icon_size + panel.format.radius_small
 
       Repeater {
         model: Mpris.players
@@ -28,7 +29,7 @@ Item {
           id: tabRoot
           required property MprisPlayer modelData
           visible: modelData.trackArtUrl ? true : false
-          implicitHeight: icon.height + panel.format.radius_small
+          implicitHeight: parent.height
           Layout.fillWidth: true
           radius: panel.format.radius_large
           color: mediaPlayerRoot.player === modelData ? panel.colors.dark_surface : (mouseArea.containsMouse ? panel.colors.dark_surface : panel.colors.dark_surface_variant)
@@ -299,6 +300,6 @@ Item {
     var hours = Math.floor(minutes / 60);
     minutes = minutes % 60;
     seconds = seconds % 60;
-    return (hours > 0 ?? hours + ":") + minutes + ":" + (seconds < 10 ? "0" : "") + Math.floor(seconds);
+    return (hours > 0 ? hours + ":" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + Math.floor(seconds);
   }
 }
