@@ -35,7 +35,7 @@ PanelWindow {
         left: parent.left
       }
 
-      implicitWidth: open ? 500 : panel.height
+      implicitWidth: open ? (500 > (itemsLeft.width + panel.width/2 - itemsCenter/2) ? (itemsLeft.width + panel.width/2 - itemsCenter/2) : 500) : panel.height
       color: panel.colors.surface_variant
       bottomRightRadius: panel.format.radius_large
 
