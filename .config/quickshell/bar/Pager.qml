@@ -13,7 +13,7 @@ Item {
 
   Rectangle {
     id: rect
-    color: panel.colors.dark_surface_variant
+    color: panel.colors.surface_variant
     radius: panel.format.radius_small
     implicitWidth: row.implicitWidth + panel.format.spacing_medium
     implicitHeight: panel.format.module_height
@@ -28,7 +28,7 @@ Item {
         model: Hyprland.workspaces
         delegate: Rectangle {
           visible: (panel.screen.name === modelData.monitor.name) && modelData.id >= 1
-          color: modelData.active ? panel.colors.dark_primary : panel.colors.dark_secondary
+          color: modelData.active ? panel.colors.primary : panel.colors.secondary
           
           implicitHeight: panel.format.module_height - panel.format.spacing_small
           implicitWidth: implicitHeight
@@ -38,7 +38,7 @@ Item {
           Text{
             font.pixelSize: panel.format.text_size
             text: modelData.id
-            color: panel.colors.dark_on_primary
+            color: panel.colors.on_primary
             anchors.horizontalCenter: parent.horizontalCenter
           }
           

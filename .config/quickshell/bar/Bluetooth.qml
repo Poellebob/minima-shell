@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
-import qs.colors
 
 Item {
   id: bluetoothRoot
@@ -13,7 +12,7 @@ Item {
     id: rect
     implicitHeight: panel.format.module_height
     implicitWidth: row.implicitWidth + panel.format.spacing_medium
-    color: panel.colors.dark_surface_variant
+    color: panel.colors.surface_variant
     radius: panel.format.radius_small
 
     RowLayout {
@@ -24,14 +23,14 @@ Item {
       Text {
         id: bluetoothIcon
         text: bluetoothRoot.bluetoothEnabled ? "󰂯" : "󰂲"
-        color: bluetoothRoot.bluetoothEnabled ? panel.colors.dark_on_surface_variant : panel.colors.dark_outline
+        color: bluetoothRoot.bluetoothEnabled ? panel.colors.on_surface_variant : panel.colors.outline
         font.pixelSize: panel.format.text_size
       }
 
       Text {
         id: bluetoothText
         text: bluetoothRoot.displayText
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
         font.pixelSize: panel.format.text_size
         visible: bluetoothRoot.displayText !== ""
       }

@@ -13,7 +13,7 @@ Item {
     id: rect
     implicitHeight: panel.format.module_height
     implicitWidth: row.implicitWidth + panel.format.spacing_medium
-    color: panel.colors.dark_surface_variant
+    color: panel.colors.surface_variant
     radius: panel.format.radius_small
 
     RowLayout {
@@ -24,14 +24,14 @@ Item {
       Text {
         id: networkIcon
         text: networkRoot.getNetworkIcon()
-        color: networkRoot.isConnected ? panel.colors.dark_on_surface_variant : panel.colors.dark_outline
+        color: networkRoot.isConnected ? panel.colors.on_surface_variant : panel.colors.outline
         font.pixelSize: panel.format.text_size
       }
 
       Text {
         id: networkText
         text: networkRoot.displayText
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
         font.pixelSize: panel.format.text_size
         visible: networkRoot.displayText !== ""
       }

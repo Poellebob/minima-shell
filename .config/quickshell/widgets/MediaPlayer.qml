@@ -10,6 +10,10 @@ Item {
   property MprisPlayer player: Mpris.players.values[0]
   property real position: 0
 
+  onPlayerChanged: {
+    mediaPlayerRoot.position = mediaPlayerRoot.player?.position
+  }
+
   ColumnLayout {
     anchors.fill: parent
     anchors.margins: panel.format.spacing_large
@@ -22,8 +26,10 @@ Item {
       anchors.right: parent.right
       anchors.top: parent.top
       height: panel.format.big_icon_size + panel.format.radius_small
+      visible: tabs.count ? true : false
 
       Repeater {
+        id: tabs
         model: Mpris.players
         Rectangle {
           id: tabRoot
@@ -32,7 +38,7 @@ Item {
           implicitHeight: parent.height
           Layout.fillWidth: true
           radius: panel.format.radius_large
-          color: mediaPlayerRoot.player === modelData ? panel.colors.dark_surface : (mouseArea.containsMouse ? panel.colors.dark_surface : panel.colors.dark_surface_variant)
+          color: mediaPlayerRoot.player === modelData ? panel.colors.surface : (mouseArea.containsMouse ? panel.colors.surface : panel.colors.surface_variant)
 
           IconImage {
             id: icon
@@ -83,7 +89,7 @@ Item {
       Layout.fillHeight: true
       Layout.fillWidth: true
       radius: panel.format.radius_large
-      color: panel.colors.dark_surface_variant
+      color: panel.colors.surface_variant
 
       RowLayout {
         anchors.fill: parent
@@ -96,7 +102,7 @@ Item {
           Layout.preferredHeight: parent.height * 0.8
           Layout.alignment: Qt.AlignVCenter
           radius: panel.format.radius_medium
-          color: panel.colors.dark_surface
+          color: panel.colors.surface
           clip: true
 
           Image {
@@ -131,7 +137,7 @@ Item {
               id: trackTitle
               Layout.fillWidth: true
               text: mediaPlayerRoot.player?.trackTitle ?? "No track"
-              color: panel.colors.dark_on_surface_variant
+              color: panel.colors.on_surface_variant
               font.pixelSize: panel.format.text_size
               font.bold: true
               elide: Text.ElideRight
@@ -142,7 +148,7 @@ Item {
               id: trackArtist
               Layout.fillWidth: true
               text: mediaPlayerRoot.player?.trackArtists ?? "Unknown artist"
-              color: panel.colors.dark_outline
+              color: panel.colors.outline
               font.pixelSize: panel.format.text_size
               elide: Text.ElideRight
               maximumLineCount: 1
@@ -152,7 +158,7 @@ Item {
               id: trackAlbum
               Layout.fillWidth: true
               text: mediaPlayerRoot.player?.trackAlbum ?? ""
-              color: panel.colors.dark_surface_bright
+              color: panel.colors.surface_bright
               font.pixelSize: panel.format.text_size
               elide: Text.ElideRight
               maximumLineCount: 1
@@ -170,7 +176,7 @@ Item {
               Layout.fillWidth: true
               height: 4
               radius: 2
-              color: panel.colors.dark_surface
+              color: panel.colors.surface
 
               Rectangle {
                 width: parent.width * (mediaPlayerRoot.position ?? 0) / (mediaPlayerRoot.player?.length ?? 1)
@@ -287,7 +293,7 @@ Item {
   Timer {
     running: true
     repeat: true
-    interval: 100
+    interval: 1000
 
     onTriggered: {
       mediaPlayerRoot.position = mediaPlayerRoot.player?.position

@@ -1,3 +1,4 @@
 .qmlls.ini
 wallpaper.conf
-colors/
+colors/**
+!colors/Colors.qml

@@ -75,7 +75,7 @@ MouseArea {
 
       Rectangle {
         id: rect
-        color: panel.colors.dark_background
+        color: panel.colors.background
         implicitWidth: parent.width
         implicitHeight: parent.height
         bottomLeftRadius: panel.format.radius_xlarge
@@ -95,7 +95,7 @@ MouseArea {
             
             Rectangle {
               required property QsMenuEntry modelData
-              color: mouseArea.containsMouse && !modelData.isSeparator ? panel.colors.dark_surface_container_high : panel.colors.dark_surface_variant
+              color: mouseArea.containsMouse && !modelData.isSeparator ? panel.colors.surface_container_high : panel.colors.surface_variant
               anchors.horizontalCenter: parent.horizontalCenter
               implicitWidth: menu.width - panel.format.spacing_large
               implicitHeight: modelData.isSeparator ? 2 : panel.format.icon_size
@@ -112,7 +112,7 @@ MouseArea {
               Text {
                 visible: !modelData.isSeparator
                 anchors.fill: parent
-                color: panel.colors.dark_on_background
+                color: panel.colors.on_background
                 text: modelData.text
                 anchors.left: parent.left
                 anchors.leftMargin: panel.format.font_size_small

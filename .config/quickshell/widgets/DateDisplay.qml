@@ -54,7 +54,7 @@ Item {
         font.family: "CommitMono Nerd Font Mono"
         font.pixelSize: panel.format.font_size_xlarge
         font.bold: true
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
         horizontalAlignment: Text.AlignHCenter
       }
       
@@ -63,7 +63,7 @@ Item {
         Layout.topMargin: panel.format.spacing_small
         implicitWidth: 80
         implicitHeight: 2
-        color: panel.colors.dark_primary
+        color: panel.colors.primary
         radius: 1
       }
 
@@ -73,7 +73,7 @@ Item {
         font.family: "CommitMono Nerd Font Mono"
         font.pixelSize: panel.format.font_size_medium
         font.bold: true
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
         horizontalAlignment: Text.AlignHCenter
       }
 
@@ -83,7 +83,7 @@ Item {
         font.family: "CommitMono Nerd Font Mono"
         font.pixelSize: panel.format.font_size_medium
         font.bold: true
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
         horizontalAlignment: Text.AlignHCenter
       }
     }

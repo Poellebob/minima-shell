@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.UPower
-import qs.colors
 
 Item {
   id: batteryRoot
@@ -15,9 +14,9 @@ Item {
     anchors.centerIn: parent
     implicitHeight: panel.format.module_height
     implicitWidth: column.implicitWidth + panel.format.radius_xlarge
-    color: panel.colors.dark_surface_variant
+    color: panel.colors.surface_variant
     radius: panel.format.radius_small
-    border.color: panel.colors.dark_primary
+    border.color: panel.colors.primary
     border.width: UPower.onBattery ? 0 : 1
 
     RowLayout {
@@ -27,7 +26,7 @@ Item {
 
       Text {
         text: batteryRoot.batteryIcon(UPower.displayDevice.iconName)
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
         font.pixelSize: panel.format.text_size
         horizontalAlignment: Text.AlignHCenter
       }
@@ -35,7 +34,7 @@ Item {
       Text {
         id: percentageText
         text: "NaN%"
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
         font.pixelSize: panel.format.text_size
         horizontalAlignment: Text.AlignHCenter
       }

@@ -9,7 +9,7 @@ Rectangle {
     signal clicked()
     
     radius: panel.format.radius_small
-    color: enabled ? (mouseArea.containsMouse ? panel.colors.dark_surface : "transparent") : "transparent"
+    color: enabled ? (mouseArea.containsMouse ? panel.colors.surface : "transparent") : "transparent"
     opacity: enabled ? 1.0 : 0.5
     
     IconImage {

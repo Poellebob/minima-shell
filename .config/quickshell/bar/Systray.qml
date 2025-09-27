@@ -10,7 +10,7 @@ Item {
 
   Rectangle {
     id: rect
-    color: panel.colors.dark_surface_variant
+    color: panel.colors.surface_variant
     radius: panel.format.radius_small
     anchors.centerIn: parent
 

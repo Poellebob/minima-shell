@@ -3,17 +3,16 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Pipewire
 import Quickshell.Widgets
-import qs.colors
 
 Item {
   id: audioRoot
-  implicitHeight: rect.implicitHeight
+  implicitHeight: panel.height
   implicitWidth: rect.implicitWidth
   property PwNode defaultNode: Pipewire.defaultAudioSink
   
   Rectangle {
     id: rect
-    color: panel.colors.dark_surface_variant
+    color: panel.colors.surface_variant
     radius: panel.format.radius_small
     anchors.centerIn: parent
     implicitHeight: panel.format.module_height
@@ -37,7 +36,7 @@ Item {
               ? " 󰖀"
               : " 󰕿")
         font.pixelSize: panel.format.text_size
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
       }
       
       Text {
@@ -46,18 +45,23 @@ Item {
           ? Math.round(defaultNode.audio.volume * 100) + "%"
           : "—"
         font.pixelSize: panel.format.text_size
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
       }
     }
+  }
 
-    MouseArea {
-      anchors.fill: parent
-      onClicked: if (defaultNode) defaultNode.audio.muted = !defaultNode.audio.muted
-      onWheel: {
-        if (!defaultNode) return
-        const delta = wheel.angleDelta.y > 0 ? 0.05 : -0.05
-        defaultNode.audio.volume = Math.max(0.0, Math.min(1.0, defaultNode.audio.volume + delta))
+  MouseArea {
+    anchors.fill: parent
+    acceptedButtons: Qt.MiddleButton | Qt.RightButton
+    onClicked: {
+      if (mouse.button === Qt.MiddleButton && defaultNode) {
+        defaultNode.audio.muted = !defaultNode.audio.muted
       }
+    }
+    onWheel: {
+      if (!defaultNode) return
+      const delta = wheel.angleDelta.y > 0 ? 0.05 : -0.05
+      defaultNode.audio.volume = Math.max(0.0, Math.min(1.0, defaultNode.audio.volume + delta))
     }
   }
 }

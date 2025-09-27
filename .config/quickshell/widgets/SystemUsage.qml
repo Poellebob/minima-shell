@@ -73,13 +73,13 @@ Item {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignHCenter
         implicitWidth: panel.format.spacing_large
-        color: panel.colors.dark_background
+        color: panel.colors.background
         radius: panel.format.radius_medium
 
         Rectangle {
           anchors.bottom: parent.bottom
           anchors.horizontalCenter: parent.horizontalCenter
-          color: panel.colors.dark_primary
+          color: panel.colors.primary
           implicitWidth: parent.width
           height: (parent.height / 100) * sysUsageRoot.cpuPercent
           radius: parent.radius
@@ -102,7 +102,7 @@ Item {
         font.family: "CommitMono Nerd Font Mono"
         font.pixelSize: panel.format.font_size_xlarge
         font.bold: true
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
       }
     }
 
@@ -116,13 +116,13 @@ Item {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignHCenter
         implicitWidth: panel.format.spacing_large
-        color: panel.colors.dark_background
+        color: panel.colors.background
         radius: panel.format.radius_medium
 
         Rectangle {
           anchors.bottom: parent.bottom
           anchors.horizontalCenter: parent.horizontalCenter
-          color: panel.colors.dark_secondary
+          color: panel.colors.secondary
           implicitWidth: parent.width
           height: (parent.height / 100) * sysUsageRoot.ramPercent
           radius: parent.radius
@@ -145,7 +145,7 @@ Item {
         font.family: "CommitMono Nerd Font Mono"
         font.pixelSize: panel.format.font_size_xlarge
         font.bold: true
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
       }
     }
 
@@ -159,13 +159,13 @@ Item {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignHCenter
         implicitWidth: panel.format.spacing_large
-        color: panel.colors.dark_background
+        color: panel.colors.background
         radius: panel.format.radius_medium
 
         Rectangle {
           anchors.bottom: parent.bottom
           anchors.horizontalCenter: parent.horizontalCenter
-          color: panel.colors.dark_tertiary
+          color: panel.colors.tertiary
           implicitWidth: parent.width
           height: (parent.height / 100) * sysUsageRoot.diskPercent
           radius: parent.radius
@@ -188,7 +188,7 @@ Item {
         font.family: "CommitMono Nerd Font Mono"
         font.pixelSize: panel.format.font_size_large
         font.bold: true
-        color: panel.colors.dark_on_surface_variant
+        color: panel.colors.on_surface_variant
       }
     }
   }

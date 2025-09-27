@@ -17,10 +17,10 @@ Item {
       id: networkStatus
       Layout.fillHeight: true
       Layout.fillWidth: true
-      color: panel.colors.dark_inverse_on_surface
+      color: panel.colors.inverse_on_surface
       radius: panel.format.radius_large
       border.width: 1
-      border.color: panel.colors.dark_primary
+      border.color: panel.colors.primary
       
       // Network status process
       property string networkInfo: ""
@@ -57,7 +57,7 @@ Item {
             font.family: "CommitMono Nerd Font Mono"
             font.pixelSize: panel.format.font_size_large
             font.bold: true
-            color: panel.colors.dark_primary
+            color: panel.colors.primary
           }
           
           Text {
@@ -65,7 +65,7 @@ Item {
             font.family: "CommitMono Nerd Font Mono"
             font.bold: true
             font.pixelSize: panel.format.font_size_medium
-            color: panel.colors.dark_on_surface_variant
+            color: panel.colors.on_surface_variant
           }
         }
         
@@ -93,7 +93,7 @@ Item {
           }
           font.family: "CommitMono Nerd Font Mono"
           font.pixelSize: panel.format.font_size_small
-          color: panel.colors.dark_on_surface_variant
+          color: panel.colors.on_surface_variant
           wrapMode: Text.WrapAtWordBoundaryOrAnywhere
           elide: Text.ElideRight
         }
@@ -105,10 +105,10 @@ Item {
       id: bluetoothStatus
       Layout.fillHeight: true
       Layout.fillWidth: true
-      color: panel.colors.dark_inverse_on_surface
+      color: panel.colors.inverse_on_surface
       radius: panel.format.radius_large
       border.width: 1
-      border.color: panel.colors.dark_secondary
+      border.color: panel.colors.secondary
       
       // Bluetooth status process
       property string bluetoothInfo: ""
@@ -161,7 +161,7 @@ Item {
             font.family: "CommitMono Nerd Font Mono"
             font.pixelSize: panel.format.font_size_large
             font.bold: true
-            color: panel.colors.dark_secondary
+            color: panel.colors.secondary
           }
           
           Text {
@@ -169,7 +169,7 @@ Item {
             font.family: "CommitMono Nerd Font Mono"
             font.bold: true
             font.pixelSize: panel.format.font_size_medium
-            color: panel.colors.dark_on_surface_variant
+            color: panel.colors.on_surface_variant
           }
         }
         
@@ -198,7 +198,7 @@ Item {
           }
           font.family: "CommitMono Nerd Font Mono"
           font.pixelSize: panel.format.font_size_small
-          color: panel.colors.dark_on_surface_variant
+          color: panel.colors.on_surface_variant
           wrapMode: Text.WrapAtWordBoundaryOrAnywhere
           elide: Text.ElideRight
         }

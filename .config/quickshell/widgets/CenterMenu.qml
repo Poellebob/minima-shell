@@ -41,7 +41,7 @@ PopupWindow {
     anchors.fill: parent
     bottomLeftRadius: panel.format.radius_xlarge + panel.format.spacing_small
     bottomRightRadius: panel.format.radius_xlarge + panel.format.spacing_small
-    color: panel.colors.dark_background
+    color: panel.colors.background
   }
   
   Timer {
@@ -92,7 +92,7 @@ PopupWindow {
               id: profileIcon
               Layout.preferredWidth: parent.height
               Layout.preferredHeight: parent.height
-              color: panel.colors.dark_inverse_on_surface
+              color: panel.colors.inverse_on_surface
               radius: panel.format.radius_large
 
               DateDisplay{
@@ -104,7 +104,7 @@ PopupWindow {
               id: fetchOutput
               Layout.fillWidth: true
               Layout.preferredHeight: parent.height
-              color: panel.colors.dark_inverse_on_surface
+              color: panel.colors.inverse_on_surface
               radius: panel.format.radius_large
               
               Text {
@@ -116,7 +116,7 @@ PopupWindow {
                 font.bold: true
                 wrapMode: Text.WrapAnywhere
                 textFormat: Text.RichText
-                color: panel.colors.dark_on_surface_variant
+                color: panel.colors.on_surface_variant
               }
             }
           }
@@ -126,7 +126,7 @@ PopupWindow {
             id: mediaControls
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: panel.colors.dark_inverse_on_surface
+            color: panel.colors.inverse_on_surface
             radius: panel.format.radius_large
             
             MediaPlayer {
@@ -139,7 +139,7 @@ PopupWindow {
             id: systemUsage
             Layout.fillWidth: true
             Layout.preferredHeight: parent.height * 0.2
-            color: panel.colors.dark_inverse_on_surface
+            color: panel.colors.inverse_on_surface
             radius: panel.format.radius_large
 
             NetworkBluetoothStatus {
@@ -153,7 +153,7 @@ PopupWindow {
           id: audioAndBrightness
           Layout.fillHeight: true
           Layout.preferredWidth: parent.height * 0.235
-          color: panel.colors.dark_inverse_on_surface
+          color: panel.colors.inverse_on_surface
           radius: panel.format.radius_large
           
           SystemUsage {
