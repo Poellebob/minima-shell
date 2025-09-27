@@ -27,6 +27,8 @@ PanelWindow {
     Rectangle {
       id: launcher
 
+      readonly property int maxwidth: 500
+
       property bool open: false
 
       anchors {
@@ -35,7 +37,7 @@ PanelWindow {
         left: parent.left
       }
 
-      implicitWidth: open ? (500 > (panel.width/2 - itemsLeft.width - itemsCenter/2) ? (itemsLeft.width + panel.width/2 - itemsCenter/2) : 500) : panel.height
+      implicitWidth: open ? (maxwidth > (panel.width/2 - itemsLeft.width - itemsCenter.width/2) ? ( panel.width/2 - itemsLeft.width - itemsCenter.width/2 - 16) : maxwidth) : panel.height
       color: panel.colors.surface_variant
       bottomRightRadius: panel.format.radius_large
 
