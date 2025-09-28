@@ -5,4 +5,6 @@ import qs.colors
 
 PopupWindow {
   id: launcherMenuRoot
+
+  required property string command
 }
