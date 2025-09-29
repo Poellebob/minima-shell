@@ -1,9 +1,8 @@
 #!/bin/sh
+setup() {
+  cp ./defaults/hypr.conf ~/.config/hypr/config.conf
 
-touch_minima() {
-  touch ~/.config/hypr/config.conf
-
-  cat ./defaults/hypr.conf > ~/.config/hypr/config.conf
+  
 }
 
 

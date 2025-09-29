@@ -21,7 +21,8 @@ resolution=$(hyprctl monitors | awk -v monitor="$MONITOR_NAME" '$2 == monitor {g
 [ -z "$resolution" ] && { echo "Error: Monitor '$MONITOR_NAME' not found." >&2; exit 1; }
 
 width=${resolution%x*}
-dpi=$(echo "scale=2; 96 * ($width / 1920) * $SCALE_FACTOR" | bc)
+dpi=$(echo "96 * ($width / 1920) * $SCALE_FACTOR" | bc)
 
+echo $width
 echo "Xft.dpi: $dpi" | xrdb -merge
 echo "Set Xft.dpi to $dpi for monitor '$MONITOR_NAME' (scale: $SCALE_FACTOR)"

@@ -13,11 +13,18 @@ PanelWindow {
   required property Colors colors
   implicitHeight: format.panel_height
   aboveWindows: true
+  focusable: WlrKeyboardFocus.Exclusive
 
   anchors {
     top: true
     left: true
     right: true
+  }
+
+  HyprlandFocusGrab {
+    id: grab
+    windows: [panel]
+    active: launcher.open
   }
 
   GlobalShortcut {
@@ -27,7 +34,11 @@ PanelWindow {
     description: "Opens the minima-shell launcher"
 
     onPressed: {
-      if (panel.screen.name == Hyprland.focusedMonitor?.name) launcher.open = !launcher.open
+      if (panel.screen.name == Hyprland.focusedMonitor?.name) {
+        launcher.open = !launcher.open
+        launcherCommand.focus = launcher.open
+        console.log(launcherCommand.focus)
+      }
     }
   }
 
@@ -65,6 +76,8 @@ PanelWindow {
         
         Launcher {
           id: launcherCommand
+          visible: launcher.open
+          anchors.fill: parent
         }
       }
       
@@ -91,6 +104,7 @@ PanelWindow {
           onClicked: (event) => {
             if (event.button == Qt.LeftButton) {
               launcher.open = !launcher.open
+              launcher.focus = launcher.open
             }
           }
         }
@@ -171,6 +185,6 @@ PanelWindow {
   LauncherMenu {
     id: launcherMenu
     visible: launcher.open
-    command: launcherCommand.command
+    command: launcherCommand.text
   }
 }
