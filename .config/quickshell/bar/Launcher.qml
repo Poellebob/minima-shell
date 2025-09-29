@@ -12,8 +12,28 @@ TextField {
   color: "white"
   font.pixelSize: panel.format.text_size
   verticalAlignment: TextInput.AlignVCenter
-  placeholderText: "type> for command"
-  background: Rectangle{
+  placeholderText: "type > for command"
+  
+  signal up()
+  signal down()
+  signal launch()
+
+  onAccepted: {
+    launch()
+    clear()
+  }
+  
+  Keys.onPressed: (event) => {
+    if (event.key === Qt.Key_Up) {
+      up()
+      event.accepted = true
+    } else if (event.key === Qt.Key_Down) {
+      down()
+      event.accepted = true
+    }
+  }
+  
+  background: Rectangle {
     anchors.fill: parent
     color: panel.colors.surface
     radius: panel.format.radius_medium

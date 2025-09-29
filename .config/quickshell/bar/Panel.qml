@@ -37,7 +37,6 @@ PanelWindow {
       if (panel.screen.name == Hyprland.focusedMonitor?.name) {
         launcher.open = !launcher.open
         launcherCommand.focus = launcher.open
-        console.log(launcherCommand.focus)
       }
     }
   }
@@ -48,7 +47,7 @@ PanelWindow {
     
     Rectangle {
       id: launcher
-      readonly property int maxwidth: 500
+      readonly property int maxwidth: 400
       property bool open: false
       anchors {
         top: parent.top
@@ -78,6 +77,10 @@ PanelWindow {
           id: launcherCommand
           visible: launcher.open
           anchors.fill: parent
+
+          onUp: launcherMenu.up()
+          onDown: launcherMenu.down()
+          onLaunch: launcherMenu.launch()
         }
       }
       
@@ -104,7 +107,7 @@ PanelWindow {
           onClicked: (event) => {
             if (event.button == Qt.LeftButton) {
               launcher.open = !launcher.open
-              launcher.focus = launcher.open
+              launcherCommand.focus = launcher.open
             }
           }
         }
@@ -186,5 +189,10 @@ PanelWindow {
     id: launcherMenu
     visible: launcher.open
     command: launcherCommand.text
+
+    onExecuted: {
+      launcher.open = false
+      launcherCommand.focus = false
+    }
   }
 }
