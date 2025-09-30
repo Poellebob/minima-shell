@@ -17,6 +17,7 @@ TextField {
   signal up()
   signal down()
   signal launch()
+  signal exit()
 
   onAccepted: {
     launch()
@@ -29,6 +30,10 @@ TextField {
       event.accepted = true
     } else if (event.key === Qt.Key_Down) {
       down()
+      event.accepted = true
+    } else if (event.key === Qt.Key_Escape) {
+      clear()
+      exit()
       event.accepted = true
     }
   }

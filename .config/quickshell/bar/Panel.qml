@@ -25,6 +25,12 @@ PanelWindow {
     id: grab
     windows: [panel]
     active: launcher.open
+    /*onActiveChanged: {
+      if (!active) {
+        launcher.open = false
+        launcherCommand.focus = false
+      }
+    }*/
   }
 
   GlobalShortcut {
@@ -81,6 +87,10 @@ PanelWindow {
           onUp: launcherMenu.up()
           onDown: launcherMenu.down()
           onLaunch: launcherMenu.launch()
+          onExit: {
+            launcher.open = false
+            launcherCommand.focus = false
+          }
         }
       }
       
@@ -90,14 +100,15 @@ PanelWindow {
           right: parent.right
           top: parent.top
           bottom: parent.bottom
-          rightMargin: 6
+          left: launcherCommand.right
         }
-        implicitWidth: iconText.width
+        implicitWidth: panel.height
         
         Text {
           id: iconText
           text: "󰣇"
           color: panel.colors.on_background
+          font.family: "JetBrainsMono Nerd Font Propo"
           font.pixelSize: panel.format.icon_size
           anchors.centerIn: parent
         }
