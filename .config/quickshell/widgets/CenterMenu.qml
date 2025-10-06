@@ -8,13 +8,21 @@ PopupWindow {
   anchor.window: panel
   anchor.rect.x: panel.width / 2 - width / 2
   anchor.rect.y: panel.height
-  implicitHeight: 600
+  implicitHeight: visible ? visibleHeight : 1
   implicitWidth: 800
   color: "transparent"
-  
+
+  property int visibleHeight: 600
   property string fetchString
   property string fetchPath: Quickshell.shellDir + "/scripts/sysfetch.sh"
   
+  /*Behavior on implicitHeight {
+    NumberAnimation {
+      duration: 100
+      easing.type: Easing.OutCubic
+    }
+  }*/
+
   Process {
     id: fetchRunner
     command: [fetchPath]
@@ -71,6 +79,8 @@ PopupWindow {
       anchors.rightMargin: panel.format.spacing_large
       anchors.bottomMargin: panel.format.spacing_large
       anchors.topMargin: panel.format.spacing_medium
+
+      //visible: menuRoot.height == menuRoot.visibleHeight ? true : false
       
       RowLayout {
         spacing: panel.format.spacing_large

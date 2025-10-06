@@ -63,7 +63,11 @@ PanelWindow {
         visible: !launcherMenuRoot.isCustomCommand
         highlightFollowsCurrentItem: true
         focus: false
-        
+
+        populate: Transition {
+          NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 100 }
+        }
+
         model: {
           if (isCustomCommand) {
             return []

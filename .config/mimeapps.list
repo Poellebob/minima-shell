@@ -14,6 +14,8 @@ video/x-matroska=mpv.desktop;
 x-scheme-handler/http=zen.desktop;
 x-scheme-handler/https=zen.desktop;
 x-scheme-handler/chrome=zen.desktop;
+x-scheme-handler/mailto=userapp-Thunderbird-EV5AD3.desktop;
+x-scheme-handler/mid=userapp-Thunderbird-EV5AD3.desktop;
 
 [Default Applications]
 application/octet-stream=nvim.desktop;
@@ -37,3 +39,6 @@ video/x-matroska=mpv.desktop;
 x-scheme-handler/chrome=zen.desktop
 x-scheme-handler/http=zen.desktop
 x-scheme-handler/https=zen.desktop
+x-scheme-handler/mailto=userapp-Thunderbird-EV5AD3.desktop
+message/rfc822=userapp-Thunderbird-EV5AD3.desktop
+x-scheme-handler/mid=userapp-Thunderbird-EV5AD3.desktop
