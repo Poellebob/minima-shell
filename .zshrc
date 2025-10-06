@@ -1,4 +1,9 @@
 # ---------------------------
+# Components
+# ---------------------------
+source ~/.zsh-defer/zsh-defer.plugin.zsh
+
+# ---------------------------
 # Aliases
 # ---------------------------
 alias homeserver="ssh -i ~/.ssh/slave-under-the-tv slave@85.27.195.162"

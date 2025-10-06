@@ -26,7 +26,7 @@ Item {
 
       Repeater {
         model: SystemTray.items
-        SysTrayItem {
+        delegate: SysTrayItem {
           required property SystemTrayItem modelData
           item: modelData
           bar: panel
