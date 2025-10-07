@@ -1,37 +1,25 @@
-vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
-vim.g.mapleader = " "
+local base_dir = vim.env.LUNARVIM_BASE_DIR
+  or (function()
+    local init_path = debug.getinfo(1, "S").source
+    return init_path:sub(2):match("(.*[/\\])"):sub(1, -2)
+  end)()
 
--- bootstrap lazy and all plugins
-local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
-
-if not vim.uv.fs_stat(lazypath) then
-  local repo = "https://github.com/folke/lazy.nvim.git"
-  vim.fn.system { "git", "clone", "--filter=blob:none", repo, "--branch=stable", lazypath }
+if not vim.tbl_contains(vim.opt.rtp:get(), base_dir) then
+  vim.opt.rtp:prepend(base_dir)
 end
 
-vim.opt.rtp:prepend(lazypath)
+require("lvim.bootstrap"):init(base_dir)
 
-local lazy_config = require "configs.lazy"
+require("lvim.config"):load()
 
--- load plugins
-require("lazy").setup({
-  {
-    "NvChad/NvChad",
-    lazy = false,
-    branch = "v2.5",
-    import = "nvchad.plugins",
-  },
+local plugins = require "lvim.plugins"
 
-  { import = "plugins" },
-}, lazy_config)
+require("lvim.plugin-loader").load { plugins, lvim.plugins }
 
--- load theme
-dofile(vim.g.base46_cache .. "defaults")
-dofile(vim.g.base46_cache .. "statusline")
+require("lvim.core.theme").setup()
 
-require "options"
-require "autocmds"
+local Log = require "lvim.core.log"
+Log:debug "Starting LunarVim"
 
-vim.schedule(function()
-  require "mappings"
-end)
+local commands = require "lvim.core.commands"
+commands.load(commands.defaults)

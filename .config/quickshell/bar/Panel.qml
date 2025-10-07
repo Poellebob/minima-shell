@@ -13,7 +13,7 @@ PanelWindow {
   required property Colors colors
   implicitHeight: format.panel_height
   aboveWindows: true
-  focusable: WlrKeyboardFocus.Exclusive
+  focusable: WlrKeyboardFocus.OnDemand
 
   anchors {
     top: true
