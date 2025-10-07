@@ -1,9 +1,11 @@
 #!/bin/sh
 
-WALLPAPER_PATH=$(cat ~/.config/quickshell/wallpaper.conf)
+WALLPAPER_PATH=$(cat ~/.config/wallpaper.conf)
 
 mkdir -p ~/.config/quickshell/colors/
 touch ~/.config/quickshell/colors/colors.json
+touch ~/.config/quickshell/colors/ColorsDark.qml
+touch ~/.config/quickshell/colors/ColorsLight.qml
 
 matugen -j hex image "$WALLPAPER_PATH" 2>/dev/null | grep '{' | jq . > ~/.config/quickshell/colors/colors.json
 

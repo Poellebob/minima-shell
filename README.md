@@ -17,7 +17,7 @@ sudo update-desktop-database
 sudo mv /etc/xdg/menus/arch-applications.menu /etc/xdg/menus/applications.menu 
 ```
 
-### yes
+### Copy to home
 ```sh
 git clone git@github.com:Poellebob/minima-shell.git
 cd minima-shell
@@ -38,9 +38,19 @@ chmod +x ~/.config/hypr/set-xft-dpi.sh
 chmod +x ~/.config/hypr/suspend.sh
 
 touch ~/.config/hypr/wallpaper.conf
-echo $HOME/Wallpaper/botw.png > ~/.config/hypr/wallpaper.conf
+echo $HOME/Wallpaper/botw.png > ~/.config/wallpaper.conf
 touch ~/.config/hypr/config.conf
 mv defaults/hypr.conf ~/.config/hypr/config.conf
 
 sh -c ~/.config/quickshell/scripts/generate-colors.sh
+```
+
+### virt-machine
+```sh
+sudo pacman -S qemu libvirt virt-manager dnsmasq bridge-utils #ebtables
+sudo systemctl start libvirtd
+sudo systemctl enable libvirtd
+
+sudo usermod -aG libvirt $(whoami)
+
 ```

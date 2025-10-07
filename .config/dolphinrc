@@ -23,3 +23,6 @@ Places Icons Static Size=22
 
 [MainWindow]
 MenuBar=Disabled
+
+[Search]
+SearchTool=Baloo
