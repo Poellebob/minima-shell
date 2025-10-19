@@ -1,7 +1,7 @@
 return {
   {
     vim.keymap.set("n", "-m", "<cmd>!make<cr>", {desc = "Run Make"}),
-    
+
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "tex",
       callback = function()
@@ -55,7 +55,7 @@ return {
           '-synctex=1',
           '-interaction=nonstopmode',
         },
-      }
+      } 
       
       vim.keymap.set("n", "-t", "", { desc = "+VimTeX" })
       vim.keymap.set("n", "-tl", "<cmd>VimtexCompile<cr>", { desc = "Compile LaTeX (VimTeX)" })

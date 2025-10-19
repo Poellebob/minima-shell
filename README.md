@@ -9,7 +9,7 @@ sudo pacman -Syu wireplumber libgtop bluez bluez-utils btop networkmanager dart-
 ```
 
 ```sh
-yay -S --noconfirm qt6ct-kde rose-pine-hyprcursor rose-pine-cursor quickshell-git matugen-bin afetch
+yay -S --noconfirm qt6ct-kde rose-pine-hyprcursor rose-pine-cursor quickshell-git matugen-bin afetch hyprmoji
 ```
 
 ```sh
