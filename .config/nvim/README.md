@@ -2,6 +2,6 @@
 
 **NOTE:** This is for AstroNvim v5+
 
-[AstroNvim](https://github.com/AstroNvim/template)'s template is what i have used.
+[AstroNvim](https://github.com/AstroNvim/template)'s template is what is used with wery minor changes.
 
 
