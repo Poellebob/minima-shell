@@ -29,7 +29,7 @@ rm -rf ./**.git*
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
 
-cp ./* ~
+cp -r ./* ~
 
 chmod +x ~/.config/quickshell/scripts/generate-colors.sh
 chmod +x ~/.config/quickshell/scripts/sysfetch.sh
