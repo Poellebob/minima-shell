@@ -1,6 +1,10 @@
 # Install
 **Warning backup your configs**
+# minima-shell
 
+minima-shell is a userspace shell and a hyprland config in one.
+
+**warning:** this project is not done and is still pre-alpha, it will contain
 
 ## Manual
 
@@ -9,7 +13,7 @@ sudo pacman -Syu wireplumber libgtop bluez bluez-utils btop networkmanager dart-
 ```
 
 ```sh
-yay -S --noconfirm qt6ct-kde rose-pine-hyprcursor rose-pine-cursor quickshell-git matugen-bin afetch hyprmoji
+yay -S --noconfirm qt6ct-kde rose-pine-hyprcursor rose-pine-cursor quickshell-git matugen-bin afetch hypremoji
 ```
 
 ```sh
@@ -37,9 +41,8 @@ chmod +x ~/.config/hypr/genkeys.sh
 chmod +x ~/.config/hypr/set-xft-dpi.sh
 chmod +x ~/.config/hypr/suspend.sh
 
-touch ~/.config/hypr/wallpaper.conf
-echo $HOME/Wallpaper/botw.png > ~/.config/wallpaper.conf
-touch ~/.config/hypr/config.conf
+touch ~/.config/wallpaper.conf
+echo $HOME/Wallpapers/botw.png > ~/.config/wallpaper.conf
 mv defaults/hypr.conf ~/.config/hypr/config.conf
 
 sh -c ~/.config/quickshell/scripts/generate-colors.sh
