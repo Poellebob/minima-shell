@@ -24,6 +24,8 @@ eval "$(zoxide init zsh)"
 
 export PATH=~/.npm-global/bin:$PATH
 
+zsh-defer source /usr/share/nvm/init-nvm.sh
+
 # ---------------------------
 # Start Fetch
 # ---------------------------
