@@ -7,17 +7,17 @@ import qs.components.text
 
 ModuleBase {
   id: bluetoothRoot
-  implicitWidth: row.implicitWidth + panel.format.spacing_medium
+  implicitWidth: row.implicitWidth + format.spacing_medium
 
   RowLayout {
     id: row
     anchors.centerIn: parent
-    spacing: panel.format.spacing_small
+    spacing: format.spacing_small
 
     StyledText {
       id: bluetoothIcon
       text: bluetoothRoot.bluetoothEnabled ? "󰂯" : "󰂲"
-      color: bluetoothRoot.bluetoothEnabled ? panel.colors.on_surface_variant : panel.colors.outline
+      color: bluetoothRoot.bluetoothEnabled ? colors.on_surface_variant : colors.outline
     }
 
     StyledText {
@@ -99,14 +99,14 @@ ModuleBase {
   }
 
   Timer {
-    interval: panel.format.interval_long
+    interval: format.interval_long
     running: true
     repeat: true
     onTriggered: bluetoothProcess.running = true
   }
 
   Timer {
-    interval: panel.format.interval_medium
+    interval: format.interval_medium
     running: true
     repeat: true
     onTriggered: bluetoothRoot.updateDisplayText()

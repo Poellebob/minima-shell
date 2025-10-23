@@ -8,17 +8,17 @@ import qs.components.text
 
 ModuleBase {
   id: networkRoot
-  implicitWidth: row.implicitWidth + panel.format.spacing_medium
+  implicitWidth: row.implicitWidth + format.spacing_medium
 
   RowLayout {
     id: row
     anchors.centerIn: parent
-    spacing: panel.format.spacing_small
+    spacing: format.spacing_small
 
     StyledText {
       id: networkIcon
       text: networkRoot.getNetworkIcon()
-      color: networkRoot.isConnected ? panel.colors.on_surface_variant : panel.colors.outline
+      color: networkRoot.isConnected ? colors.on_surface_variant : colors.outline
     }
 
     StyledText {
@@ -158,7 +158,7 @@ ModuleBase {
   }
 
   Timer {
-    interval: panel.format.interval_long
+    interval: format.interval_long
     running: true
     repeat: true
     onTriggered: {
@@ -168,7 +168,7 @@ ModuleBase {
   }
   Timer {
     id: fallbackTimer
-    interval: panel.format.interval_short
+    interval: format.interval_short
     running: false
     onTriggered: {
       if (!networkRoot.isConnected) {
@@ -178,7 +178,7 @@ ModuleBase {
   }
 
   Timer {
-    interval: panel.format.interval_longest
+    interval: format.interval_longest
     running: networkRoot.connectionType === "wifi" && networkRoot.isConnected
     repeat: true
     onTriggered: wifiSignalProcess.running = true

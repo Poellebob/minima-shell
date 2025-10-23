@@ -4,9 +4,17 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Widgets
 import qs.components
+import qs.colors
+import qs.format
 
 Item {
   id: mediaPlayerRoot
+
+  readonly property Format format: Format {}
+  // TODO: The color theme is hardcoded to dark.
+  // This should be made dynamic.
+  readonly property Colors colors: ColorsDark {}
+
   property MprisPlayer player: Mpris.players.values[0]
   property real position: 0
 
@@ -16,16 +24,16 @@ Item {
 
   ColumnLayout {
     anchors.fill: parent
-    anchors.margins: panel.format.spacing_large
-    spacing: panel.format.spacing_large
+    anchors.margins: format.spacing_large
+    spacing: format.spacing_large
 
     RowLayout {
       id: tabLayout
-      spacing: panel.format.spacing_medium
+      spacing: format.spacing_medium
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.top: parent.top
-      height: panel.format.big_icon_size + panel.format.radius_small
+      height: format.big_icon_size + format.radius_small
       visible: tabs.count ? true : false
 
       Repeater {
@@ -37,14 +45,14 @@ Item {
           visible: modelData.trackArtUrl ? true : false
           implicitHeight: parent.height
           Layout.fillWidth: true
-          radius: panel.format.radius_large
-          color: mediaPlayerRoot.player === modelData ? panel.colors.surface : (mouseArea.containsMouse ? panel.colors.surface : panel.colors.surface_variant)
+          radius: format.radius_large
+          color: mediaPlayerRoot.player === modelData ? colors.surface : (mouseArea.containsMouse ? colors.surface : colors.surface_variant)
 
           IconImage {
             id: icon
             anchors.centerIn: parent
-            width: panel.format.big_icon_size
-            height: panel.format.big_icon_size
+            width: format.big_icon_size
+            height: format.big_icon_size
             source: {
               if (modelData.desktopEntry) {
                 var desktopEntry = DesktopEntries.byId(modelData.desktopEntry);
@@ -88,21 +96,21 @@ Item {
       id: controllerRoot
       Layout.fillHeight: true
       Layout.fillWidth: true
-      radius: panel.format.radius_large
-      color: panel.colors.surface_variant
+      radius: format.radius_large
+      color: colors.surface_variant
 
       RowLayout {
         anchors.fill: parent
-        anchors.margins: panel.format.spacing_large
-        spacing: panel.format.spacing_medium
+        anchors.margins: format.spacing_large
+        spacing: format.spacing_medium
 
         // Album Art
         Rectangle {
           Layout.preferredWidth: parent.height * 0.8
           Layout.preferredHeight: parent.height * 0.8
           Layout.alignment: Qt.AlignVCenter
-          radius: panel.format.radius_medium
-          color: panel.colors.surface
+          radius: format.radius_medium
+          color: colors.surface
           clip: true
 
           Image {
@@ -126,19 +134,19 @@ Item {
         ColumnLayout {
           Layout.fillWidth: true
           Layout.fillHeight: true
-          spacing: panel.format.spacing_small
+          spacing: format.spacing_small
 
           // Track Info
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: panel.format.spacing_tiny
+            spacing: format.spacing_tiny
 
             Text {
               id: trackTitle
               Layout.fillWidth: true
               text: mediaPlayerRoot.player?.trackTitle ?? "No track"
-              color: panel.colors.on_surface_variant
-              font.pixelSize: panel.format.text_size
+              color: colors.on_surface_variant
+              font.pixelSize: format.text_size
               font.bold: true
               elide: Text.ElideRight
               maximumLineCount: 1
@@ -148,8 +156,8 @@ Item {
               id: trackArtist
               Layout.fillWidth: true
               text: mediaPlayerRoot.player?.trackArtists ?? "Unknown artist"
-              color: panel.colors.outline
-              font.pixelSize: panel.format.text_size
+              color: colors.outline
+              font.pixelSize: format.text_size
               elide: Text.ElideRight
               maximumLineCount: 1
             }
@@ -158,8 +166,8 @@ Item {
               id: trackAlbum
               Layout.fillWidth: true
               text: mediaPlayerRoot.player?.trackAlbum ?? ""
-              color: panel.colors.surface_bright
-              font.pixelSize: panel.format.text_size
+              color: colors.surface_bright
+              font.pixelSize: format.text_size
               elide: Text.ElideRight
               maximumLineCount: 1
               visible: text !== ""
@@ -169,20 +177,20 @@ Item {
           // Progress Bar
           ColumnLayout {
             Layout.fillWidth: true
-            spacing: panel.format.spacing_tiny
+            spacing: format.spacing_tiny
             visible: mediaPlayerRoot.player?.length > 0
 
             Rectangle {
               Layout.fillWidth: true
               height: 4
               radius: 2
-              color: panel.colors.surface
+              color: colors.surface
 
               Rectangle {
                 width: parent.width * (mediaPlayerRoot.position ?? 0) / (mediaPlayerRoot.player?.length ?? 1)
                 height: parent.height
                 radius: parent.radius
-                color: panel.colors.accent_primary
+                color: colors.primary
                 
                 Behavior on width {
                   NumberAnimation {
@@ -198,16 +206,16 @@ Item {
 
               Text {
                 text: formatTime(mediaPlayerRoot.position ?? 0)
-                color: panel.colors.text_tertiary
-                font.pixelSize: panel.format.text_tiny
+                color: colors.on_surface_variant
+                font.pixelSize: format.font_size_small
               }
 
               Item { Layout.fillWidth: true }
 
               Text {
                 text: formatTime(mediaPlayerRoot.player?.length ?? 0)
-                color: panel.colors.text_tertiary
-                font.pixelSize: panel.format.text_tiny
+                color: colors.on_surface_variant
+                font.pixelSize: format.font_size_small
               }
             }
           }
@@ -215,11 +223,11 @@ Item {
           // Control Buttons
           RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: panel.format.spacing_medium
+            spacing: format.spacing_medium
 
             IconButton {
-              width: panel.format.icon_size
-              height: panel.format.icon_size
+              width: format.icon_size
+              height: format.icon_size
               icon: mediaPlayerRoot.player?.shuffle ? Quickshell.iconPath("media-playlist-shuffle") : Quickshell.iconPath("media-playlist-no-shuffle")
               enabled: mediaPlayerRoot.player?.shuffleSupported
               onClicked: {
@@ -228,16 +236,16 @@ Item {
             }
 
             IconButton {
-              width: panel.format.icon_size
-              height: panel.format.icon_size
+              width: format.icon_size
+              height: format.icon_size
               icon: Quickshell.iconPath("media-skip-backward")
               enabled: mediaPlayerRoot.player?.canGoPrevious ?? false
               onClicked: mediaPlayerRoot.player?.previous()
             }
 
             IconButton {
-              width: panel.format.big_icon_size
-              height: panel.format.big_icon_size
+              width: format.big_icon_size
+              height: format.big_icon_size
               icon: {
                 if (mediaPlayerRoot.player?.playbackState === MprisPlaybackState.Playing) {
                   return Quickshell.iconPath("media-playback-pause")
@@ -250,16 +258,16 @@ Item {
             }
 
             IconButton {
-              width: panel.format.icon_size
-              height: panel.format.icon_size
+              width: format.icon_size
+              height: format.icon_size
               icon: Quickshell.iconPath("media-skip-forward")
               enabled: mediaPlayerRoot.player?.canGoNext ?? false
               onClicked: mediaPlayerRoot.player?.next()
             }
 
             IconButton {
-              width: panel.format.icon_size
-              height: panel.format.icon_size
+              width: format.icon_size
+              height: format.icon_size
               icon: {
                 if(mediaPlayerRoot.player?.loopState === MprisLoopState.Playlist) {
                   return Quickshell.iconPath("media-playlist-repeat")

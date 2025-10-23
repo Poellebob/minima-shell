@@ -5,20 +5,24 @@ import qs.components.bar
 
 ModuleBase {
   id: systray
-  implicitWidth: rowLayout.implicitWidth + panel.format.spacing_medium
+  implicitWidth: rowLayout.implicitWidth + format.spacing_medium
+
+  // TODO: This component is dependent on the panel because of the bar property
+  // passed to SysTrayItem. This needs to be refactored to be able to use it without a panel.
+  property var bar: panel
 
   RowLayout {
     id: rowLayout
-    anchors.margins: panel.format.spacing_small
+    anchors.margins: format.spacing_small
     anchors.fill: parent
-    spacing: panel.format.spacing_small
+    spacing: format.spacing_small
 
     Repeater {
       model: SystemTray.items
       delegate: SysTrayItem {
         required property SystemTrayItem modelData
         item: modelData
-        bar: panel
+        bar: systray.bar
       }
     }
   }

@@ -3,19 +3,27 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.DBusMenu
 import qs.components.text
+import qs.colors
+import qs.format
 
 PopupWindow {
   id: menu
   color: "transparent"
+
+  readonly property Format format: Format {}
+  // TODO: The color theme is hardcoded to dark.
+  // This should be made dynamic.
+  readonly property Colors colors: ColorsDark {}
+
   implicitWidth: 200
-  implicitHeight: items.height + panel.format.spacing_large + panel.format.spacing_small
+  implicitHeight: items.height + format.spacing_large + format.spacing_small
 
   property var model
   signal itemTriggered()
 
   Timer {
     id: hideTimer
-    interval: panel.format.interval_short
+    interval: format.interval_short
     running: false
     repeat: false
     onTriggered: menu.visible = false
@@ -33,16 +41,16 @@ PopupWindow {
 
     Rectangle {
       id: rect
-      color: panel.colors.background
+      color: colors.background
       implicitWidth: parent.width
       implicitHeight: parent.height
-      bottomLeftRadius: panel.format.radius_xlarge
-      bottomRightRadius: panel.format.radius_xlarge
+      bottomLeftRadius: format.radius_xlarge
+      bottomRightRadius: format.radius_xlarge
       anchors.fill: parent
 
       ColumnLayout {
         id: items
-        spacing: panel.format.radius_medium
+        spacing: format.radius_medium
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
 
@@ -52,11 +60,11 @@ PopupWindow {
 
           Rectangle {
             required property QsMenuEntry modelData
-            color: mouseArea.containsMouse && !modelData.isSeparator ? panel.colors.surface_container_high : panel.colors.surface_variant
+            color: mouseArea.containsMouse && !modelData.isSeparator ? colors.surface_container_high : colors.surface_variant
             anchors.horizontalCenter: parent.horizontalCenter
-            implicitWidth: menu.width - panel.format.spacing_large
-            implicitHeight: modelData.isSeparator ? 2 : panel.format.icon_size
-            radius: panel.format.radius_large
+            implicitWidth: menu.width - format.spacing_large
+            implicitHeight: modelData.isSeparator ? 2 : format.icon_size
+            radius: format.radius_large
 
             Behavior on color {
               ColorAnimation {
@@ -68,10 +76,10 @@ PopupWindow {
             StyledText {
               visible: !modelData.isSeparator
               anchors.fill: parent
-              color: panel.colors.on_background
+              color: colors.on_background
               text: modelData.text
               anchors.left: parent.left
-              anchors.leftMargin: panel.format.font_size_small
+              anchors.leftMargin: format.font_size_small
               verticalAlignment: Text.AlignVCenter
               horizontalAlignment: Text.AlignLeft
             }

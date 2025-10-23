@@ -6,7 +6,7 @@ import qs.components.text
 
 ModuleBase {
   id: clockRoot
-  implicitWidth: text.implicitWidth + panel.format.spacing_medium
+  implicitWidth: text.implicitWidth + format.spacing_medium
 
   StyledText {
     id: text

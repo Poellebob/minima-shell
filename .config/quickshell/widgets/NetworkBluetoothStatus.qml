@@ -2,25 +2,32 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
+import qs.colors
+import qs.format
 
 Item {
   id: statusRoot
   anchors.fill: parent
 
+  readonly property Format format: Format {}
+  // TODO: The color theme is hardcoded to dark.
+  // This should be made dynamic.
+  readonly property Colors colors: ColorsDark {}
+
   RowLayout {
     anchors.fill: parent
-    anchors.margins: panel.format.spacing_large
-    spacing: panel.format.spacing_large
+    anchors.margins: format.spacing_large
+    spacing: format.spacing_large
 
     // Left side - Network Status
     Rectangle {
       id: networkStatus
       Layout.fillHeight: true
       Layout.fillWidth: true
-      color: panel.colors.inverse_on_surface
-      radius: panel.format.radius_large
+      color: colors.inverse_on_surface
+      radius: format.radius_large
       border.width: 1
-      border.color: panel.colors.primary
+      border.color: colors.primary
       
       // Network status process
       property string networkInfo: ""
@@ -37,7 +44,7 @@ Item {
       }
       
       Timer {
-        interval: panel.format.interval_long
+        interval: format.interval_long
         running: true
         repeat: true
         onTriggered: networkProcess.running = true
@@ -45,27 +52,27 @@ Item {
       
       Column {
         anchors.fill: parent
-        anchors.margins: panel.format.spacing_medium
-        spacing: panel.format.spacing_medium
+        anchors.margins: format.spacing_medium
+        spacing: format.spacing_medium
         
         RowLayout {
           width: parent.width
-          spacing: panel.format.spacing_medium
+          spacing: format.spacing_medium
           
           Text {
             text: "󰖩"
             font.family: "CommitMono Nerd Font Mono"
-            font.pixelSize: panel.format.font_size_large
+            font.pixelSize: format.font_size_large
             font.bold: true
-            color: panel.colors.primary
+            color: colors.primary
           }
           
           Text {
             text: "Network"
             font.family: "CommitMono Nerd Font Mono"
             font.bold: true
-            font.pixelSize: panel.format.font_size_medium
-            color: panel.colors.on_surface_variant
+            font.pixelSize: format.font_size_medium
+            color: colors.on_surface_variant
           }
         }
         
@@ -92,8 +99,8 @@ Item {
             return activeConnections.slice(0, 2).join('\n')
           }
           font.family: "CommitMono Nerd Font Mono"
-          font.pixelSize: panel.format.font_size_small
-          color: panel.colors.on_surface_variant
+          font.pixelSize: format.font_size_small
+          color: colors.on_surface_variant
           wrapMode: Text.WrapAtWordBoundaryOrAnywhere
           elide: Text.ElideRight
         }
@@ -105,10 +112,10 @@ Item {
       id: bluetoothStatus
       Layout.fillHeight: true
       Layout.fillWidth: true
-      color: panel.colors.inverse_on_surface
-      radius: panel.format.radius_large
+      color: colors.inverse_on_surface
+      radius: format.radius_large
       border.width: 1
-      border.color: panel.colors.secondary
+      border.color: colors.secondary
       
       // Bluetooth status process
       property string bluetoothInfo: ""
@@ -141,7 +148,7 @@ Item {
       }
       
       Timer {
-        interval: panel.format.interval_long
+        interval: format.interval_long
         running: true
         repeat: true
         onTriggered: bluetoothProcess.running = true
@@ -149,27 +156,27 @@ Item {
       
       Column {
         anchors.fill: parent
-        anchors.margins: panel.format.spacing_medium
-        spacing: panel.format.spacing_medium
+        anchors.margins: format.spacing_medium
+        spacing: format.spacing_medium
         
         RowLayout {
           width: parent.width
-          spacing: panel.format.spacing_medium
+          spacing: format.spacing_medium
           
           Text {
             text: "󰂯"
             font.family: "CommitMono Nerd Font Mono"
-            font.pixelSize: panel.format.font_size_large
+            font.pixelSize: format.font_size_large
             font.bold: true
-            color: panel.colors.secondary
+            color: colors.secondary
           }
           
           Text {
             text: "Bluetooth"
             font.family: "CommitMono Nerd Font Mono"
             font.bold: true
-            font.pixelSize: panel.format.font_size_medium
-            color: panel.colors.on_surface_variant
+            font.pixelSize: format.font_size_medium
+            color: colors.on_surface_variant
           }
         }
         
@@ -197,8 +204,8 @@ Item {
             return connectedDevices.slice(0, 2).join('\n')
           }
           font.family: "CommitMono Nerd Font Mono"
-          font.pixelSize: panel.format.font_size_small
-          color: panel.colors.on_surface_variant
+          font.pixelSize: format.font_size_small
+          color: colors.on_surface_variant
           wrapMode: Text.WrapAtWordBoundaryOrAnywhere
           elide: Text.ElideRight
         }
