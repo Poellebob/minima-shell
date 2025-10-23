@@ -6,14 +6,17 @@ import Quickshell.Widgets
 import Quickshell.DBusMenu
 import Qt5Compat.GraphicalEffects
 import qs.components.popup
+import qs.format
 
 MouseArea {
   id: sysTrayItem
 
+  readonly property Format format: Format {}
+
   required property var bar
   required property SystemTrayItem item
   property bool targetMenuOpen: false
-  property int trayItemWidth: panel.format.radius_xlarge
+  property int trayItemWidth: format.systray_icon_size
 
   anchors {
     verticalCenter: parent.verticalCenter

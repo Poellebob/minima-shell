@@ -8,7 +8,7 @@ import qs.components.text
 
 ModuleBase {
   id: audioRoot
-  implicitWidth: row.implicitWidth + panel.format.spacing_medium
+  implicitWidth: row.implicitWidth + format.spacing_medium
   property PwNode defaultNode: Pipewire.defaultAudioSink
 
   RowLayout {

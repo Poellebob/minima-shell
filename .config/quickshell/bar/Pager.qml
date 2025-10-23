@@ -10,28 +10,32 @@ import qs.components.text
 
 ModuleBase {
   id: pagerRoot
-  implicitWidth: row.implicitWidth + panel.format.spacing_medium
+  implicitWidth: row.implicitWidth + format.spacing_medium
+
+  // TODO: This component is dependent on the panel because of the screen property.
+  // This needs to be refactored to be able to use it without a panel.
+  property var screen: panel.screen
 
   RowLayout {
     id: row
     anchors.fill: parent
-    anchors.margins: panel.format.spacing_small
-    spacing: panel.format.spacing_small
+    anchors.margins: format.spacing_small
+    spacing: format.spacing_small
 
     Repeater {
       model: Hyprland.workspaces
       delegate: Rectangle {
-        visible: (panel.screen.name === modelData.monitor.name) && modelData.id >= 1
-        color: modelData.active ? panel.colors.primary : panel.colors.secondary
+        visible: (pagerRoot.screen.name === modelData.monitor.name) && modelData.id >= 1
+        color: modelData.active ? colors.primary : colors.secondary
         
-        implicitHeight: panel.format.module_height - panel.format.spacing_small
+        implicitHeight: format.module_height - format.spacing_small
         implicitWidth: implicitHeight
         anchors.verticalCenter: parent.verticalCenter
-        radius: panel.format.module_radius
+        radius: format.module_radius
 
         StyledText{
           text: modelData.id
-          color: panel.colors.on_primary
+          color: colors.on_primary
           anchors.horizontalCenter: parent.horizontalCenter
         }
         
