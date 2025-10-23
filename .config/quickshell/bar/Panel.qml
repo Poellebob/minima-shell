@@ -49,7 +49,7 @@ PanelWindow {
 
   Rectangle {
     anchors.fill: parent
-    color: panel.colors.surface
+    color: colors.surface
     
     Rectangle {
       id: launcher
@@ -61,8 +61,8 @@ PanelWindow {
         left: parent.left
       }
       implicitWidth: open ? (maxwidth > (panel.width/2 - itemsLeft.width - itemsCenter.width/2) ? ( panel.width/2 - itemsLeft.width - itemsCenter.width/2 - 16) : maxwidth) : panel.height
-      color: panel.colors.surface_variant
-      bottomRightRadius: panel.format.radius_large
+      color: colors.surface_variant
+      bottomRightRadius: format.radius_large
       
       Behavior on implicitWidth {
         NumberAnimation {
@@ -107,9 +107,9 @@ PanelWindow {
         Text {
           id: iconText
           text: "󰣇"
-          color: panel.colors.on_background
+          color: colors.on_background
           font.family: "JetBrainsMono Nerd Font Propo"
-          font.pixelSize: panel.format.icon_size
+          font.pixelSize: format.icon_size
           anchors.centerIn: parent
         }
         
@@ -129,10 +129,10 @@ PanelWindow {
       id: itemsLeft
       anchors {
         left: launcher.right
-        leftMargin: panel.format.spacing_medium
+        leftMargin: format.spacing_medium
         verticalCenter: parent.verticalCenter
       }
-      spacing: panel.format.spacing_medium
+      spacing: format.spacing_medium
       
       Systray {
         Layout.alignment: Qt.AlignVCenter
@@ -156,7 +156,7 @@ PanelWindow {
         RowLayout {
           id: itemsCenter
           anchors.centerIn: parent
-          spacing: panel.format.spacing_medium
+          spacing: format.spacing_medium
           
           Audio {
             Layout.alignment: Qt.AlignCenter
@@ -181,10 +181,10 @@ PanelWindow {
       id: itemsRight
       anchors {
         right: parent.right
-        rightMargin: panel.format.spacing_medium
+        rightMargin: format.spacing_medium
         verticalCenter: parent.verticalCenter
       }
-      spacing: panel.format.spacing_medium
+      spacing: format.spacing_medium
       
       Pager {
         Layout.alignment: Qt.AlignVCenter

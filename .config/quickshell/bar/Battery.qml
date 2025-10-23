@@ -2,47 +2,35 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.UPower
+import qs.components.bar
+import qs.components.text
 
-Item {
+ModuleBase {
   id: batteryRoot
-  implicitHeight: rect.implicitHeight
-  implicitWidth: rect.implicitWidth
+  implicitWidth: column.implicitWidth + format.radius_xlarge
   visible: UPower.displayDevice.percentage == 0 ? false : true
+  border.color: colors.primary
+  border.width: UPower.onBattery ? 0 : 1
 
-  Rectangle {
-    id: rect
+  RowLayout {
+    id: column
     anchors.centerIn: parent
-    implicitHeight: panel.format.module_height
-    implicitWidth: column.implicitWidth + panel.format.radius_xlarge
-    color: panel.colors.surface_variant
-    radius: panel.format.radius_small
-    border.color: panel.colors.primary
-    border.width: UPower.onBattery ? 0 : 1
+    spacing: format.spacing_tiny
 
-    RowLayout {
-      id: column
-      anchors.centerIn: parent
-      spacing: panel.format.spacing_tiny
+    StyledText {
+      text: batteryRoot.batteryIcon(UPower.displayDevice.iconName)
+      horizontalAlignment: Text.AlignHCenter
+    }
 
-      Text {
-        text: batteryRoot.batteryIcon(UPower.displayDevice.iconName)
-        color: panel.colors.on_surface_variant
-        font.pixelSize: panel.format.text_size
-        horizontalAlignment: Text.AlignHCenter
-      }
-
-      Text {
-        id: percentageText
-        text: "NaN%"
-        color: panel.colors.on_surface_variant
-        font.pixelSize: panel.format.text_size
-        horizontalAlignment: Text.AlignHCenter
-      }
+    StyledText {
+      id: percentageText
+      text: "NaN%"
+      horizontalAlignment: Text.AlignHCenter
     }
   }
 
   Timer {
-    interval: panel.format.interval_xlong
+    interval: format.interval_xlong
     running: true
     repeat: true
     onTriggered: {
