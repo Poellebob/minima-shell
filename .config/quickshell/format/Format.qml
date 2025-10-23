@@ -4,6 +4,7 @@ import QtQuick.Controls
 Item {
     readonly property int icon_size: 24
     readonly property int big_icon_size: 28
+    readonly property int systray_icon_size: 16
 
     readonly property int text_size: 13
     readonly property int module_height: 22

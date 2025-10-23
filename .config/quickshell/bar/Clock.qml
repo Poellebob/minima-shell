@@ -1,27 +1,17 @@
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import qs.colors
+import qs.components.bar
+import qs.components.text
 
-Item {
+ModuleBase {
   id: clockRoot
-  implicitHeight: rect.implicitHeight
-  implicitWidth: rect.implicitWidth
+  implicitWidth: text.implicitWidth + format.spacing_medium
 
-  Rectangle {
-    id: rect
-    implicitHeight: panel.format.module_height
-    implicitWidth: text.implicitWidth + panel.format.spacing_medium
-    color: panel.colors.surface_variant
-    radius: panel.format.radius_small
-
-    Text {
-      id: text
-      text: Qt.formatDateTime(clock.date, "HH:mm")
-      color: panel.colors.on_surface_variant
-      font.pixelSize: panel.format.text_size
-      anchors.centerIn: parent
-    }
+  StyledText {
+    id: text
+    text: Qt.formatDateTime(clock.date, "HH:mm")
+    anchors.centerIn: parent
   }
 
   SystemClock {

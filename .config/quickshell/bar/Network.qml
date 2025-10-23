@@ -3,38 +3,28 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import qs.colors
+import qs.components.bar
+import qs.components.text
 
-Item {
+ModuleBase {
   id: networkRoot
-  implicitHeight: rect.implicitHeight
-  implicitWidth: rect.implicitWidth
+  implicitWidth: row.implicitWidth + format.spacing_medium
 
-  Rectangle {
-    id: rect
-    implicitHeight: panel.format.module_height
-    implicitWidth: row.implicitWidth + panel.format.spacing_medium
-    color: panel.colors.surface_variant
-    radius: panel.format.radius_small
+  RowLayout {
+    id: row
+    anchors.centerIn: parent
+    spacing: format.spacing_small
 
-    RowLayout {
-      id: row
-      anchors.centerIn: parent
-      spacing: panel.format.spacing_small
+    StyledText {
+      id: networkIcon
+      text: networkRoot.getNetworkIcon()
+      color: networkRoot.isConnected ? colors.on_surface_variant : colors.outline
+    }
 
-      Text {
-        id: networkIcon
-        text: networkRoot.getNetworkIcon()
-        color: networkRoot.isConnected ? panel.colors.on_surface_variant : panel.colors.outline
-        font.pixelSize: panel.format.text_size
-      }
-
-      Text {
-        id: networkText
-        text: networkRoot.displayText
-        color: panel.colors.on_surface_variant
-        font.pixelSize: panel.format.text_size
-        visible: networkRoot.displayText !== ""
-      }
+    StyledText {
+      id: networkText
+      text: networkRoot.displayText
+      visible: networkRoot.displayText !== ""
     }
   }
 
@@ -168,7 +158,7 @@ Item {
   }
 
   Timer {
-    interval: panel.format.interval_long
+    interval: format.interval_long
     running: true
     repeat: true
     onTriggered: {
@@ -178,7 +168,7 @@ Item {
   }
   Timer {
     id: fallbackTimer
-    interval: panel.format.interval_short
+    interval: format.interval_short
     running: false
     onTriggered: {
       if (!networkRoot.isConnected) {
@@ -188,7 +178,7 @@ Item {
   }
 
   Timer {
-    interval: panel.format.interval_longest
+    interval: format.interval_longest
     running: networkRoot.connectionType === "wifi" && networkRoot.isConnected
     repeat: true
     onTriggered: wifiSignalProcess.running = true

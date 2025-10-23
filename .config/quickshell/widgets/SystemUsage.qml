@@ -3,17 +3,25 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import qs.colors
+import qs.format
 
 Item {
   id: sysUsageRoot
+
+  readonly property Format format: Format {}
+  // TODO: The color theme is hardcoded to dark.
+  // This should be made dynamic.
+  readonly property Colors colors: ColorsDark {}
+
   property real cpuPercent: 0
   property real ramPercent: 0
   property real diskPercent: 0
 
   RowLayout {
     anchors.fill: parent
-    anchors.rightMargin: panel.format.spacing_large
-    anchors.leftMargin: panel.format.spacing_large
+    anchors.rightMargin: format.spacing_large
+    anchors.leftMargin: format.spacing_large
     anchors.topMargin: 24
     anchors.bottomMargin: 24
     spacing: 0
@@ -53,7 +61,7 @@ Item {
 
     Timer {
       id: usageTimer
-      interval: panel.format.interval_short
+      interval: format.interval_short
       running: true
       repeat: true
       onTriggered: {
@@ -67,19 +75,19 @@ Item {
     ColumnLayout {
       Layout.fillHeight: true
       Layout.preferredWidth: parent.width * (1 / 3)
-      spacing: panel.format.spacing_large
+      spacing: format.spacing_large
 
       Rectangle {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignHCenter
-        implicitWidth: panel.format.spacing_large
-        color: panel.colors.background
-        radius: panel.format.radius_medium
+        implicitWidth: format.spacing_large
+        color: colors.background
+        radius: format.radius_medium
 
         Rectangle {
           anchors.bottom: parent.bottom
           anchors.horizontalCenter: parent.horizontalCenter
-          color: panel.colors.primary
+          color: colors.primary
           implicitWidth: parent.width
           height: (parent.height / 100) * sysUsageRoot.cpuPercent
           radius: parent.radius
@@ -95,14 +103,14 @@ Item {
 
       Text {
         Layout.alignment: Qt.AlignHCenter
-        Layout.preferredHeight: panel.format.font_size_small
-        Layout.bottomMargin: panel.format.font_size_small
+        Layout.preferredHeight: format.font_size_small
+        Layout.bottomMargin: format.font_size_small
         horizontalAlignment: Text.AlignHCenter
         text: ""
         font.family: "CommitMono Nerd Font Mono"
-        font.pixelSize: panel.format.font_size_xlarge
+        font.pixelSize: format.font_size_xlarge
         font.bold: true
-        color: panel.colors.on_surface_variant
+        color: colors.on_surface_variant
       }
     }
 
@@ -110,19 +118,19 @@ Item {
     ColumnLayout {
       Layout.fillHeight: true
       Layout.preferredWidth: parent.width * (1 / 3)
-      spacing: panel.format.spacing_large
+      spacing: format.spacing_large
 
       Rectangle {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignHCenter
-        implicitWidth: panel.format.spacing_large
-        color: panel.colors.background
-        radius: panel.format.radius_medium
+        implicitWidth: format.spacing_large
+        color: colors.background
+        radius: format.radius_medium
 
         Rectangle {
           anchors.bottom: parent.bottom
           anchors.horizontalCenter: parent.horizontalCenter
-          color: panel.colors.secondary
+          color: colors.secondary
           implicitWidth: parent.width
           height: (parent.height / 100) * sysUsageRoot.ramPercent
           radius: parent.radius
@@ -138,14 +146,14 @@ Item {
 
       Text {
         Layout.alignment: Qt.AlignHCenter
-        Layout.preferredHeight: panel.format.font_size_small
-        Layout.bottomMargin: panel.format.font_size_small
+        Layout.preferredHeight: format.font_size_small
+        Layout.bottomMargin: format.font_size_small
         horizontalAlignment: Text.AlignHCenter
         text: ""
         font.family: "CommitMono Nerd Font Mono"
-        font.pixelSize: panel.format.font_size_xlarge
+        font.pixelSize: format.font_size_xlarge
         font.bold: true
-        color: panel.colors.on_surface_variant
+        color: colors.on_surface_variant
       }
     }
 
@@ -153,19 +161,19 @@ Item {
     ColumnLayout {
       Layout.fillHeight: true
       Layout.preferredWidth: parent.width * (1 / 3)
-      spacing: panel.format.spacing_large
+      spacing: format.spacing_large
 
       Rectangle {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignHCenter
-        implicitWidth: panel.format.spacing_large
-        color: panel.colors.background
-        radius: panel.format.radius_medium
+        implicitWidth: format.spacing_large
+        color: colors.background
+        radius: format.radius_medium
 
         Rectangle {
           anchors.bottom: parent.bottom
           anchors.horizontalCenter: parent.horizontalCenter
-          color: panel.colors.tertiary
+          color: colors.tertiary
           implicitWidth: parent.width
           height: (parent.height / 100) * sysUsageRoot.diskPercent
           radius: parent.radius
@@ -181,14 +189,14 @@ Item {
 
       Text {
         Layout.alignment: Qt.AlignHCenter
-        Layout.preferredHeight: panel.format.font_size_small
-        Layout.bottomMargin: panel.format.font_size_small
+        Layout.preferredHeight: format.font_size_small
+        Layout.bottomMargin: format.font_size_small
         horizontalAlignment: Text.AlignHCenter
         text: "󰋊"
         font.family: "CommitMono Nerd Font Mono"
-        font.pixelSize: panel.format.font_size_large
+        font.pixelSize: format.font_size_large
         font.bold: true
-        color: panel.colors.on_surface_variant
+        color: colors.on_surface_variant
       }
     }
   }
