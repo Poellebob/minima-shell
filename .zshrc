@@ -6,8 +6,7 @@ source ~/.zsh-defer/zsh-defer.plugin.zsh
 # ---------------------------
 # Aliases
 # ---------------------------
-alias homeserver="ssh -i ~/.ssh/slave-under-the-tv slave@85.27.195.162"
-alias htxserver="ssh minecraft@152.115.47.165 -i /home/viggokh/.ssh/HTXminecraft"
+alias newtexdoc = git clone https://github.com/Poellebob/latex-template.git 
 
 # ---------------------------
 # Environment
