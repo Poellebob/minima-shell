@@ -1,0 +1,3 @@
+.qmlls.ini
+colors/**
+!colors/Colors.qml
