@@ -7,7 +7,7 @@ touch ~/.config/quickshell/colors/colors.json
 touch ~/.config/quickshell/colors/ColorsDark.qml
 touch ~/.config/quickshell/colors/ColorsLight.qml
 
-matugen -j hex image "$WALLPAPER_PATH" 2>/dev/null | grep '{' | jq . > ~/.config/quickshell/old/colors/colors.json
+matugen -j hex image "$WALLPAPER_PATH" 2>/dev/null | grep '{' | jq . > ~/.config/quickshell/colors/colors.json
 
 if [ ! -s ~/.config/quickshell/colors/colors.json ]; then
     echo "Error: matugen failed to generate colors.json. Make sure matugen is installed and the path in wallpaper.conf is correct."
@@ -20,7 +20,7 @@ echo "Colors {"
 
 jq -r '.colors.dark  | to_entries | map("  "  + .key + ": \"" + .value + "\"") | .[]' ~/.config/quickshell/colors/colors.json
 
-echo "}") > ~/.config/quickshell/colors/old/ColorsDark.qml
+echo "}") > ~/.config/quickshell/colors/ColorsDark.qml
 
 (echo "import QtQuick"
 echo
@@ -28,4 +28,4 @@ echo "Colors {"
 
 jq -r '.colors.light | to_entries | map("  " + .key + ": \"" + .value + "\"") | .[]' ~/.config/quickshell/colors/colors.json
 
-echo "}") > ~/.config/quickshell/colors/old/ColorsLight.qml
+echo "}") > ~/.config/quickshell/colors/ColorsLight.qml
