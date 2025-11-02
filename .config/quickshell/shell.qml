@@ -1,6 +1,9 @@
+//@ pragma UseQApplication
 import Quickshell
+import QtQuick
 import qs.components
+import qs.bar
 
 ShellRoot {
-  Base {}
+  LazyLoader { active: true; component: Panel {}}
 }
