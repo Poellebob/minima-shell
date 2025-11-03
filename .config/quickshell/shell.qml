@@ -1,9 +1,16 @@
 //@ pragma UseQApplication
-import Quickshell
 import QtQuick
-import qs.components
+import Quickshell
 import qs.bar
+import qs.colors
+import qs.widgets
+import qs.components
 
 ShellRoot {
-  LazyLoader { active: true; component: Panel {}}
+  id: root
+
+  readonly property bool darkTheme: true
+  readonly property bool bar: true
+
+  LazyLoader {active: bar; component: Bar{ isDarkTheme: darkTheme }}
 }

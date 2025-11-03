@@ -1,10 +1,12 @@
+pragma Singleton
 import QtQuick
+import QtQml
 import Quickshell
 import Quickshell.Io
 import qs.colors
 import qs.format
 
-Item {
+Singleton {
   readonly property Colors darkColors: ColorsDark {}
   readonly property Colors lightColors: ColorsLight {}
 
