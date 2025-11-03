@@ -1,7 +1,209 @@
+import QtQuick
+import QtQuick.Layouts
 import Quickshell
-import qs.components
+import Quickshell.Wayland
+import Quickshell.Hyprland
+import qs.format
+import qs.colors
+import qs.widgets
 
-Rect {
+PanelWindow {
+  id: panel
+  readonly property Format format: Format {}
+  required property Colors colors
+  implicitHeight: format.panel_height
+  aboveWindows: true
+  focusable: WlrKeyboardFocus.OnDemand
+
+  anchors {
+    top: true
+    left: true
+    right: true
+  }
+
+  HyprlandFocusGrab {
+    id: grab
+    windows: [panel]
+    active: launcher.open
+    /*onActiveChanged: {
+      if (!active) {
+        launcher.open = false
+        launcherCommand.focus = false
+      }
+    }*/
+  }
+
+  GlobalShortcut {
+    id: launcherShortcut
+    appid: "minima"
+    name: "launcher"
+    description: "Opens the minima-shell launcher"
+
+    onPressed: {
+      if (panel.screen.name == Hyprland.focusedMonitor?.name) {
+        launcher.open = !launcher.open
+        launcherCommand.focus = launcher.open
+      }
+    }
+  }
+
+  Rectangle {
+    anchors.fill: parent
+    color: colors.surface
+    
+    Rectangle {
+      id: launcher
+      readonly property int maxwidth: 400
+      property bool open: false
+      anchors {
+        top: parent.top
+        bottom: parent.bottom
+        left: parent.left
+      }
+      implicitWidth: open ? (maxwidth > (panel.width/2 - itemsLeft.width - itemsCenter.width/2) ? ( panel.width/2 - itemsLeft.width - itemsCenter.width/2 - 16) : maxwidth) : panel.height
+      color: colors.surface_variant
+      bottomRightRadius: format.radius_large
+      
+      Behavior on implicitWidth {
+        NumberAnimation {
+          duration: 200
+          easing.type: Easing.OutCubic
+        }
+      }
+      
+      Item {
+        anchors {
+          left: parent.left
+          top: parent.top
+          bottom: parent.bottom
+          right: icon.left
+        }
+        
+        Launcher {
+          id: launcherCommand
+          visible: launcher.open
+          anchors.fill: parent
+
+          onUp: launcherMenu.up()
+          onDown: launcherMenu.down()
+          onLaunch: launcherMenu.launch()
+          onExit: {
+            launcher.open = false
+            launcherCommand.focus = false
+          }
+        }
+      }
+      
+      Item{
+        id: icon
+        anchors {
+          right: parent.right
+          top: parent.top
+          bottom: parent.bottom
+          left: launcherCommand.right
+        }
+        implicitWidth: panel.height
+        
+        Text {
+          id: iconText
+          text: "󰣇"
+          color: colors.on_background
+          font.family: "JetBrainsMono Nerd Font Propo"
+          font.pixelSize: format.icon_size
+          anchors.centerIn: parent
+        }
+        
+        MouseArea {
+          anchors.fill: parent
+          onClicked: (event) => {
+            if (event.button == Qt.LeftButton) {
+              launcher.open = !launcher.open
+              launcherCommand.focus = launcher.open
+            }
+          }
+        }
+      }
+    }
+    
+    RowLayout {
+      id: itemsLeft
+      anchors {
+        left: launcher.right
+        leftMargin: format.spacing_medium
+        verticalCenter: parent.verticalCenter
+      }
+      spacing: format.spacing_medium
+      
+      Systray {
+        Layout.alignment: Qt.AlignVCenter
+      }
+    }
+    
+    Item {
+      id: itemsCenterWrapper
+      anchors.centerIn: parent
+      implicitWidth: itemsCenter.width
+      implicitHeight: parent.height
+      
+      MouseArea {
+        onClicked: (event) => {
+          if (event.button == Qt.LeftButton) {
+            centerMenu.visible = !centerMenu.visible
+          }
+        }
+        anchors.fill: parent
+        
+        RowLayout {
+          id: itemsCenter
+          anchors.centerIn: parent
+          spacing: format.spacing_medium
+          
+          Audio {
+            Layout.alignment: Qt.AlignCenter
+          }
+          Battery {
+            Layout.alignment: Qt.AlignVCenter
+          }
+          Bluetooth {
+            Layout.alignment: Qt.AlignVCenter
+          }
+          Network {
+            Layout.alignment: Qt.AlignVCenter
+          }
+          Clock {
+            Layout.alignment: Qt.AlignVCenter
+          }
+        }
+      }
+    }
+    
+    RowLayout {
+      id: itemsRight
+      anchors {
+        right: parent.right
+        rightMargin: format.spacing_medium
+        verticalCenter: parent.verticalCenter
+      }
+      spacing: format.spacing_medium
+      
+      Pager {
+        Layout.alignment: Qt.AlignVCenter
+      }
+    }
+  }
   
-}
+  CenterMenu {
+    id: centerMenu
+  }
+  
+  LauncherMenu {
+    id: launcherMenu
+    visible: launcher.open
+    command: launcherCommand.text
 
+    onExecuted: {
+      launcher.open = false
+      launcherCommand.focus = false
+    }
+  }
+}
