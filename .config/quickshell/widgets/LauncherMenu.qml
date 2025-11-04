@@ -3,16 +3,10 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
-import qs.colors
-import qs.format
+import qs
 
 PanelWindow {
   id: launcherMenuRoot
-
-  readonly property Format format: Format {}
-  // TODO: The color theme is hardcoded to dark.
-  // This should be made dynamic.
-  readonly property Colors colors: ColorsDark {}
 
   anchors {
     top: true
@@ -48,24 +42,24 @@ PanelWindow {
       left: parent.left
     }
     implicitHeight: launcherMenuRoot.height
-    bottomRightRadius: format.radius_xlarge + format.spacing_small
-    color: colors.surface_variant
+    bottomRightRadius: Global.format.radius_xlarge + Global.format.spacing_small
+    color: Global.colors.surface_variant
     
     Rectangle {
       id: innerRect
       anchors.fill: parent
-      anchors.topMargin: format.spacing_medium - 2
-      anchors.bottomMargin: format.spacing_large
-      anchors.rightMargin: format.spacing_large
-      anchors.leftMargin: format.spacing_tiny
-      radius: format.radius_large
-      color: colors.surface
+      anchors.topMargin: Global.format.spacing_medium - 2
+      anchors.bottomMargin: Global.format.spacing_large
+      anchors.rightMargin: Global.format.spacing_large
+      anchors.leftMargin: Global.format.spacing_tiny
+      radius: Global.format.radius_large
+      color: Global.colors.surface
       
       ListView {
         id: appList
         anchors.fill: parent
-        anchors.margins: format.spacing_small
-        spacing: format.spacing_tiny
+        anchors.margins: Global.format.spacing_small
+        spacing: Global.format.spacing_tiny
         clip: true
         visible: !launcherMenuRoot.isCustomCommand
         highlightFollowsCurrentItem: true
@@ -104,9 +98,9 @@ PanelWindow {
           property bool selected: modelData == appList.currentItem
           focus: false
           width: appList.width - scrollBar.width
-          height: format.module_height + format.spacing_medium
-          radius: format.radius_medium
-          color: mouseArea.containsMouse || appList.currentItem.modelData == modelData ? colors.surface_container_high : "transparent"
+          height: Global.format.module_height + Global.format.spacing_medium
+          radius: Global.format.radius_medium
+          color: mouseArea.containsMouse || appList.currentItem.modelData == modelData ? Global.colors.surface_container_high : "transparent"
           
           Behavior on color {
             ColorAnimation {
@@ -117,12 +111,12 @@ PanelWindow {
           
           RowLayout {
             anchors.fill: parent
-            anchors.margins: format.spacing_small
-            spacing: format.spacing_medium
+            anchors.margins: Global.format.spacing_small
+            spacing: Global.format.spacing_medium
             
             IconImage {
-              Layout.preferredWidth: format.icon_size
-              Layout.preferredHeight: format.icon_size
+              Layout.preferredWidth: Global.format.icon_size
+              Layout.preferredHeight: Global.format.icon_size
               Layout.alignment: Qt.AlignVCenter
               source: appItem.modelData.icon ? Quickshell.iconPath(appItem.modelData.icon) : ""
             }
@@ -135,8 +129,8 @@ PanelWindow {
               Text {
                 Layout.fillWidth: true
                 text: appItem.modelData.name
-                color: colors.on_surface_variant
-                font.pixelSize: format.text_size
+                color: Global.colors.on_surface_variant
+                font.pixelSize: Global.format.text_size
                 font.bold: true
                 elide: Text.ElideRight
               }
@@ -144,8 +138,8 @@ PanelWindow {
               Text {
                 Layout.fillWidth: true
                 text: appItem.modelData.description || ""
-                color: colors.outline
-                font.pixelSize: format.font_size_small
+                color: Global.colors.outline
+                font.pixelSize: Global.format.font_size_small
                 elide: Text.ElideRight
                 visible: text !== ""
               }
@@ -177,14 +171,14 @@ PanelWindow {
       Item {
         id: customCommandArea
         anchors.fill: parent
-        anchors.margins: format.spacing_small
+        anchors.margins: Global.format.spacing_small
         visible: launcherMenuRoot.isCustomCommand
         
         Text {
           anchors.centerIn: parent
           text: "Custom Command Mode\n" + launcherMenuRoot.command
-          color: colors.on_surface_variant
-          font.pixelSize: format.text_size
+          color: Global.colors.on_surface_variant
+          font.pixelSize: Global.format.text_size
           horizontalAlignment: Text.AlignHCenter
         }
       }

@@ -1,12 +1,12 @@
 import QtQuick
 import Quickshell
-import qs.colors
 import qs.components.bar
 import qs.components.text
+import qs
 
 ModuleBase {
   id: clockRoot
-  implicitWidth: text.implicitWidth + format.spacing_medium
+  implicitWidth: text.implicitWidth + Global.format.spacing_medium
 
   StyledText {
     id: text

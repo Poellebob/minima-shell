@@ -11,7 +11,7 @@ Singleton {
   readonly property Colors lightColors: ColorsLight {}
 
   readonly property Colors colors: settings["Panel"]["darkTheme"] ? darkColors : lightColors
-  readonly property Format format: Format 
+  readonly property Format format: Format {}
 
   FileView {
     id: confFile

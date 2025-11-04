@@ -8,7 +8,7 @@ touch ~/.config/quickshell/colors/colors.json
 matugen -j hex image "$WALLPAPER_PATH" 2>/dev/null | grep '{' | jq . > ~/.config/quickshell/colors/colors.json
 
 if [ ! -s ~/.config/quickshell/colors/colors.json ]; then
-    echo "Error: matugen failed to generate colors.json. Make sure matugen is installed and the path in wallpaper.conf is correct."
+    echo "Error: matugen failed to generate Global.colors.json. Make sure matugen is installed and the path in wallpaper.conf is correct."
     exit 1
 fi
 

@@ -3,15 +3,12 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
-import qs.format
-import qs.colors
 import qs.widgets
+import qs
 
 PanelWindow {
   id: panel
-  readonly property Format format: Format {}
-  required property Colors colors
-  implicitHeight: format.panel_height
+  implicitHeight: Global.format.panel_height
   aboveWindows: true
   focusable: WlrKeyboardFocus.OnDemand
 
@@ -23,7 +20,7 @@ PanelWindow {
 
   HyprlandFocusGrab {
     id: grab
-    windows: [panel]
+    windows: [launcherMenu, panel]
     active: launcher.open
     /*onActiveChanged: {
       if (!active) {
@@ -44,12 +41,13 @@ PanelWindow {
         launcher.open = !launcher.open
         launcherCommand.focus = launcher.open
       }
+      console.log(Global.colors)
     }
   }
 
   Rectangle {
     anchors.fill: parent
-    color: colors.surface
+    color: Global.colors.surface
     
     Rectangle {
       id: launcher
@@ -61,8 +59,8 @@ PanelWindow {
         left: parent.left
       }
       implicitWidth: open ? (maxwidth > (panel.width/2 - itemsLeft.width - itemsCenter.width/2) ? ( panel.width/2 - itemsLeft.width - itemsCenter.width/2 - 16) : maxwidth) : panel.height
-      color: colors.surface_variant
-      bottomRightRadius: format.radius_large
+      color: Global.colors.surface_variant
+      bottomRightRadius: Global.format.radius_large
       
       Behavior on implicitWidth {
         NumberAnimation {
@@ -107,9 +105,9 @@ PanelWindow {
         Text {
           id: iconText
           text: "󰣇"
-          color: colors.on_background
+          color: Global.colors.on_background
           font.family: "JetBrainsMono Nerd Font Propo"
-          font.pixelSize: format.icon_size
+          font.pixelSize: Global.format.icon_size
           anchors.centerIn: parent
         }
         
@@ -129,10 +127,10 @@ PanelWindow {
       id: itemsLeft
       anchors {
         left: launcher.right
-        leftMargin: format.spacing_medium
+        leftMargin: Global.format.spacing_medium
         verticalCenter: parent.verticalCenter
       }
-      spacing: format.spacing_medium
+      spacing: Global.format.spacing_medium
       
       Systray {
         Layout.alignment: Qt.AlignVCenter
@@ -156,7 +154,7 @@ PanelWindow {
         RowLayout {
           id: itemsCenter
           anchors.centerIn: parent
-          spacing: format.spacing_medium
+          spacing: Global.format.spacing_medium
           
           Audio {
             Layout.alignment: Qt.AlignCenter
@@ -181,10 +179,10 @@ PanelWindow {
       id: itemsRight
       anchors {
         right: parent.right
-        rightMargin: format.spacing_medium
+        rightMargin: Global.format.spacing_medium
         verticalCenter: parent.verticalCenter
       }
-      spacing: format.spacing_medium
+      spacing: Global.format.spacing_medium
       
       Pager {
         Layout.alignment: Qt.AlignVCenter
