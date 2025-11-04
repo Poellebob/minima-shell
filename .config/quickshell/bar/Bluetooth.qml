@@ -4,20 +4,21 @@ import Quickshell
 import Quickshell.Io
 import qs.components.bar
 import qs.components.text
+import qs
 
 ModuleBase {
   id: bluetoothRoot
-  implicitWidth: row.implicitWidth + format.spacing_medium
+  implicitWidth: row.implicitWidth + Global.format.spacing_medium
 
   RowLayout {
     id: row
     anchors.centerIn: parent
-    spacing: format.spacing_small
+    spacing: Global.format.spacing_small
 
     StyledText {
       id: bluetoothIcon
       text: bluetoothRoot.bluetoothEnabled ? "󰂯" : "󰂲"
-      color: bluetoothRoot.bluetoothEnabled ? colors.on_surface_variant : colors.outline
+      color: bluetoothRoot.bluetoothEnabled ? Global.colors.on_surface_variant : Global.colors.outline
     }
 
     StyledText {
@@ -99,14 +100,14 @@ ModuleBase {
   }
 
   Timer {
-    interval: format.interval_long
+    interval: Global.format.interval_long
     running: true
     repeat: true
     onTriggered: bluetoothProcess.running = true
   }
 
   Timer {
-    interval: format.interval_medium
+    interval: Global.format.interval_medium
     running: true
     repeat: true
     onTriggered: bluetoothRoot.updateDisplayText()

@@ -2,7 +2,6 @@
 import QtQuick
 import Quickshell
 import qs.bar
-import qs.colors
 import qs.widgets
 import qs.components
 
@@ -12,5 +11,5 @@ ShellRoot {
   readonly property bool darkTheme: true
   readonly property bool bar: true
 
-  LazyLoader {active: bar; component: Bar{ isDarkTheme: darkTheme }}
+  LazyLoader {active: bar; component: Bar {}}
 }

@@ -3,16 +3,10 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
-import qs.colors
-import qs.format
+import qs
 
 Item {
   id: dateRoot
-
-  readonly property Format format: Format {}
-  // TODO: The color theme is hardcoded to dark.
-  // This should be made dynamic.
-  readonly property Colors colors: ColorsDark {}
 
   property string currentTime: ""
   property string currentDate: ""
@@ -22,7 +16,7 @@ Item {
   // Timer to update the time every second
   Timer {
     id: timeTimer
-    interval: format.interval_short
+    interval: Global.format.interval_short
     running: true
     repeat: true
     onTriggered: {
@@ -43,10 +37,10 @@ Item {
   
   RowLayout {
     anchors.fill: parent
-    anchors.rightMargin: format.spacing_large
-    anchors.leftMargin: format.spacing_large
-    anchors.topMargin: format.spacing_large
-    anchors.bottomMargin: format.spacing_large * 2
+    anchors.rightMargin: Global.format.spacing_large
+    anchors.leftMargin: Global.format.spacing_large
+    anchors.topMargin: Global.format.spacing_large
+    anchors.bottomMargin: Global.format.spacing_large * 2
     spacing: 0
     
     // Centered clock display
@@ -54,24 +48,24 @@ Item {
       Layout.fillHeight: true
       Layout.fillWidth: true
       Layout.alignment: Qt.AlignCenter
-      spacing: format.spacing_medium
+      spacing: Global.format.spacing_medium
       
       Text {
         Layout.alignment: Qt.AlignHCenter
         text: dateRoot.currentTime
         font.family: "CommitMono Nerd Font Mono"
-        font.pixelSize: format.font_size_xlarge
+        font.pixelSize: Global.format.font_size_xlarge
         font.bold: true
-        color: colors.on_surface_variant
+        color: Global.colors.on_surface_variant
         horizontalAlignment: Text.AlignHCenter
       }
       
       Rectangle {
         Layout.alignment: Qt.AlignHCenter
-        Layout.topMargin: format.spacing_small
+        Layout.topMargin: Global.format.spacing_small
         implicitWidth: 80
         implicitHeight: 2
-        color: colors.primary
+        color: Global.colors.primary
         radius: 1
       }
 
@@ -79,9 +73,9 @@ Item {
         Layout.alignment: Qt.AlignHCenter
         text: dateRoot.currentDay
         font.family: "CommitMono Nerd Font Mono"
-        font.pixelSize: format.font_size_medium
+        font.pixelSize: Global.format.font_size_medium
         font.bold: true
-        color: colors.on_surface_variant
+        color: Global.colors.on_surface_variant
         horizontalAlignment: Text.AlignHCenter
       }
 
@@ -89,9 +83,9 @@ Item {
         Layout.alignment: Qt.AlignHCenter
         text: dateRoot.currentDate
         font.family: "CommitMono Nerd Font Mono"
-        font.pixelSize: format.font_size_medium
+        font.pixelSize: Global.format.font_size_medium
         font.bold: true
-        color: colors.on_surface_variant
+        color: Global.colors.on_surface_variant
         horizontalAlignment: Text.AlignHCenter
       }
     }

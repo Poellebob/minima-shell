@@ -4,18 +4,19 @@ import Quickshell
 import Quickshell.Services.UPower
 import qs.components.bar
 import qs.components.text
+import qs
 
 ModuleBase {
   id: batteryRoot
-  implicitWidth: column.implicitWidth + format.radius_xlarge
+  implicitWidth: column.implicitWidth + Global.format.radius_xlarge
   visible: UPower.displayDevice.percentage == 0 ? false : true
-  border.color: colors.primary
+  border.color: Global.colors.primary
   border.width: UPower.onBattery ? 0 : 1
 
   RowLayout {
     id: column
     anchors.centerIn: parent
-    spacing: format.spacing_tiny
+    spacing: Global.format.spacing_tiny
 
     StyledText {
       text: batteryRoot.batteryIcon(UPower.displayDevice.iconName)
@@ -30,7 +31,7 @@ ModuleBase {
   }
 
   Timer {
-    interval: format.interval_xlong
+    interval: Global.format.interval_xlong
     running: true
     repeat: true
     onTriggered: {

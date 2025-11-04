@@ -2,19 +2,11 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
-import qs.colors
-import qs.format
+import qs
 
 PopupWindow {
   id: menuRoot
 
-  readonly property Format format: Format {}
-  // TODO: The color theme is hardcoded to dark.
-  // This should be made dynamic.
-  readonly property Colors colors: ColorsDark {}
-
-  // TODO: This component is dependent on the panel to anchor itself.
-  // This needs to be refactored to be able to use it without a panel.
   property var bar: panel
   anchor.window: bar
   anchor.rect.x: bar.width / 2 - width / 2
@@ -48,7 +40,7 @@ PopupWindow {
   
   Timer {
     id: fetchTimer
-    interval: format.interval_xlong
+    interval: Global.format.interval_xlong
     running: true
     repeat: true
     onTriggered: {
@@ -59,14 +51,14 @@ PopupWindow {
   Rectangle {
     id: menuIURoot
     anchors.fill: parent
-    bottomLeftRadius: format.radius_xlarge + format.spacing_small
-    bottomRightRadius: format.radius_xlarge + format.spacing_small
-    color: colors.background
+    bottomLeftRadius: Global.format.radius_xlarge + Global.format.spacing_small
+    bottomRightRadius: Global.format.radius_xlarge + Global.format.spacing_small
+    color: Global.colors.background
   }
   
   Timer {
     id: hideTimer
-    interval: format.interval_short
+    interval: Global.format.interval_short
     running: false
     repeat: false
     onTriggered: {
@@ -87,26 +79,26 @@ PopupWindow {
 
     Item {
       anchors.fill: parent
-      anchors.leftMargin: format.spacing_large
-      anchors.rightMargin: format.spacing_large
-      anchors.bottomMargin: format.spacing_large
-      anchors.topMargin: format.spacing_medium
+      anchors.leftMargin: Global.format.spacing_large
+      anchors.rightMargin: Global.format.spacing_large
+      anchors.bottomMargin: Global.format.spacing_large
+      anchors.topMargin: Global.format.spacing_medium
 
       //visible: menuRoot.height == menuRoot.visibleHeight ? true : false
       
       RowLayout {
-        spacing: format.spacing_large
+        spacing: Global.format.spacing_large
         anchors.fill: parent
         
         // Left column
         ColumnLayout {
-          spacing: format.spacing_large
+          spacing: Global.format.spacing_large
           Layout.fillHeight: true
           Layout.preferredWidth: parent.width * 0.8
           
           // Top row with small square and wide rectangle
           RowLayout {
-            spacing: format.spacing_large
+            spacing: Global.format.spacing_large
             Layout.fillWidth: true
             Layout.preferredHeight: parent.height * 0.235
             
@@ -114,8 +106,8 @@ PopupWindow {
               id: profileIcon
               Layout.preferredWidth: parent.height
               Layout.preferredHeight: parent.height
-              color: colors.inverse_on_surface
-              radius: format.radius_large
+              color: Global.colors.inverse_on_surface
+              radius: Global.format.radius_large
 
               DateDisplay{
                 anchors.fill: parent
@@ -126,19 +118,19 @@ PopupWindow {
               id: fetchOutput
               Layout.fillWidth: true
               Layout.preferredHeight: parent.height
-              color: colors.inverse_on_surface
-              radius: format.radius_large
+              color: Global.colors.inverse_on_surface
+              radius: Global.format.radius_large
               
               Text {
                 id: fetchText
                 anchors.fill: parent
-                anchors.margins: format.spacing_medium
+                anchors.margins: Global.format.spacing_medium
                 text: menuRoot.fetchString
                 font.family: "monospace"
                 font.bold: true
                 wrapMode: Text.WrapAnywhere
                 textFormat: Text.RichText
-                color: colors.on_surface_variant
+                color: Global.colors.on_surface_variant
               }
             }
           }
@@ -148,8 +140,8 @@ PopupWindow {
             id: mediaControls
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: colors.inverse_on_surface
-            radius: format.radius_large
+            color: Global.colors.inverse_on_surface
+            radius: Global.format.radius_large
             
             MediaPlayer {
               anchors.fill: parent
@@ -161,8 +153,8 @@ PopupWindow {
             id: systemUsage
             Layout.fillWidth: true
             Layout.preferredHeight: parent.height * 0.2
-            color: colors.inverse_on_surface
-            radius: format.radius_large
+            color: Global.colors.inverse_on_surface
+            radius: Global.format.radius_large
 
             NetworkBluetoothStatus {
               anchors.fill: parent
@@ -175,8 +167,8 @@ PopupWindow {
           id: audioAndBrightness
           Layout.fillHeight: true
           Layout.preferredWidth: parent.height * 0.235
-          color: colors.inverse_on_surface
-          radius: format.radius_large
+          color: Global.colors.inverse_on_surface
+          radius: Global.format.radius_large
           
           SystemUsage {
             anchors.fill: parent

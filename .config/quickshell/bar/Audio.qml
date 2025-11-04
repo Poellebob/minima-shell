@@ -5,10 +5,11 @@ import Quickshell.Services.Pipewire
 import Quickshell.Widgets
 import qs.components.bar
 import qs.components.text
+import qs
 
 ModuleBase {
   id: audioRoot
-  implicitWidth: row.implicitWidth + format.spacing_medium
+  implicitWidth: row.implicitWidth + Global.format.spacing_medium
   property PwNode defaultNode: Pipewire.defaultAudioSink
 
   RowLayout {

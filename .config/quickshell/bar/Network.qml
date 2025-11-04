@@ -2,23 +2,23 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
-import qs.colors
 import qs.components.bar
 import qs.components.text
+import qs
 
 ModuleBase {
   id: networkRoot
-  implicitWidth: row.implicitWidth + format.spacing_medium
+  implicitWidth: row.implicitWidth + Global.format.spacing_medium
 
   RowLayout {
     id: row
     anchors.centerIn: parent
-    spacing: format.spacing_small
+    spacing: Global.format.spacing_small
 
     StyledText {
       id: networkIcon
       text: networkRoot.getNetworkIcon()
-      color: networkRoot.isConnected ? colors.on_surface_variant : colors.outline
+      color: networkRoot.isConnected ? Global.colors.on_surface_variant : Global.colors.outline
     }
 
     StyledText {
@@ -158,7 +158,7 @@ ModuleBase {
   }
 
   Timer {
-    interval: format.interval_long
+    interval: Global.format.interval_long
     running: true
     repeat: true
     onTriggered: {
@@ -168,7 +168,7 @@ ModuleBase {
   }
   Timer {
     id: fallbackTimer
-    interval: format.interval_short
+    interval: Global.format.interval_short
     running: false
     onTriggered: {
       if (!networkRoot.isConnected) {
@@ -178,7 +178,7 @@ ModuleBase {
   }
 
   Timer {
-    interval: format.interval_longest
+    interval: Global.format.interval_longest
     running: networkRoot.connectionType === "wifi" && networkRoot.isConnected
     repeat: true
     onTriggered: wifiSignalProcess.running = true
