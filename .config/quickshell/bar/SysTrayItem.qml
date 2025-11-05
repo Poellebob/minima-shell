@@ -5,7 +5,7 @@ import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import Quickshell.DBusMenu
 import Qt5Compat.GraphicalEffects
-import qs.components.popup
+import qs.components.widget
 import qs
 
 MouseArea {
@@ -47,9 +47,8 @@ MouseArea {
 
   PopupMenu {
     id: menu
-    anchor.window: bar
-    anchor.rect.x: sysTrayItem.x
-    anchor.rect.y: bar.implicitHeight
+    window: bar
+    x: sysTrayItem.x
     anchor.edges: Edges.Top
     model: menuOpen.children
     onItemTriggered: menu.visible = false

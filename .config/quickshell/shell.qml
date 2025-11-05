@@ -2,7 +2,6 @@
 import QtQuick
 import Quickshell
 import qs.bar
-import qs.widgets
 import qs.components
 
 ShellRoot {

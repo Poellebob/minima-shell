@@ -2,15 +2,13 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
+import qs.components.widget
 import qs
 
-PopupWindow {
+DropdownWindow {
   id: menuRoot
 
-  property var bar: panel
-  anchor.window: bar
-  anchor.rect.x: bar.width / 2 - width / 2
-  anchor.rect.y: bar.height
+  x: window.width / 2 - width / 2
 
   implicitHeight: visible ? visibleHeight : 1
   implicitWidth: 800
