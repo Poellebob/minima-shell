@@ -5,14 +5,14 @@ import Quickshell.DBusMenu
 import qs.components.text
 import qs
 
-PopupWindow {
+DropdownWindow {
   id: menu
   color: "transparent"
 
   implicitWidth: 200
   implicitHeight: items.height + Global.format.spacing_large + Global.format.spacing_small
 
-  property var model
+  required property var model
   signal itemTriggered()
 
   Timer {

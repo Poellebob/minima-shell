@@ -3,7 +3,8 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
-import qs.widgets
+import qs.widgets.centerMenu
+import qs.widgets.launcher
 import qs
 
 PanelWindow {
@@ -192,6 +193,7 @@ PanelWindow {
   
   CenterMenu {
     id: centerMenu
+    window: panel
   }
   
   LauncherMenu {
