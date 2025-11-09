@@ -12,6 +12,8 @@ ModuleBase {
   implicitWidth: row.implicitWidth + Global.format.spacing_medium
   property PwNode defaultNode: Pipewire.defaultAudioSink
 
+  signal activated()
+
   RowLayout {
     id: row
     anchors.centerIn: parent
@@ -45,6 +47,10 @@ ModuleBase {
     onClicked: {
       if (mouse.button === Qt.MiddleButton && defaultNode) {
         defaultNode.audio.muted = !defaultNode.audio.muted
+      }
+
+      if (mouse.button === Qt.RightButton && defaultNode) {
+        activated()
       }
     }
     onWheel: {
