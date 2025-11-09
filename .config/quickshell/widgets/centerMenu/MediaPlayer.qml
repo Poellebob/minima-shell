@@ -36,7 +36,7 @@ Item {
         Rectangle {
           id: tabRoot
           required property MprisPlayer modelData
-          visible: modelData.trackArtUrl ? true : false
+          visible: true
           implicitHeight: parent.height
           Layout.fillWidth: true
           radius: Global.format.radius_large

@@ -160,7 +160,6 @@ PanelWindow {
           
           Audio {
             Layout.alignment: Qt.AlignCenter
-            onActivated: audioControll.visible != audioControll.visible
           }
           Battery {
             Layout.alignment: Qt.AlignVCenter
@@ -191,11 +190,6 @@ PanelWindow {
         Layout.alignment: Qt.AlignVCenter
       }
     }
-  }
-
-  AudioControll {
-    id: audioControll
-    window: panel
   }
   
   CenterMenu {
