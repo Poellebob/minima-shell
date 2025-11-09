@@ -8,7 +8,40 @@ import qs
 DropdownWindow {
   id: menuRoot
 
-  implicitWidth: 200
-  x: 300
+  implicitWidth: 400
+  color: "transparent"
+
+  Timer {
+    id: hideTimer
+    interval: Global.format.interval_short
+    running: false
+    repeat: false
+    onTriggered: {
+      menuRoot.visible = false
+    }
+  }
+  Rectangle {
+    anchors.margins: Global.format.radius_large
+    anchors.fill: parent
+    radius: Global.format.radius_large
+    ColumnLayout {
+      anchors.left: parent.left
+      anchors.right: parent.right
+      RowLayout {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        Layout.margins: 30
+        height: Global.format.big_icon_size + Global.format.radius_small
+
+        Rectangle {
+          color: Global.colors.inverse_on_surface
+          implicitHeight: parent.height
+          Layout.fillWidth: true
+          radius: Global.format.radius_large
+        }
+      }
+    }
+  }
 }
 

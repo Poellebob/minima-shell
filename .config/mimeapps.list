@@ -47,3 +47,6 @@ x-scheme-handler/https=zen.desktop
 x-scheme-handler/mailto=userapp-Thunderbird-EV5AD3.desktop
 x-scheme-handler/mid=userapp-Thunderbird-EV5AD3.desktop
 x-scheme-handler/nxm=com.nexusmods.app.desktop
+application/x-ms-dos-executable=wine.desktop
+application/x-msi=wine.desktop
+application/x-ms-shortcut=wine.desktop

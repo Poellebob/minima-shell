@@ -5,14 +5,13 @@ import Quickshell.Services.Pipewire
 import Quickshell.Widgets
 import qs.components.bar
 import qs.components.text
+import qs.widgets.audio
 import qs
 
 ModuleBase {
   id: audioRoot
   implicitWidth: row.implicitWidth + Global.format.spacing_medium
   property PwNode defaultNode: Pipewire.defaultAudioSink
-
-  signal activated()
 
   RowLayout {
     id: row
@@ -44,13 +43,17 @@ ModuleBase {
   MouseArea {
     anchors.fill: parent
     acceptedButtons: Qt.MiddleButton | Qt.RightButton
-    onClicked: {
+    onClicked: (mouse) => {
       if (mouse.button === Qt.MiddleButton && defaultNode) {
         defaultNode.audio.muted = !defaultNode.audio.muted
       }
 
       if (mouse.button === Qt.RightButton && defaultNode) {
-        activated()
+        menu.visible = !menu.visible
+        console.log(audioRoot.mapToGlobal(audioRoot.width / 2, 0).x - menu.width / 2)
+        console.log((panel.width - audioRoot.parent.width) / 2 + audioRoot.x + (audioRoot.width - menu.width) / 2)
+        console.log(typeof(audioRoot.mapToGlobal(audioRoot.width / 2, 0).x - menu.width / 2))
+        console.log(typeof((panel.width - audioRoot.parent.width) / 2 + audioRoot.x + (audioRoot.width - menu.width) / 2))
       }
     }
     onWheel: {
@@ -58,5 +61,11 @@ ModuleBase {
       const delta = wheel.angleDelta.y > 0 ? 0.05 : -0.05
       defaultNode.audio.volume = Math.max(0.0, Math.min(1.0, defaultNode.audio.volume + delta))
     }
+  }
+
+  AudioControll {
+    id: menu
+    window: panel
+    x: (panel.width - audioRoot.parent.width) / 2 + audioRoot.x + (audioRoot.width - width) / 2
   }
 }

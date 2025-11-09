@@ -23,58 +23,39 @@ DropdownWindow {
     onTriggered: menu.visible = false
   }
 
-  MouseArea {
-    id: menuMouseArea
-    anchors.fill: parent
-    hoverEnabled: true
-    acceptedButtons: Qt.NoButton
-    propagateComposedEvents: true
+  ColumnLayout {
+    id: items
+    spacing: Global.format.radius_medium
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
 
-    onEntered: hideTimer.stop()
-    onExited: hideTimer.restart()
+    Repeater {
+      model: menu.model
+      anchors.verticalCenter: parent.verticalCenter
 
-    Rectangle {
-      id: rect
-      color: Global.colors.background
-      implicitWidth: parent.width
-      implicitHeight: parent.height
-      bottomLeftRadius: Global.format.radius_xlarge
-      bottomRightRadius: Global.format.radius_xlarge
-      anchors.fill: parent
-
-      ColumnLayout {
-        id: items
-        spacing: Global.format.radius_medium
+      Rectangle {
+        required property QsMenuEntry modelData
+        color: mouseArea.containsMouse && !modelData.isSeparator ? Global.colors.surface_container_high : Global.colors.surface_variant
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
+        implicitWidth: menu.width - Global.format.spacing_large
+        implicitHeight: modelData.isSeparator ? 2 : Global.format.icon_size
+        radius: Global.format.radius_large
 
-        Repeater {
-          model: menu.model
-          anchors.verticalCenter: parent.verticalCenter
+        Behavior on color {
+          ColorAnimation {
+            duration: 150
+            easing.type: Easing.OutCubic
+          }
+        }
 
-          Rectangle {
-            required property QsMenuEntry modelData
-            color: mouseArea.containsMouse && !modelData.isSeparator ? Global.colors.surface_container_high : Global.colors.surface_variant
-            anchors.horizontalCenter: parent.horizontalCenter
-            implicitWidth: menu.width - Global.format.spacing_large
-            implicitHeight: modelData.isSeparator ? 2 : Global.format.icon_size
-            radius: Global.format.radius_large
-
-            Behavior on color {
-              ColorAnimation {
-                duration: 150
-                easing.type: Easing.OutCubic
-              }
-            }
-
-            StyledText {
-              visible: !modelData.isSeparator
-              anchors.fill: parent
-              color: Global.colors.on_background
-              text: modelData.text
-              anchors.left: parent.left
-              anchors.leftMargin: Global.format.font_size_small
-              verticalAlignment: Text.AlignVCenter
+        StyledText {
+          visible: !modelData.isSeparator
+          anchors.fill: parent
+          color: Global.colors.on_background
+          text: modelData.text
+          anchors.left: parent.left
+          anchors.leftMargin: Global.format.font_size_small
+          verticalAlignment: Text.AlignVCenter
               horizontalAlignment: Text.AlignLeft
             }
 
@@ -93,6 +74,4 @@ DropdownWindow {
           }
         }
       }
-    }
-  }
 }
