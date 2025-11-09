@@ -19,7 +19,7 @@ ModuleBase {
     spacing: Global.format.spacing_tiny
 
     StyledText {
-      text: batteryRoot.batteryIcon(UPower.displayDevice.iconName)
+      id: batteryIcon
       horizontalAlignment: Text.AlignHCenter
     }
 
@@ -34,13 +34,18 @@ ModuleBase {
     interval: Global.format.interval_xlong
     running: true
     repeat: true
-    onTriggered: {
-      // Force property refresh
-      percentageText.text = UPower.displayDevice.ready
-        ? Math.round(UPower.displayDevice.percentage * 100) + "%" : "—"
-    }
+    onTriggered: displayInfo() 
   }
-  function batteryIcon(name) {
+
+  function displayInfo() {
+    // Force property refresh
+    percentageText.text = UPower.displayDevice.ready
+    ? Math.round(UPower.displayDevice.percentage * 100) + "%" : "—"
+
+    batteryIcon.text = batteryRoot.getBatteryIcon(UPower.displayDevice.iconName)
+  }
+
+  function getBatteryIcon(name) {
     switch (name) {
     case "battery-empty-symbolic":
         return "󰂎";
