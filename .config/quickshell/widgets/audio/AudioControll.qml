@@ -21,9 +21,11 @@ DropdownWindow {
     }
   }
   Rectangle {
-    anchors.margins: Global.format.radius_large
+    anchors.margins: Global.format.spacing_large
+    anchors.topMargin: Global.format.spacing_medium
     anchors.fill: parent
     radius: Global.format.radius_large
+    color: Global.colors.on_surface
     ColumnLayout {
       anchors.left: parent.left
       anchors.right: parent.right
@@ -31,7 +33,7 @@ DropdownWindow {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        Layout.margins: 30
+        anchors.margins: Global.format.spaceing_large
         height: Global.format.big_icon_size + Global.format.radius_small
 
         Rectangle {
@@ -40,6 +42,8 @@ DropdownWindow {
           Layout.fillWidth: true
           radius: Global.format.radius_large
         }
+
+        
       }
     }
   }
