@@ -46,21 +46,24 @@ ModuleBase {
   }
 
   function getBatteryIcon(name) {
+    console.log(name)
     switch (name) {
     case "battery-empty-symbolic":
-        return "󰂎";
+      return "󰂎";
     case "battery-caution-symbolic":
-        return "󰂃";
+      return "󰂃";
     case "battery-low-symbolic":
-        return "󱊡";
+      return "󱊡";
     case "battery-good-symbolic":
-        return "󱊢";
+      return "󱊢";
     case "battery-full-symbolic":
-        return "󱊣";
+      return "󱊣";
     case "battery-charging-symbolic":
-        return "󰂄";
+      return "󰂄";
+    case "battery-low-charging-symbolic":
+      return "󰂄";
     default:
-        return "󰁹";
+      return "󰁹";
     }
   }
 }
