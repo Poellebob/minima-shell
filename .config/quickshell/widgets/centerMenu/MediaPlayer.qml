@@ -311,3 +311,4 @@ Item {
     return (hours > 0 ? hours + ":" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + Math.floor(seconds);
   }
 }
+
