@@ -32,41 +32,12 @@ DropdownWindow {
       anchors.margins: Global.format.spacing_large
       spacing: Global.format.spacing_medium
       
-      RowLayout {
-        id: tabLayout
-        spacing: Global.format.spacing_medium
-        Layout.fillWidth: true
-        Layout.preferredHeight: Global.format.big_icon_size + Global.format.radius_small
-        
-        Rectangle {
-          id: tab1
-          implicitHeight: parent.height
-          Layout.fillWidth: true
-          radius: Global.format.radius_large
-          color: Global.colors.surface
-          
-          Behavior on color {
-            ColorAnimation {
-              duration: 150
-              easing.type: Easing.OutCubic
-            }
-          }
-        }
-        
-        Rectangle {
-          id: tab2
-          implicitHeight: parent.height
-          Layout.fillWidth: true
-          radius: Global.format.radius_large
-          color: Global.colors.surface
-          
-          Behavior on color {
-            ColorAnimation {
-              duration: 150
-              easing.type: Easing.OutCubic
-            }
-          }
-        }
+      Tabbar {
+        id: tabs
+        model: [
+          {text: "hello"},
+          {text: "joho"}
+        ]
       }
     }
   }

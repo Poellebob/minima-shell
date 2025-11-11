@@ -29,9 +29,7 @@ PopupWindow {
       anchors.fill: parent
       color: Global.colors.surface
       bottomLeftRadius: Global.format.radius_xlarge
-      bottomRightRadius: Global.format.radius_xlarge
-
-          
+      bottomRightRadius: Global.format.radius_xlarge 
     }
   }
 }
