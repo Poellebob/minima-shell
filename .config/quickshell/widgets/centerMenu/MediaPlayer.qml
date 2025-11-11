@@ -3,7 +3,7 @@ import Quickshell.Services.Mpris
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Widgets
-import qs.components
+import qs.components.widget
 import qs
 
 Item {
@@ -30,59 +30,29 @@ Item {
       height: Global.format.big_icon_size + Global.format.radius_small
       visible: tabs.count ? true : false
 
-      Repeater {
+      Tabbar {
         id: tabs
         model: Mpris.players
-        Rectangle {
-          id: tabRoot
-          required property MprisPlayer modelData
-          visible: true
-          implicitHeight: parent.height
-          Layout.fillWidth: true
-          radius: Global.format.radius_large
-          color: mediaPlayerRoot.player === modelData ? Global.colors.surface : (mouseArea.containsMouse ? Global.colors.surface : Global.colors.surface_variant)
-
-          IconImage {
-            id: icon
-            anchors.centerIn: parent
-            width: Global.format.big_icon_size
-            height: Global.format.big_icon_size
-            source: {
-              if (modelData.desktopEntry) {
-                var desktopEntry = DesktopEntries.byId(modelData.desktopEntry);
-                if (desktopEntry && desktopEntry.icon) {
-                  console.log("Using desktop entry icon:", desktopEntry.icon);
-                  return Quickshell.iconPath(desktopEntry.icon);
-                }
+        delegate: Tab {
+          iconSource: {
+            if (modelData.desktopEntry) {
+              var desktopEntry = DesktopEntries.byId(modelData.desktopEntry);
+              if (desktopEntry && desktopEntry.icon) {
+                console.log("Using desktop entry icon:", desktopEntry.icon);
+                return Quickshell.iconPath(desktopEntry.icon);
               }
-              if (modelData.identity) {
-                var identityIcon = modelData.identity.toLowerCase();
-                console.log("Trying identity as icon:", identityIcon);
-                return Quickshell.iconPath(identityIcon, "audio-player");
-              }
-              console.log("Using fallback media icon");
-              return Quickshell.iconPath("media-player") || Quickshell.iconPath("audio-player") || "no-icon";
             }
+            if (modelData.identity) {
+              var identityIcon = modelData.identity.toLowerCase();
+              console.log("Trying identity as icon:", identityIcon);
+              return Quickshell.iconPath(identityIcon, "audio-player");
+            }
+            console.log("Using fallback media icon");
+            return Quickshell.iconPath("media-player") || Quickshell.iconPath("audio-player") || "no-icon";
           }
 
-          Behavior on color {
-            ColorAnimation {
-              duration: 150
-              easing.type: Easing.OutCubic
-            }
-          }
-
-          MouseArea {
-            id: mouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-
-            onClicked: {
-              mediaPlayerRoot.player = modelData
-              mouse.accepted = true
-            }
-          }
-        }
+          onClicked: mediaPlayerRoot.player = modelData
+        } 
       }
     }
 

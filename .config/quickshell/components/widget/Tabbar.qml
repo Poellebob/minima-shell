@@ -7,10 +7,11 @@ RowLayout {
   id: tabBarRoot
 
   property var model
-  property int currentIndex: 0
+  property var selected
   property alias delegate: repeater.delegate
+  readonly property alias count: repeater.count
 
-  signal tabClicked(int index)
+  signal clicked(var tab)
 
   spacing: Global.format.spacing_medium
   anchors.left: parent.left
@@ -21,5 +22,13 @@ RowLayout {
   Repeater {
     id: repeater
     model: tabBarRoot.model
+    delegate: Tab {
+      text: model.text
+      iconSource: model.iconSource
+
+      onClicked: {
+        tabBarRoot.selected = model
+      }
+    }
   }
 }

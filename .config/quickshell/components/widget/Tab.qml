@@ -8,14 +8,16 @@ import qs.components.text
 Rectangle {
   id: tabRoot
 
-  property bool selected: false
+  property bool isSelected: false
   property string iconSource: ""
   property string text: ""
+
+  signal clicked() 
 
   implicitHeight: Global.format.big_icon_size + Global.format.radius_small
   Layout.fillWidth: true
   radius: Global.format.radius_large
-  color: selected ? Global.colors.surface : (mouseArea.containsMouse ? Global.colors.surface : Global.colors.surface_variant)
+  color: isSelected ? Global.colors.surface : (mouseArea.containsMouse ? Global.colors.surface : Global.colors.surface_variant)
 
   Behavior on color {
     ColorAnimation {
@@ -53,5 +55,9 @@ Rectangle {
     id: mouseArea
     anchors.fill: parent
     hoverEnabled: true
+
+    onClicked: {
+      tabRoot.clicked()
+    }
   }
 }
