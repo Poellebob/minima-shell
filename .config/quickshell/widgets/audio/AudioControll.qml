@@ -8,17 +8,7 @@ import qs
 DropdownWindow {
   id: menuRoot
   implicitWidth: 400
-  color: "transparent"
-  
-  Timer {
-    id: hideTimer
-    interval: Global.format.interval_short
-    running: false
-    repeat: false
-    onTriggered: {
-      menuRoot.visible = false
-    }
-  }
+  color: "transparent" 
   
   Rectangle {
     anchors.margins: Global.format.spacing_large
