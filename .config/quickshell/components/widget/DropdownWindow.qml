@@ -14,6 +14,16 @@ PopupWindow {
   anchor.rect.x: x 
   anchor.rect.y: window.height
 
+  Timer {
+    id: hideTimer
+    interval: Global.format.interval_short
+    running: false
+    repeat: false
+    onTriggered: {
+      menuRoot.visible = false
+    }
+  }
+
   MouseArea {
     id: menuMouseArea
     anchors.fill: parent
