@@ -45,7 +45,7 @@ MouseArea {
     menu: sysTrayItem.item.menu
   }
 
-  PopupMenu {
+  DropdownMenu {
     id: menu
     window: bar
     x: sysTrayItem.x

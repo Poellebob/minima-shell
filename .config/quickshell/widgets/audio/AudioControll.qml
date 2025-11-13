@@ -15,7 +15,7 @@ DropdownWindow {
     anchors.topMargin: Global.format.spacing_medium
     anchors.fill: parent
     radius: Global.format.radius_large
-    color: Global.colors.on_surface
+    color: Global.colors.inverse_on_surface
     
     ColumnLayout {
       anchors.fill: parent
@@ -25,10 +25,12 @@ DropdownWindow {
       Tabbar {
         id: tabs
         model: [
-          {text: "hello"},
-          {text: "joho"}
+          {text: "Devices"},
+          {text: "Sourses"}
         ]
       }
+
+      
     }
   }
 }
