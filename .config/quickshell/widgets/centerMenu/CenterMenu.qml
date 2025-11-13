@@ -53,124 +53,102 @@ DropdownWindow {
     bottomRightRadius: Global.format.radius_xlarge + Global.format.spacing_small
     color: Global.colors.background
   }
-  
-  Timer {
-    id: hideTimer
-    interval: Global.format.interval_short
-    running: false
-    repeat: false
-    onTriggered: {
-      menuRoot.visible = false
-    }
-  }
-  
-  MouseArea {
-    id: menuMouseArea
+
+  Item {
     anchors.fill: parent
-    hoverEnabled: true
-    acceptedButtons: Qt.NoButton
-    propagateComposedEvents: true
-    preventStealing: true
+    anchors.leftMargin: Global.format.spacing_large
+    anchors.rightMargin: Global.format.spacing_large
+    anchors.bottomMargin: Global.format.spacing_large
+    anchors.topMargin: Global.format.spacing_medium
 
-    onEntered: hideTimer.stop()
-    onExited: hideTimer.restart()
-
-    Item {
+    //visible: menuRoot.height == menuRoot.visibleHeight ? true : false
+    
+    RowLayout {
+      spacing: Global.format.spacing_large
       anchors.fill: parent
-      anchors.leftMargin: Global.format.spacing_large
-      anchors.rightMargin: Global.format.spacing_large
-      anchors.bottomMargin: Global.format.spacing_large
-      anchors.topMargin: Global.format.spacing_medium
-
-      //visible: menuRoot.height == menuRoot.visibleHeight ? true : false
       
-      RowLayout {
+      // Left column
+      ColumnLayout {
         spacing: Global.format.spacing_large
-        anchors.fill: parent
+        Layout.fillHeight: true
+        Layout.preferredWidth: parent.width * 0.8
         
-        // Left column
-        ColumnLayout {
+        // Top row with small square and wide rectangle
+        RowLayout {
           spacing: Global.format.spacing_large
-          Layout.fillHeight: true
-          Layout.preferredWidth: parent.width * 0.8
+          Layout.fillWidth: true
+          Layout.preferredHeight: parent.height * 0.235
           
-          // Top row with small square and wide rectangle
-          RowLayout {
-            spacing: Global.format.spacing_large
-            Layout.fillWidth: true
-            Layout.preferredHeight: parent.height * 0.235
-            
-            Rectangle {
-              id: profileIcon
-              Layout.preferredWidth: parent.height
-              Layout.preferredHeight: parent.height
-              color: Global.colors.inverse_on_surface
-              radius: Global.format.radius_large
-
-              DateDisplay{
-                anchors.fill: parent
-              }
-            }
-            
-            Rectangle {
-              id: fetchOutput
-              Layout.fillWidth: true
-              Layout.preferredHeight: parent.height
-              color: Global.colors.inverse_on_surface
-              radius: Global.format.radius_large
-              
-              Text {
-                id: fetchText
-                anchors.fill: parent
-                anchors.margins: Global.format.spacing_medium
-                text: menuRoot.fetchString
-                font.family: "monospace"
-                font.bold: true
-                wrapMode: Text.WrapAnywhere
-                textFormat: Text.RichText
-                color: Global.colors.on_surface_variant
-              }
-            }
-          }
-          
-          // Large middle rectangle
           Rectangle {
-            id: mediaControls
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            id: profileIcon
+            Layout.preferredWidth: parent.height
+            Layout.preferredHeight: parent.height
             color: Global.colors.inverse_on_surface
             radius: Global.format.radius_large
-            
-            MediaPlayer {
+
+            DateDisplay{
               anchors.fill: parent
             }
           }
           
-          // Bottom rectangle
           Rectangle {
-            id: systemUsage
+            id: fetchOutput
             Layout.fillWidth: true
-            Layout.preferredHeight: parent.height * 0.2
+            Layout.preferredHeight: parent.height
             color: Global.colors.inverse_on_surface
             radius: Global.format.radius_large
-
-            NetworkBluetoothStatus {
+            
+            Text {
+              id: fetchText
               anchors.fill: parent
+              anchors.margins: Global.format.spacing_medium
+              text: menuRoot.fetchString
+              font.family: "monospace"
+              font.bold: true
+              wrapMode: Text.WrapAnywhere
+              textFormat: Text.RichText
+              color: Global.colors.on_surface_variant
             }
           }
         }
         
-        // Right tall rectangle with audio and brightness controls
+        // Large middle rectangle
         Rectangle {
-          id: audioAndBrightness
+          id: mediaControls
+          Layout.fillWidth: true
           Layout.fillHeight: true
-          Layout.preferredWidth: parent.height * 0.235
           color: Global.colors.inverse_on_surface
           radius: Global.format.radius_large
           
-          SystemUsage {
+          MediaPlayer {
             anchors.fill: parent
           }
+        }
+        
+        // Bottom rectangle
+        Rectangle {
+          id: systemUsage
+          Layout.fillWidth: true
+          Layout.preferredHeight: parent.height * 0.2
+          color: Global.colors.inverse_on_surface
+          radius: Global.format.radius_large
+
+          NetworkBluetoothStatus {
+            anchors.fill: parent
+          }
+        }
+      }
+      
+      // Right tall rectangle with audio and brightness controls
+      Rectangle {
+        id: audioAndBrightness
+        Layout.fillHeight: true
+        Layout.preferredWidth: parent.height * 0.235
+        color: Global.colors.inverse_on_surface
+        radius: Global.format.radius_large
+        
+        SystemUsage {
+          anchors.fill: parent
         }
       }
     }

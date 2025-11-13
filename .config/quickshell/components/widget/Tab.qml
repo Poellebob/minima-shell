@@ -8,7 +8,7 @@ import qs.components.text
 Rectangle {
   id: tabRoot
 
-  property bool isSelected: false
+  property bool isSelected
   property string iconSource: ""
   property string text: ""
 
@@ -17,7 +17,7 @@ Rectangle {
   implicitHeight: Global.format.big_icon_size + Global.format.radius_small
   Layout.fillWidth: true
   radius: Global.format.radius_large
-  color: isSelected ? Global.colors.surface : (mouseArea.containsMouse ? Global.colors.surface : Global.colors.surface_variant)
+  color: isSelected ? Global.colors.surface : (mouseArea.containsMouse ? Qt.lighter(Global.colors.surface_variant, 0.8) : Global.colors.surface_variant)
 
   Behavior on color {
     ColorAnimation {

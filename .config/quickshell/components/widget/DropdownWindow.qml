@@ -6,6 +6,7 @@ import qs
 
 PopupWindow {
   id: menuRoot
+  default property alias content: menuMouseArea.data
 
   required property var window
   anchor.window: window
