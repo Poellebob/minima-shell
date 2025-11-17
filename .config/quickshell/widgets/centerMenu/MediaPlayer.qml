@@ -50,7 +50,8 @@ Item {
             console.log("Using fallback media icon");
             return Quickshell.iconPath("media-player") || Quickshell.iconPath("audio-player") || "no-icon";
           }
-
+          
+          isSelected: mediaPlayerRoot.player = modelData
           onClicked: mediaPlayerRoot.player = modelData
         } 
       }
