@@ -56,4 +56,6 @@ sudo systemctl enable libvirtd
 
 sudo usermod -aG libvirt $(whoami)
 
+sudo virsh net-start default
+sudo virsh net-autostart default
 ```
