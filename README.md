@@ -54,7 +54,7 @@ sudo pacman -S qemu libvirt virt-manager dnsmasq bridge-utils #ebtables
 sudo systemctl start libvirtd
 sudo systemctl enable libvirtd
 
-sudo usermod -aG libvirt $(whoami)
+sudo usermod -aG libvirt,video,render,kvm $(whoami)
 
 sudo virsh net-start default
 sudo virsh net-autostart default
