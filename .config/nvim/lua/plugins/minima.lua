@@ -1,5 +1,10 @@
 return {
   {
+    vim.opt.tabstop = 2
+    vim.opt.shiftwidth = 2
+    vim.opt.softtabstop = 2
+    vim.opt.expandtab = true
+
     vim.keymap.set("n", "-m", "<cmd>!make<cr>", {desc = "Run Make"}),
     
     vim.keymap.set("n", "-p", "", {desc = "PlatformIO"}),
@@ -16,14 +21,11 @@ return {
       end,
     })
   },
-
-  "andweeb/presence.nvim",
   {
     "ray-x/lsp_signature.nvim",
     event = "BufRead",
     config = function() require("lsp_signature").setup() end,
   },
-
   {
     "folke/snacks.nvim",
     opts = {
@@ -40,7 +42,6 @@ return {
       },
     },
   },
-
   {
     "lervag/vimtex",
     lazy = false,
@@ -60,6 +61,7 @@ return {
           '-file-line-error',
           '-synctex=1',
           '-interaction=nonstopmode',
+          '-shell-escape'
         },
       } 
       
@@ -71,7 +73,6 @@ return {
       vim.keymap.set("n", "-ts", "<cmd>VimtexStop<cr>", { desc = "Stop compilation (VimTeX)" })
     end,
   },
-
   {
     "nvim-treesitter/nvim-treesitter",
     opts = {
@@ -80,5 +81,8 @@ return {
         disable = { "latex", "tex", "plaintex" },
       },
     },
+  },
+  {
+    "andweeb/presence.nvim"
   },
 }
