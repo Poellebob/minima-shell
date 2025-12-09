@@ -4,12 +4,13 @@ import Quickshell.Services.Pipewire
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQml.Models
 import qs.components.widget
 import qs
 
 DropdownWindow {
   id: menuRoot
-  implicitWidth: 450
+  implicitWidth: 1050
   implicitHeight: 300
   color: "transparent" 
   
@@ -45,52 +46,42 @@ DropdownWindow {
           radius: Global.format.radius_large
 
           ListView {
-            id: audioList
+            id: outputList
             anchors.fill: parent
             anchors.margins: Global.format.spacing_small
             spacing: Global.format.spacing_tiny
             clip: true
             focus: false
-
             populate: Transition {
               NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 100 }
             }
-
-            model: {
-              return Pipewire.nodes.filter(n => n.isSink)
-            }
+            model: Pipewire.nodes
 
             delegate: Rectangle {
               id: audioItem
               required property var modelData
-              property bool selected: audioList.currentItem?.modelData === modelData
-
-              width: audioList.width - scrollBar.width
+              property bool selected: outputList.currentItem?.modelData.id === modelData.id
+              width: outputList.width - scrollBar.width
               height: Global.format.module_height + Global.format.spacing_medium
               radius: Global.format.radius_medium
-
-              color: mouseArea.containsMouse || audioList.currentItem?.modelData === modelData ? Global.colors.surface_container_high : "transparent"
-
+              color: mouseArea.containsMouse || outputList.currentItem?.modelData === modelData ? Global.colors.surface_container_high : "transparent"
               Behavior on color {
                 ColorAnimation {
                   duration: 150
                   easing.type: Easing.OutCubic
                 }
               }
-
               RowLayout {
                 anchors.fill: parent
                 anchors.margins: Global.format.spacing_small
                 spacing: Global.format.spacing_medium
-
                 ColumnLayout {
                   Layout.fillWidth: true
                   Layout.alignment: Qt.AlignVCenter
                   spacing: 0
-
                   Text {
                     Layout.fillWidth: true
-                    text: modelData.nickname || "Unnamed Node"
+                    text: modelData.nickname || modelData.name || "Unnamed Node"
                     color: Global.colors.on_surface_variant
                     font.pixelSize: Global.format.text_size
                     font.bold: true
@@ -98,14 +89,12 @@ DropdownWindow {
                   }
                 }
               }
-
               MouseArea {
                 id: mouseArea
                 anchors.fill: parent
                 hoverEnabled: true
               }
             }
-
             ScrollBar.vertical: ScrollBar {
               id: scrollBar
               policy: ScrollBar.AsNeeded
@@ -141,7 +130,6 @@ DropdownWindow {
               width: audioList2.width - scrollBar2.width
               height: Global.format.module_height + Global.format.spacing_medium
               radius: Global.format.radius_medium
-
               color: mouseArea2.containsMouse || audioList2.currentItem?.modelData === modelData ? Global.colors.surface_container_high : "transparent"
 
               Behavior on color {
@@ -163,7 +151,7 @@ DropdownWindow {
 
                   Text {
                     Layout.fillWidth: true
-                    text: modelData.nickname|| "Unnamed Node"
+                    text: (modelData.nickname|| modelData.name || "Unnamed Node") + " - isSink: " + modelData.isSink
                     color: Global.colors.on_surface_variant
                     font.pixelSize: Global.format.text_size
                     font.bold: true
