@@ -9,7 +9,8 @@ RowLayout {
   id: tabBarRoot
 
   property var model
-  property int selected: 0
+  property int index: 0
+  property var selected: model[index] || None
   property alias delegate: repeater.delegate
   readonly property alias count: repeater.count
 
@@ -28,9 +29,9 @@ RowLayout {
       text: modelData.text
       iconSource: modelData.iconSource
        
-      isSelected: tabBarRoot.selected == index ? true : false
+      isSelected: tabBarRoot.index == index ? true : false
       onClicked: {
-        tabBarRoot.selected = index
+        tabBarRoot.index = index
       }
     }
   }

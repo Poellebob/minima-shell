@@ -43,7 +43,6 @@ PanelWindow {
         launcher.open = !launcher.open
         launcherCommand.focus = launcher.open
       }
-      console.log(Global.colors)
     }
   }
 
@@ -142,40 +141,33 @@ PanelWindow {
     Item {
       id: itemsCenterWrapper
       anchors.centerIn: parent
-      implicitWidth: itemsCenter.width
-      implicitHeight: parent.height
-      
+      implicitWidth: itemsCenter.implicitWidth
+      implicitHeight: itemsCenter.implicitHeight
+
       MouseArea {
-        onClicked: (event) => {
-          if (event.button == Qt.LeftButton) {
-            centerMenu.visible = !centerMenu.visible
-          }
-        }
         anchors.fill: parent
-        
+        propagateComposedEvents: true
+        acceptedButtons: Qt.RightButton
+
+        onClicked: (event) => {
+          if (event.button === Qt.RightButton)
+            centerMenu.visible = !centerMenu.visible
+        }
+
         RowLayout {
           id: itemsCenter
           anchors.centerIn: parent
           spacing: Global.format.spacing_medium
-          
-          Audio {
-            Layout.alignment: Qt.AlignCenter
-          }
-          Battery {
-            Layout.alignment: Qt.AlignVCenter
-          }
-          Bluetooth {
-            Layout.alignment: Qt.AlignVCenter
-          }
-          Network {
-            Layout.alignment: Qt.AlignVCenter
-          }
-          Clock {
-            Layout.alignment: Qt.AlignVCenter
-          }
+
+          Audio { Layout.alignment: Qt.AlignVCenter }
+          Battery { Layout.alignment: Qt.AlignVCenter }
+          Bluetooth { Layout.alignment: Qt.AlignVCenter }
+          Network { Layout.alignment: Qt.AlignVCenter }
+          Clock { Layout.alignment: Qt.AlignVCenter }
         }
       }
     }
+
     
     RowLayout {
       id: itemsRight

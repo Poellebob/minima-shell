@@ -17,7 +17,7 @@ ModuleBase {
     id: row
     anchors.centerIn: parent
     anchors.horizontalCenter: parent.horizontalCenter
-    spacing: 4
+    spacing: Global.format.spacing_small
 
     PwObjectTracker { objects: [ Pipewire.defaultAudioSink ] }
 
@@ -45,7 +45,7 @@ ModuleBase {
       defaultNode.audio.muted = !defaultNode.audio.muted
     }
 
-    if (mouse.button === Qt.RightButton && defaultNode) {
+    if (mouse.button === Qt.LeftButton && defaultNode) {
       menu.visible = !menu.visible
       console.log(audioRoot.mapToGlobal(audioRoot.width / 2, 0).x - menu.width / 2)
       console.log((panel.width - audioRoot.parent.width) / 2 + audioRoot.x + (audioRoot.width - menu.width) / 2)
