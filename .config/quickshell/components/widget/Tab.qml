@@ -8,7 +8,7 @@ import qs.components.text
 Rectangle {
   id: tabRoot
 
-  property bool isSelected
+  property bool isSelected: false
   property string iconSource: ""
   property string text: ""
 

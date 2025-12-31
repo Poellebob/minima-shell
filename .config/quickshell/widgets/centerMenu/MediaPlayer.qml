@@ -51,7 +51,7 @@ Item {
             return Quickshell.iconPath("media-player") || Quickshell.iconPath("audio-player") || "no-icon";
           }
           
-          isSelected: mediaPlayerRoot.player = modelData
+          isSelected: mediaPlayerRoot.player == modelData
           onClicked: mediaPlayerRoot.player = modelData
         } 
       }

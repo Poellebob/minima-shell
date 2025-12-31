@@ -12,8 +12,17 @@ Rectangle {
 
   MouseArea {
     anchors.fill: parent
-    acceptedButtons: Qt.MiddleButton | Qt.RightButton
-    onClicked: (mouse) => moduleBase.clicked(mouse)
-    onWheel: (wheel) => moduleBase.wheel(wheel)
+    acceptedButtons: Qt.MiddleButton | Qt.LeftButton
+    propagateComposedEvents: true
+
+    onClicked: (mouse) => {
+      mouse.accepted = false
+      moduleBase.clicked(mouse)
+    }
+
+    onWheel: (wheel) => {
+      wheel.accepted = false
+      moduleBase.wheel(wheel)
+    }
   }
 }
