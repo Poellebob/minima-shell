@@ -3,55 +3,70 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
+import Quickshell.Hyprland
 import qs
 
 PanelWindow {
   id: launcherMenuRoot
+  property int menuWidth: 600
 
   anchors {
-    top: true
     left: true
     bottom: true
+    right: true
   }
-  property int height: 600
-  implicitWidth: 300
+
+  margins {
+    left: (Screen.width - menuWidth) / 2
+    right: (Screen.width - menuWidth) / 2
+    bottom: 0
+  }
+
+  GlobalShortcut {
+    id: launcherShortcut
+    appid: "minima"
+    name: "launcher"
+    description: "Opens the minima-shell launcher"
+
+    onPressed: {
+      launcherMenuRoot.visible = !launcherMenuRoot.visible
+      searchBox.focus = true
+      grab.active = launcherMenuRoot.visible
+    }
+  }
+
+  HyprlandFocusGrab {
+    id: grab
+    windows: [launcherMenuRoot]
+  }
+
+  implicitHeight: 400
+  visible: false
   exclusiveZone: 0
   aboveWindows: true
   color: "transparent"
-  focusable: WlrKeyboardFocus.OnDemand 
-  required property string command
+  focusable: WlrKeyboardFocus.OnDemand
   
-  property bool isCustomCommand: command.length > 0 && command[0] === ">"
-  signal executed()
-
-  function up() {
-    appList.currentIndex -= 1
-  }
-  function down() {
-    appList.currentIndex += 1
-  }
-  function launch() {
-    appList.currentItem.modelData.execute()
-    executed()
-  }
+  property bool isCustomCommand: searchBox.text.length > 0 && searchBox.text[0] === ">"
 
   Rectangle {
-    anchors {
-      top: parent.top
-      right: parent.right
-      left: parent.left
-    }
-    implicitHeight: launcherMenuRoot.height
-    bottomRightRadius: Global.format.radius_xlarge + Global.format.spacing_small
+    anchors.fill: parent
+    topLeftRadius: Global.format.radius_xlarge + Global.format.spacing_small
+    topRightRadius: Global.format.radius_xlarge + Global.format.spacing_small
     color: Global.colors.surface_variant
     
     Rectangle {
-      id: innerRect
-      anchors.fill: parent
-      anchors.topMargin: Global.format.spacing_medium - 2
-      anchors.bottomMargin: Global.format.spacing_large
-      anchors.rightMargin: Global.format.spacing_large
-      anchors.leftMargin: Global.format.spacing_tiny
+      anchors{
+        top: parent.top
+        left: parent.left
+        right: parent.right
+        bottom: searchBox.top
+
+        topMargin: Global.format.spacing_large
+        bottomMargin: Global.format.spacing_large
+        rightMargin: Global.format.spacing_large
+        leftMargin: Global.format.spacing_large
+      }
       radius: Global.format.radius_large
       color: Global.colors.surface
       
@@ -77,13 +92,13 @@ PanelWindow {
           const entries = []
           const allEntries = DesktopEntries.applications.values
           
-          if (command === "") {
+          if (searchBox.text === "") {
             appList.currentIndex = 0
             return allEntries
           }
           
           // Filter entries
-          const searchTerm = command.trim().toLowerCase()
+          const searchTerm = searchBox.text.trim().toLowerCase()
           for (const entry in allEntries) {
             if (allEntries[entry].name.toLowerCase().includes(searchTerm)) entries.push(allEntries[entry])
           }
@@ -183,5 +198,50 @@ PanelWindow {
         }
       }
     }
+
+    TextField {
+      id: searchBox
+
+      anchors{
+        bottom: parent.bottom
+        left: parent.left
+        right: parent.right
+
+        bottomMargin: Global.format.spacing_medium
+        topMargin: Global.format.spacing_large
+        leftMargin: Global.format.spacing_large
+        rightMargin: Global.format.spacing_large
+      }
+      implicitHeight: 39
+      color: "white"
+      font.pixelSize: Global.format.text_size
+      placeholderText: "type > for command"
+      
+      onAccepted: {
+        appList.currentItem.modelData.execute()
+        clear()
+      }
+
+      Keys.onPressed: (event) => {
+        if (event.key === Qt.Key_Up) {
+          appList.currentIndex -= 1
+          event.accepted = true
+        } else if (event.key === Qt.Key_Down) {
+          appList.currentIndex += 1
+          event.accepted = true
+        } else if (event.key === Qt.Key_Escape) {
+          clear()
+          launcherMenuRoot.visible = false
+          event.accepted = true
+        }
+      }
+      
+      background: Rectangle {
+        anchors.fill: parent
+        color: Global.colors.surface
+        radius: Global.format.radius_large
+      }
+    }
+
   }
 }
