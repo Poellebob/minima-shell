@@ -50,3 +50,4 @@ x-scheme-handler/nxm=com.nexusmods.app.desktop
 application/x-ms-dos-executable=wine.desktop
 application/x-msi=wine.desktop
 application/x-ms-shortcut=wine.desktop
+x-scheme-handler/discord-455712169795780630=discord-455712169795780630.desktop

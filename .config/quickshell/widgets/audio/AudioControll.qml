@@ -98,13 +98,12 @@ DropdownWindow {
                 spacing: Global.format.spacing_medium
                   
                 Text {
-                  text: "  " + (modelData.nickname || modelData.name || "Unnamed Node")
+                  text: (tabs.index == 1 ? "   " : "  ") + (modelData.nickname || modelData.name || "Unnamed Node")
                   color: Global.colors.on_surface_variant
                   font.pixelSize: Global.format.text_size
                   font.bold: true
                   elide: Text.ElideRight
                 }
-                
                 
                 Slider {
                   id: volumeSlider
@@ -120,36 +119,51 @@ DropdownWindow {
                       modelData.audio.volume = value / 100
                   }
 
-                  background: Rectangle {
+                  
+                  background: Item {
                     implicitWidth: 200
-                    implicitHeight: 4
+                    implicitHeight: 24   // ← clickable height
 
                     x: volumeSlider.leftPadding
-                    y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+                    y: volumeSlider.topPadding
                     width: volumeSlider.availableWidth
                     height: implicitHeight
-                    radius: 2
-                    color: Global.colors.surface_container_highest
+
+                    MouseArea {
+                      anchors.fill: parent
+                      onPressed: (mouse) => {
+                        let pos = Math.max(0, Math.min(1, mouse.x / width))
+                        volumeSlider.value =
+                          volumeSlider.from + pos * (volumeSlider.to - volumeSlider.from)
+                      }
+                    }
 
                     Rectangle {
-                      width: volumeSlider.visualPosition * parent.width
-                      height: parent.height
+                      anchors.verticalCenter: parent.verticalCenter
+                      width: parent.width
+                      height: 4
                       radius: 2
-                      color: Global.colors.primary
+                      color: Global.colors.surface_container_highest
+
+                      Rectangle {
+                        width: volumeSlider.visualPosition * parent.width
+                        height: parent.height
+                        radius: 2
+                        color: Global.colors.primary
+                      }
                     }
                   }
+
 
                   handle: Rectangle {
                     implicitWidth: 16
                     implicitHeight: 16
 
-                    x: volumeSlider.leftPadding
-                      + volumeSlider.visualPosition * (volumeSlider.availableWidth - width)
+                    x: volumeSlider.leftPadding + volumeSlider.visualPosition * (volumeSlider.availableWidth - width)
                     y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
 
                     radius: 8
-                    color: Global.colors.primary
-                    border.color: Global.colors.primary
+                    color: Global.colors.secondary
                   }
                 }
               }
