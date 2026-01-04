@@ -13,7 +13,7 @@ PopupWindow {
   anchor.edges: Edges.Top
   required property real x
   anchor.rect.x: x 
-  anchor.rect.y: window.height
+  anchor.rect.y: window.height + Global.format.spacing_large
 
   Timer {
     id: hideTimer
@@ -39,8 +39,7 @@ PopupWindow {
     Rectangle {
       anchors.fill: parent
       color: Global.colors.surface
-      bottomLeftRadius: Global.format.radius_xlarge
-      bottomRightRadius: Global.format.radius_xlarge 
+      radius: Global.format.radius_xlarge
     }
   }
 }

@@ -7,9 +7,12 @@ import qs.launcher
 ShellRoot {
   id: root
 
-  readonly property bool darkTheme: true
-  readonly property bool bar: true
-
-  LazyLoader { active: bar; component: Bar{} }
-  LazyLoader { active: true; component: Launcher{} }
+  LazyLoader { active: Global.settings["Panel"]["enabled"]; component: Bar{} }
+  LazyLoader { active: Global.settings["Launcher"]["enabled"]; component: Launcher{} }
+  LazyLoader { active: Global.settings["Clipboard"]["enabled"]; 
+    component: ClipboardManager{ 
+      id: clipboardManager 
+      Component.onCompleted: Global.clipboardManager = clipboardManager
+    }
+  }
 }

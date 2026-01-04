@@ -29,6 +29,7 @@ PanelWindow {
     description: "Opens the minima-shell launcher"
 
     onPressed: {
+      searchBox.clear()
       launcherMenuRoot.visible = !launcherMenuRoot.visible
       searchBox.focus = true
       grab.active = launcherMenuRoot.visible
@@ -45,9 +46,20 @@ PanelWindow {
   exclusiveZone: 0
   aboveWindows: true
   color: "transparent"
-  focusable: WlrKeyboardFocus.OnDemand
+  focusable: true
   
   property bool isCustomCommand: searchBox.text.length > 0 && searchBox.text[0] === ">"
+
+  property var customCommands: [
+    {
+      name: "Clip",
+      description: "Open clipboard manager",
+      icon: "edit-paste",
+      execute: function () {
+        Global.clipboardManager.visible = true
+      }
+    }
+  ]
 
   Rectangle {
     anchors.fill: parent
@@ -76,7 +88,6 @@ PanelWindow {
         anchors.margins: Global.format.spacing_small
         spacing: Global.format.spacing_tiny
         clip: true
-        visible: !launcherMenuRoot.isCustomCommand
         highlightFollowsCurrentItem: true
         focus: false
 
@@ -85,25 +96,31 @@ PanelWindow {
         }
 
         model: {
+          let entries = []
+          let allEntries = []
+
           if (isCustomCommand) {
-            return []
-          }
-          
-          const entries = []
-          const allEntries = DesktopEntries.applications.values
-          
-          if (searchBox.text === "") {
-            appList.currentIndex = 0
-            return allEntries
-          }
-          
-          // Filter entries
-          const searchTerm = searchBox.text.trim().toLowerCase()
-          for (const entry in allEntries) {
-            if (allEntries[entry].name.toLowerCase().includes(searchTerm)) entries.push(allEntries[entry])
+            allEntries = launcherMenuRoot.customCommands
+          } else {
+            allEntries = DesktopEntries.applications.values
           }
 
           appList.currentIndex = 0
+
+          if (searchBox.text === "") {
+            return allEntries
+          }
+
+          const searchTerm = isCustomCommand
+            ? searchBox.text.slice(1).trim().toLowerCase()
+            : searchBox.text.trim().toLowerCase()
+
+          for (const entry of allEntries) {
+            if (entry.name.toLowerCase().includes(searchTerm)) {
+              entries.push(entry)
+            }
+          }
+
           return entries
         }
         
@@ -113,7 +130,7 @@ PanelWindow {
           property bool selected: modelData == appList.currentItem
           focus: false
           width: appList.width - scrollBar.width
-          height: Global.format.module_height + Global.format.spacing_medium
+          height: 40
           radius: Global.format.radius_medium
           color: mouseArea.containsMouse || appList.currentItem.modelData == modelData ? Global.colors.surface_container_high : "transparent"
           
@@ -170,7 +187,8 @@ PanelWindow {
             onClicked: {
               if (appItem.modelData) {
                 appItem.modelData.execute()
-                launcherMenuRoot.executed()
+                searchBox.clear()
+                launcherMenuRoot.visible = false
               }
             }
           }
@@ -179,22 +197,6 @@ PanelWindow {
         ScrollBar.vertical: ScrollBar {
           id: scrollBar
           policy: ScrollBar.AsNeeded
-        }
-      }
-      
-      // Custom command area - you can implement your custom commands here
-      Item {
-        id: customCommandArea
-        anchors.fill: parent
-        anchors.margins: Global.format.spacing_small
-        visible: launcherMenuRoot.isCustomCommand
-        
-        Text {
-          anchors.centerIn: parent
-          text: "Custom Command Mode\n" + launcherMenuRoot.command
-          color: Global.colors.on_surface_variant
-          font.pixelSize: Global.format.text_size
-          horizontalAlignment: Text.AlignHCenter
         }
       }
     }
@@ -218,8 +220,9 @@ PanelWindow {
       placeholderText: "type > for command"
       
       onAccepted: {
-        appList.currentItem.modelData.execute()
+        appList.currentItem?.modelData.execute()
         clear()
+        launcherMenuRoot.visible = false
       }
 
       Keys.onPressed: (event) => {
@@ -242,6 +245,5 @@ PanelWindow {
         radius: Global.format.radius_large
       }
     }
-
   }
 }

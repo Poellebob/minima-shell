@@ -16,7 +16,6 @@ DropdownWindow {
   
   Rectangle {
     anchors.margins: Global.format.spacing_large
-    anchors.topMargin: Global.format.spacing_medium
     anchors.fill: parent
     radius: Global.format.radius_large
     color: Global.colors.inverse_on_surface
