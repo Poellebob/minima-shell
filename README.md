@@ -4,12 +4,12 @@
 
 minima-shell is a userspace shell and a hyprland config in one.
 
-**warning:** this project is not done and is still pre-alpha, it will contain
+**warning:** this project is not done and is still pre-alpha, it will contain bugs
 
 ## Manual
 
 ```sh
-o sudo pacman -Syu wireplumber libgtop bluez bluez-utils btop networkmanager dart-sass wl-clipboard brightnessctl swww python upower pacman-contrib power-profiles-daemon gvfs cliphist hyprland hyprlock hypridle kitty ttf-jetbrains-mono-nerd qt6-wayland qt5-wayland qt5ct grim slurp swappy wiremix bluetui archlinux-xdg-menu xdg-desktop-portal-hyprland jq bc hyprpolkitagent git zsh breeze breese-gtk breeze5 papirus-icon-theme fzf zoxide
+sudo pacman -Syu wireplumber libgtop bluez bluez-utils btop networkmanager dart-sass wl-clipboard brightnessctl swww python upower pacman-contrib power-profiles-daemon gvfs cliphist hyprland hyprlock hypridle kitty ttf-jetbrains-mono-nerd qt6-wayland qt5-wayland qt5ct grim slurp swappy wiremix bluetui archlinux-xdg-menu xdg-desktop-portal-hyprland jq bc hyprpolkitagent git zsh breeze breese-gtk breeze5 papirus-icon-theme fzf zoxide
 ```
 
 ```sh
