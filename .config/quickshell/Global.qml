@@ -16,6 +16,7 @@ Singleton {
   readonly property bool panelAlwaysVisible: settings["Panel"]["panelAlwaysVisible"]
 
   property var clipboardManager: null
+  property var wallpaperSelector: null
 
   FileView {
     id: confFile

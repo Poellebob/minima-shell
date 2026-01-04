@@ -44,6 +44,18 @@ DropdownWindow {
           color: Global.colors.surface_variant
           radius: Global.format.radius_large
 
+          Text {
+            anchors.fill: parent
+
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+
+            text: tabs.index == 0 ? "No inputs detected" : "No programs currently playing audio"
+            font.pixelSize: Global.format.text_size
+            visible: inputList.count <= 0
+            color: Global.colors.on_surface_variant
+          }
+
           ListView {
             id: inputList
             anchors.fill: parent
@@ -67,6 +79,8 @@ DropdownWindow {
               }
               return sources
             }
+
+            visible: model.legth() > 0
 
             delegate: Rectangle {
               id: inputItem
@@ -121,7 +135,7 @@ DropdownWindow {
                   
                   background: Item {
                     implicitWidth: 200
-                    implicitHeight: 24   // ← clickable height
+                    implicitHeight: 24
 
                     x: volumeSlider.leftPadding
                     y: volumeSlider.topPadding
@@ -201,6 +215,18 @@ DropdownWindow {
               duration: 150
               easing.type: Easing.OutCubic
             }
+          }
+
+          Text {
+            anchors.fill: parent
+
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+
+            text: "No outputs detected"
+            font.pixelSize: Global.format.text_size
+            visible: outputList.count <= 0
+            color: Global.colors.on_surface_variant
           }
 
           ListView {

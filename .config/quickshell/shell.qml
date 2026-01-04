@@ -15,4 +15,11 @@ ShellRoot {
       Component.onCompleted: Global.clipboardManager = clipboardManager
     }
   }
+  LazyLoader { 
+    active: Global.settings["Wallpaper"]["enabled"]; 
+    component: WallpaperSelector{ 
+      id: wallpaperSelector 
+      Component.onCompleted: Global.wallpaperSelector = wallpaperSelector
+    }
+  }
 }
