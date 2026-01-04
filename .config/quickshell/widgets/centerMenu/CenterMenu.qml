@@ -49,17 +49,13 @@ DropdownWindow {
   Rectangle {
     id: menuIURoot
     anchors.fill: parent
-    bottomLeftRadius: Global.format.radius_xlarge + Global.format.spacing_small
-    bottomRightRadius: Global.format.radius_xlarge + Global.format.spacing_small
+    radius: Global.format.radius_xlarge + Global.format.spacing_small
     color: Global.colors.background
   }
 
   Item {
     anchors.fill: parent
-    anchors.leftMargin: Global.format.spacing_large
-    anchors.rightMargin: Global.format.spacing_large
-    anchors.bottomMargin: Global.format.spacing_large
-    anchors.topMargin: Global.format.spacing_medium
+    anchors.margins: Global.format.spacing_large
 
     //visible: menuRoot.height == menuRoot.visibleHeight ? true : false
     

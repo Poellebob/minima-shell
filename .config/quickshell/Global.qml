@@ -10,16 +10,25 @@ Singleton {
   readonly property Colors darkColors: ColorsDark {}
   readonly property Colors lightColors: ColorsLight {}
 
-  readonly property Colors colors: settings["Panel"]["darkTheme"] ? darkColors : lightColors
+  readonly property Colors colors: settings["Theme"]["darkTheme"] ? darkColors : lightColors
   readonly property Format format: Format {}
+
+  readonly property bool panelAlwaysVisible: settings["Panel"]["panelAlwaysVisible"]
+
+  property var clipboardManager: null
 
   FileView {
     id: confFile
     path: Quickshell.env("HOME") + "/.config/quickshell/config.ini"
     blockLoading: true
+    watchChanges: true
+    
+    onFileChanged: {
+      this.reload()
+    }
   }
 
-  property bool darkTheme: settings["Panel"]["darkTheme"]
+  property bool darkTheme: settings["Theme"]["darkTheme"]
   property var settings: {
     const lines = confFile.text().split(/\r?\n/);
     const result = {};

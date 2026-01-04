@@ -56,22 +56,22 @@ DropdownWindow {
           anchors.left: parent.left
           anchors.leftMargin: Global.format.font_size_small
           verticalAlignment: Text.AlignVCenter
-              horizontalAlignment: Text.AlignLeft
-            }
+          horizontalAlignment: Text.AlignLeft
+        }
 
-            MouseArea {
-              id: mouseArea
-              anchors.fill: parent
-              hoverEnabled: true
+        MouseArea {
+          id: mouseArea
+          anchors.fill: parent
+          hoverEnabled: true
 
-              onClicked: (event) => {
-                if (event.button == Qt.LeftButton) {
-                  modelData.triggered()
-                  menu.itemTriggered()
-                }
-              }
+          onClicked: (event) => {
+            if (event.button == Qt.LeftButton) {
+              modelData.triggered()
+              menu.itemTriggered()
             }
           }
         }
       }
+    }
+  }
 }
