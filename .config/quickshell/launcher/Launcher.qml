@@ -58,6 +58,16 @@ PanelWindow {
       execute: function () {
         Global.clipboardManager.visible = true
       }
+    },
+    {
+      name: "Wallpapers",
+      description: "Open wallpaper selector",
+      icon: "preferences-desktop-wallpaper-symbolic",
+      execute: function () {
+        if (Global.wallpaperSelector) {
+          Global.wallpaperSelector.visible = true
+        }
+      }
     }
   ]
 

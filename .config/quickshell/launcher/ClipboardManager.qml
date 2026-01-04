@@ -221,7 +221,7 @@ PanelWindow {
               Layout.preferredWidth: Global.format.icon_size
               Layout.preferredHeight: Global.format.icon_size
               Layout.alignment: Qt.AlignVCenter
-              text: "󰩺"
+              text: "   󰩺   "
               
               onClicked: {
                 clipboardManagerRoot.deleteEntry(clipItem.modelData)
@@ -337,7 +337,7 @@ PanelWindow {
       
       Button {
         implicitHeight: 39
-        text: "Clear All"
+        text: "  Clear All  "
         
         onClicked: {
           clipboardManagerRoot.wipeAll()
