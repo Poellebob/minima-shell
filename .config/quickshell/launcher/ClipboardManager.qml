@@ -330,6 +330,8 @@ PanelWindow {
             }
             event.accepted = true
           }
+          if (clipList.currentIndex < 0) clipList.currentIndex = 0
+          if (clipList.currentIndex >= clipList.count) clipList.currentIndex = clipList.count -1
         }
         
         background: Rectangle {
