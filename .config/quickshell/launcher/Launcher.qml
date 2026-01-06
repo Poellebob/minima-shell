@@ -109,7 +109,9 @@ PanelWindow {
           let entries = []
           let allEntries = []
 
-          if (isCustomCommand) {
+          var evaluate = MathEval.evaluate;
+
+          if (launcherMenuRoot.isCustomCommand) {
             allEntries = launcherMenuRoot.customCommands
           } else {
             allEntries = DesktopEntries.applications.values
@@ -251,6 +253,8 @@ PanelWindow {
           launcherMenuRoot.visible = false
           event.accepted = true
         }
+        if (appList.currentIndex < 0) appList.currentIndex = 0
+        if (appList.currentIndex >= appList.count) appList.currentIndex = appList.count -1
       }
       
       background: Rectangle {
