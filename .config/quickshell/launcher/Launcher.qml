@@ -109,8 +109,6 @@ PanelWindow {
           let entries = []
           let allEntries = []
 
-          var evaluate = MathEval.evaluate;
-
           if (launcherMenuRoot.isCustomCommand) {
             allEntries = launcherMenuRoot.customCommands
           } else {
