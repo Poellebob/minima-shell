@@ -1,3 +1,2 @@
 .qmlls.ini
-colors/**
-!colors/Colors.qml
+colors/colors.json

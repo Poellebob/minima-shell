@@ -303,6 +303,10 @@ PanelWindow {
             grab.active = false
           }
         }
+
+        onFocusChanged: {
+          focus: true
+        }
         
         Keys.onPressed: (event) => {
           if (event.key === Qt.Key_Up) {
