@@ -20,6 +20,8 @@ PanelWindow {
   property int engineFps: Global.settings["Wallpaper"]["fps"]
   property bool engineFill: Global.settings["Wallpaper"]["fill"]
   property bool matureContent: Global.settings["Wallpaper"]["matureContent"]
+  property bool initialLoadComplete: false
+  property string savedWallpaper: ""
   
   anchors {
     left: true
@@ -40,23 +42,72 @@ PanelWindow {
   color: "transparent"
   focusable: true
   
-  onVisibleChanged: {
+  Component.onCompleted: {
+    // Always load wallpapers on startup
+    scanWallpapers()
+    
+    // Try to read the saved wallpaper from config
+    readWallpaperConf.running = true
+    
     if (visible) {
-      scanWallpapers()
       searchBox.clear()
       searchBox.focus = true
       wallpaperGrid.currentIndex = 0
     }
   }
   
-  Component.onCompleted: {
-    scanWallpapers()
-  }
-  
   function scanWallpapers() {
     scanImagesProc.running = true
     if (engineEnabled) {
       scanEngineProc.running = true
+    }
+  }
+
+  function startNextEngineProject() {
+    if (engineQueueIndex >= engineQueue.length) {
+      // All engine wallpapers have been scanned
+      checkAndApplyInitialWallpaper()
+      return
+    }
+
+    parseProjectProc.projectPath = engineQueue[engineQueueIndex]
+    parseProjectProc.running = true
+  }
+
+  function hasEngineWallpaper(folderId) {
+    return wallpaperSelectorRoot.wallpapers.some(w =>
+      w.type === "engine" && w.id === folderId
+    )
+  }
+  
+  function checkAndApplyInitialWallpaper() {
+    if (initialLoadComplete) return
+    initialLoadComplete = true
+    
+    if (savedWallpaper && savedWallpaper.trim() !== "") {
+      // Try to apply the saved wallpaper
+      if (savedWallpaper.startsWith("engine:")) {
+        const folderId = savedWallpaper.substring(7)
+        const engineWallpaper = wallpapers.find(w => w.type === "engine" && w.id === folderId)
+        if (engineWallpaper) {
+          console.log("Applying saved engine wallpaper:", folderId)
+          setWallpaper(engineWallpaper)
+          return
+        }
+      } else {
+        const imageWallpaper = wallpapers.find(w => w.type === "image" && w.path === savedWallpaper)
+        if (imageWallpaper) {
+          console.log("Applying saved image wallpaper:", savedWallpaper)
+          setWallpaper(imageWallpaper)
+          return
+        }
+      }
+    }
+    
+    // If no saved wallpaper or it wasn't found, apply the first wallpaper
+    if (wallpapers.length > 0) {
+      console.log("No saved wallpaper found, applying first wallpaper")
+      setWallpaper(wallpapers[0])
     }
   }
   
@@ -69,6 +120,7 @@ PanelWindow {
   }
   
   function setImageWallpaper(path) {
+    Quickshell.execDetached(["killall", "-9", "linux-wallpaperengine"])
     setWallpaperProc.wallpaperPath = path
     setWallpaperProc.previewPath = path
     setWallpaperProc.wallpaperType = "image"
@@ -76,9 +128,9 @@ PanelWindow {
   }
   
   function setEngineWallpaper(folderId, previewPath) {
-    killEngineProc.folderId = folderId
-    killEngineProc.previewPath = previewPath
-    killEngineProc.running = true
+    engineProc.folderId = folderId
+    engineProc.previewPath = previewPath
+    engineProc.running = true
   }
   
   function filterWallpapers() {
@@ -93,6 +145,26 @@ PanelWindow {
       return name.includes(search) || folder.includes(search)
     })
   }
+
+  // Read the saved wallpaper from config
+  Process {
+    id: readWallpaperConf
+    command: ["cat", Quickshell.env("HOME") + "/.config/wallpaper.conf"]
+    
+    stdout: StdioCollector {
+      onStreamFinished: {
+        wallpaperSelectorRoot.savedWallpaper = this.text.trim()
+        console.log("Read saved wallpaper:", wallpaperSelectorRoot.savedWallpaper)
+      }
+    }
+    
+    onExited: (exitCode, exitStatus) => {
+      if (exitCode !== 0) {
+        console.log("No wallpaper.conf found or error reading it")
+        wallpaperSelectorRoot.savedWallpaper = ""
+      }
+    }
+  }
   
   // Scan regular image files
   Process {
@@ -104,6 +176,7 @@ PanelWindow {
     stdout: SplitParser {
       onRead: (line) => {
         scanImagesProc.buffer.push(line)
+        console.log(line)
       }
     }
     
@@ -124,122 +197,158 @@ PanelWindow {
         }
         wallpaperSelectorRoot.wallpapers = images
         scanImagesProc.buffer = []
+        
+        // If engine is not enabled, check for initial wallpaper now
+        if (!engineEnabled) {
+          checkAndApplyInitialWallpaper()
+        }
       }
     }
   }
+
+  property var engineQueue: []
+  property int engineQueueIndex: 0
+
   
   // Scan wallpaper engine projects
   Process {
     id: scanEngineProc
     property var buffer: []
-    
-    command: ["bash", "-c", "find -L " + wallpaperSelectorRoot.workshopPath + " -name 'project.json'"]
-    
+
+    command: ["bash", "-c",
+      "find -L " + wallpaperSelectorRoot.workshopPath + " -name 'project.json'"
+    ]
+
     stdout: SplitParser {
       onRead: (line) => {
         scanEngineProc.buffer.push(line)
       }
     }
-    
+
     onExited: (exitCode, exitStatus) => {
       if (exitCode === 0) {
-        for (let projectPath of scanEngineProc.buffer) {
-          parseProjectProc.projectPath = projectPath
-          parseProjectProc.running = true
-        }
+        wallpaperSelectorRoot.engineQueue = scanEngineProc.buffer.slice()
+        wallpaperSelectorRoot.engineQueueIndex = 0
         scanEngineProc.buffer = []
+
+        if (engineQueue.length > 0) {
+          startNextEngineProject()
+        } else {
+          // No engine wallpapers found, check for initial wallpaper
+          checkAndApplyInitialWallpaper()
+        }
       }
     }
   }
-  
+
+ 
   // Parse individual project.json files
+  
   Process {
     id: parseProjectProc
     property string projectPath: ""
-    
+
     command: ["cat", projectPath]
-    
+
     stdout: StdioCollector {
       onStreamFinished: {
         try {
           const projectData = JSON.parse(this.text)
           const contentRating = projectData.contentrating || ""
-          
-          if ((contentRating === "Mature" || contentRating === "Questionable") && !wallpaperSelectorRoot.matureContent) {
-            return
+
+          if (
+            (contentRating === "Mature" || contentRating === "Questionable") &&
+            !wallpaperSelectorRoot.matureContent
+          ) {
+            // skip
+          } else {
+            const previewName = projectData.preview
+            if (previewName) {
+              const projectDir =
+                parseProjectProc.projectPath.substring(
+                  0,
+                  parseProjectProc.projectPath.lastIndexOf('/')
+                )
+
+              const folderId =
+                projectDir.substring(projectDir.lastIndexOf('/') + 1)
+
+              let current = wallpaperSelectorRoot.wallpapers.slice()
+              if (!hasEngineWallpaper(folderId)) {
+                let current = wallpaperSelectorRoot.wallpapers.slice()
+                current.push({
+                  type: "engine",
+                  name: projectData.title || folderId,
+                  folder: "WE: " + folderId,
+                  id: folderId,
+                  path: projectDir,
+                  preview: "file://" + projectDir + "/" + previewName,
+                  previewPath: projectDir + "/" + previewName
+                })
+                wallpaperSelectorRoot.wallpapers = current
+              }
+            }
           }
-          
-          const previewName = projectData.preview
-          if (!previewName) return
-          
-          const projectDir = parseProjectProc.projectPath.substring(0, parseProjectProc.projectPath.lastIndexOf('/'))
-          const folderId = projectDir.substring(projectDir.lastIndexOf('/') + 1)
-          const previewPath = projectDir + "/" + previewName
-          
-          let currentWallpapers = wallpaperSelectorRoot.wallpapers.slice()
-          currentWallpapers.push({
-            type: "engine",
-            name: projectData.title || folderId,
-            folder: "WE: " + folderId,
-            id: folderId,
-            path: projectDir,
-            preview: "file://" + previewPath,
-            previewPath: previewPath
-          })
-          wallpaperSelectorRoot.wallpapers = currentWallpapers
         } catch (e) {
           console.log("Failed to parse project.json:", e)
         }
+
+        wallpaperSelectorRoot.engineQueueIndex++
+        wallpaperSelectorRoot.startNextEngineProject()
       }
     }
   }
+
   
   // Kill existing wallpaper engine processes and start new one
   Process {
-    id: killEngineProc
+    id: engineProc
     property string folderId: ""
     property string previewPath: ""
-    command: ["pkill", "-9", "linux-wallpaperengine"]
+    command: ["killall", "-9", "linux-wallpaperengine"]
     
     onExited: (exitCode, exitStatus) => {
-      startEngineProc.folderId = folderId
-      startEngineProc.previewPath = previewPath
-      startEngineProc.running = true
+      for (let i in Quickshell.screens) {
+        let args = [
+          wallpaperSelectorRoot.enginePath,
+          "--screen-root", Quickshell.screens[i].name,
+          "--bg", workshopPath + folderId,
+          "--volume", 0
+        ]
+        if (wallpaperSelectorRoot.engineFps > 0) {
+          args.push("--fps", wallpaperSelectorRoot.engineFps)
+        }
+        if (wallpaperSelectorRoot.engineFill) {
+          args.push("--scaling", "fill")
+        }
+
+        console.log(args)
+
+        Quickshell.execDetached({
+          command: args,
+          environment: ["XDG_SESSION_TYPE=wayland"]
+        })
+      }
+      console.log(Quickshell.screens[0].name)
+
+      updateConfProc.wallpaperPath = "engine:" + folderId
+      updateConfProc.previewPath = previewPath
+      console.log(previewPath)
+      updateConfProc.running = true
     }
   }
-  
-  // Start wallpaper engine
-  Process {
-    id: startEngineProc
-    property string folderId: ""
-    property string previewPath: ""
-    command: {
-      let args = [wallpaperSelectorRoot.enginePath, "--bg", folderId]
-      if (wallpaperSelectorRoot.engineFps > 0) {
-        args.push("--fps", wallpaperSelectorRoot.engineFps.toString())
-      }
-      if (wallpaperSelectorRoot.engineFill) {
-        args.push("--scaling", "fill")
-      }
-      return args
-    }
     
-    onExited: (exitCode, exitStatus) => {
-      if (exitCode === 0) {
-        updateConfProc.wallpaperPath = "engine:" + folderId
-        updateConfProc.previewPath = previewPath
-        updateConfProc.running = true
-      }
-    }
-  }
-  
   // Set regular image wallpaper with swww
   Process {
     id: setWallpaperProc
     property string wallpaperPath: ""
     property string previewPath: ""
     property string wallpaperType: ""
-    command: ["swww", "img", wallpaperPath, "--transition-type", "fade", "--transition-duration", "1"]
+    command: [
+      "swww", "img", wallpaperPath, 
+      "--transition-type", "fade", 
+      "--transition-duration", "1"
+    ]
     
     onExited: (exitCode, exitStatus) => {
       if (exitCode === 0) {
@@ -255,28 +364,25 @@ PanelWindow {
     id: updateConfProc
     property string wallpaperPath: ""
     property string previewPath: ""
-    command: ["bash", "-c", "echo \"" + wallpaperPath + "\" > " + Quickshell.env("HOME") + "/.config/wallpaper.conf"]
+    command: [
+      "bash", "-c", 
+      "echo \"" + wallpaperPath + "\" > " + 
+      Quickshell.env("HOME") + "/.config/wallpaper.conf"
+    ]
     
     onExited: (exitCode, exitStatus) => {
-      if (exitCode === 0) {
-        regenColorsProc.previewPath = previewPath
-        regenColorsProc.running = true
+      if (exitCode !== 0) {
+        return
       }
+
+      Quickshell.execDetached([
+        "bash", "-c", 
+        "matugen -j hex image \"" + previewPath + "\" 2>/dev/null | grep { | jq . > " + 
+        Quickshell.env("HOME") + "/.config/quickshell/colors/colors.json" 
+      ])
     }
   }
-  
-  // Regenerate colors based on preview image
-  Process {
-    id: regenColorsProc
-    property string previewPath: ""
-    command: ["bash", "-c", "matugen -j hex image \"" + previewPath + "\" 2>/dev/null | grep '{' | jq . > " + Quickshell.env("HOME") + "/.config/quickshell/colors/colors.json && " + Quickshell.env("HOME") + "/.config/quickshell/scripts/generate-colors.sh"]
     
-    onExited: (exitCode, exitStatus) => {
-      wallpaperSelectorRoot.visible = false
-      grab.active = false
-    }
-  }
-  
   GlobalShortcut {
     id: wallpaperShortcut
     appid: "minima"
@@ -414,7 +520,7 @@ PanelWindow {
                   
                   Text {
                     anchors.centerIn: parent
-                    text: "󰑴"
+                    text: "󰇻"
                     font.family: "JetBrainsMono Nerd Font"
                     font.pixelSize: 14
                     color: Global.colors.on_tertiary
@@ -454,6 +560,7 @@ PanelWindow {
               
               onClicked: {
                 wallpaperGrid.currentIndex = wallpaperItem.index
+                console.log(wallpaperItem.path)
               }
               
               onDoubleClicked: {
@@ -490,6 +597,10 @@ PanelWindow {
           color: Global.colors.on_surface
           font.pixelSize: Global.format.text_size
           placeholderText: "Search by name or folder..."
+
+          onFocusChanged: {
+            focus: true
+          }
           
           onTextChanged: {
             wallpaperSelectorRoot.searchText = text

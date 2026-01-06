@@ -115,8 +115,6 @@ PanelWindow {
             allEntries = DesktopEntries.applications.values
           }
 
-          appList.currentIndex = 0
-
           if (searchBox.text === "") {
             return allEntries
           }
@@ -196,8 +194,9 @@ PanelWindow {
             
             onClicked: {
               if (appItem.modelData) {
-                appItem.modelData.execute()
+                appItem.modelData?.execute()
                 searchBox.clear()
+                grab.active = false
                 launcherMenuRoot.visible = false
               }
             }
@@ -228,8 +227,13 @@ PanelWindow {
       color: "white"
       font.pixelSize: Global.format.text_size
       placeholderText: "type > for command"
+
+      onFocusChanged: {
+        focus: true
+      }
       
       onAccepted: {
+        console.log(appList.currentItem?.name)
         appList.currentItem?.modelData.execute()
         clear()
         launcherMenuRoot.visible = false
