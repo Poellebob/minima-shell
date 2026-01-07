@@ -49,9 +49,8 @@ PanelWindow {
     command: ["sh","-c","mathjs \""+expr+"\""]
 
     stdout: StdioCollector {
-      onStreamFinished: { 
+      onStreamFinished: {
         mathProc.res = this.text.trim()
-        console.log(this.text)
       }
     }
   }
@@ -64,7 +63,7 @@ PanelWindow {
   focusable: true
   
   property bool isCustomCommand: searchBox.text.length > 0 && searchBox.text[0] === ">"
-  property bool isExpr: searchBox.text.length > 0 && searchBox.text[0] === "=" && Global.settings["Launcher"]["math_enabled"]
+  property bool isExpr: searchBox.text.length > 0 && searchBox.text[0] === "=" && Global.settings["Launcher"]["mathEnabled"]
 
   property var customCommands: [
     {
@@ -241,31 +240,31 @@ PanelWindow {
         }
       }
     }
-
+    
     TextField {
       id: searchBox
-
+      
       anchors{
         bottom: parent.bottom
         left: parent.left
         right: parent.right
-
         bottomMargin: Global.format.spacing_medium
         topMargin: Global.format.spacing_large
         leftMargin: Global.format.spacing_large
         rightMargin: Global.format.spacing_large
       }
+      
       implicitHeight: 39
       color: "white"
       font.pixelSize: Global.format.text_size
       placeholderText: "type > for command or = for calculator"
-
+      
       onFocusChanged: {
         if (launcherMenuRoot.visible) {
           focus = true
         }
       }
-
+      
       onTextEdited: {
         if (launcherMenuRoot.isExpr) {
           mathProc.expr = searchBox.text.slice(1)
