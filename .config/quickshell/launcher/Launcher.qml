@@ -225,10 +225,10 @@ PanelWindow {
             
             onClicked: {
               if (appItem.modelData) {
-                appItem.modelData?.execute()
-                searchBox.clear()
                 launcherMenuRoot.visible = false
                 grab.active = false
+                appItem.modelData?.execute()
+                searchBox.clear()
               }
             }
           }
