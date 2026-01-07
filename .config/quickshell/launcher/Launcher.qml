@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Widgets
 import Quickshell.Hyprland
 import qs
@@ -41,6 +42,20 @@ PanelWindow {
     windows: [launcherMenuRoot]
   }
 
+  Process {
+    id: mathProc
+    property string expr: "0+0"
+    property string res: ""
+    command: ["sh","-c","mathjs \""+expr+"\""]
+
+    stdout: StdioCollector {
+      onStreamFinished: { 
+        mathProc.res = this.text.trim()
+        console.log(this.text)
+      }
+    }
+  }
+
   implicitHeight: 400
   visible: false
   exclusiveZone: 0
@@ -49,6 +64,7 @@ PanelWindow {
   focusable: true
   
   property bool isCustomCommand: searchBox.text.length > 0 && searchBox.text[0] === ">"
+  property bool isExpr: searchBox.text.length > 0 && searchBox.text[0] === "=" && Global.settings["Launcher"]["math_enabled"]
 
   property var customCommands: [
     {
@@ -57,7 +73,8 @@ PanelWindow {
       icon: "edit-paste",
       execute: function () {
         Global.clipboardManager.visible = true
-      }
+      },
+      active: Global.settings["Clipboard"]["enabled"]
     },
     {
       name: "Wallpapers",
@@ -67,7 +84,8 @@ PanelWindow {
         if (Global.wallpaperSelector) {
           Global.wallpaperSelector.visible = true
         }
-      }
+      },
+      active: Global.settings["Wallpaper"]["enabled"]
     }
   ]
 
@@ -102,7 +120,12 @@ PanelWindow {
         focus: false
 
         populate: Transition {
-          NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 100 }
+          NumberAnimation { 
+            property: "opacity"
+            from: 0 
+            to: 1
+            duration:  100 
+          }
         }
 
         model: {
@@ -111,6 +134,15 @@ PanelWindow {
 
           if (launcherMenuRoot.isCustomCommand) {
             allEntries = launcherMenuRoot.customCommands
+          } else if (launcherMenuRoot.isExpr) {
+            return [{
+              name: "minimaMathProc",
+              description: "Copy to Clipbord",
+              icon: "mathmode",
+              execute: function () {
+                Quickshell.execDetached("wl-copy","\""+mathProc.res+"\"")
+              }
+            }]
           } else {
             allEntries = DesktopEntries.applications.values
           }
@@ -168,7 +200,7 @@ PanelWindow {
               
               Text {
                 Layout.fillWidth: true
-                text: appItem.modelData.name
+                text: appItem.modelData.name === "minimaMathProc" ? mathProc.res : appItem.modelData.name
                 color: Global.colors.on_surface_variant
                 font.pixelSize: Global.format.text_size
                 font.bold: true
@@ -196,8 +228,8 @@ PanelWindow {
               if (appItem.modelData) {
                 appItem.modelData?.execute()
                 searchBox.clear()
-                grab.active = false
                 launcherMenuRoot.visible = false
+                grab.active = false
               }
             }
           }
@@ -226,10 +258,19 @@ PanelWindow {
       implicitHeight: 39
       color: "white"
       font.pixelSize: Global.format.text_size
-      placeholderText: "type > for command"
+      placeholderText: "type > for command or = for calculator"
 
       onFocusChanged: {
-        focus: true
+        if (launcherMenuRoot.visible) {
+          focus = true
+        }
+      }
+
+      onTextEdited: {
+        if (launcherMenuRoot.isExpr) {
+          mathProc.expr = searchBox.text.slice(1)
+          mathProc.running = true
+        }
       }
       
       onAccepted: {

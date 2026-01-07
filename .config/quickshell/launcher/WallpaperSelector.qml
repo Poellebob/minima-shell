@@ -9,7 +9,7 @@ import qs
 
 PanelWindow {
   id: wallpaperSelectorRoot
-  property int menuWidth: 900
+  property int menuWidth: 786
   property int menuHeight: 600
   property var wallpapers: []
   property string searchText: ""
@@ -391,6 +391,7 @@ PanelWindow {
     onPressed: {
       wallpaperSelectorRoot.visible = !wallpaperSelectorRoot.visible
       grab.active = wallpaperSelectorRoot.visible
+      searchBox.focus = true
     }
   }
   
