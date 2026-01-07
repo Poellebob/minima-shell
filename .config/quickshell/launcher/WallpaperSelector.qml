@@ -14,7 +14,7 @@ PanelWindow {
   property var wallpapers: []
   property string searchText: ""
   property string wallpapersDir: Quickshell.env("HOME") + "/Wallpapers"
-  property bool engineEnabled: Global.settings["Wallpaper"]["engine_enabled"]
+  property bool engineEnabled: Global.settings["Wallpaper"]["engineEnabled"]
   property string enginePath: Global.settings["Wallpaper"]["enginePath"]
   property string workshopPath: Global.settings["Wallpaper"]["workshopPath"]
   property int engineFps: Global.settings["Wallpaper"]["fps"]
@@ -598,10 +598,7 @@ PanelWindow {
           color: Global.colors.on_surface
           font.pixelSize: Global.format.text_size
           placeholderText: "Search by name or folder..."
-
-          onFocusChanged: {
-            focus: true
-          }
+          focus: wallpaperSelectorRoot.visible
           
           onTextChanged: {
             wallpaperSelectorRoot.searchText = text
@@ -659,6 +656,7 @@ PanelWindow {
           
           onClicked: {
             wallpaperSelectorRoot.scanWallpapers()
+            searchBox.focus = true
           }
           
           background: Rectangle {
