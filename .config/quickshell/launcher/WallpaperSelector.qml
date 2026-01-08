@@ -22,6 +22,8 @@ PanelWindow {
   property bool matureContent: Global.settings["Wallpaper"]["matureContent"]
   property bool initialLoadComplete: false
   property string savedWallpaper: ""
+  property var favorites: []
+  property string favoritesPath: Quickshell.env("HOME") + "/.config/wallpaper-favorites.conf"
   
   anchors {
     left: true
@@ -41,8 +43,11 @@ PanelWindow {
   aboveWindows: true
   color: "transparent"
   focusable: true
-  
+    
   Component.onCompleted: {
+    // Load favorites first
+    readFavoritesProc.running = true
+    
     // Always load wallpapers on startup
     scanWallpapers()
     
@@ -63,13 +68,25 @@ PanelWindow {
     }
   }
 
+  function sortWallpapers() {
+    wallpapers = wallpapers.slice().sort((a, b) => {
+      const aFav = isFavorite(a)
+      const bFav = isFavorite(b)
+
+      if (aFav && !bFav) return -1
+      if (!aFav && bFav) return 1
+
+      return a.name.localeCompare(b.name)
+    })
+  }
+
   function startNextEngineProject() {
     if (engineQueueIndex >= engineQueue.length) {
       // All engine wallpapers have been scanned
       checkAndApplyInitialWallpaper()
+      sortWallpapers()
       return
     }
-
     parseProjectProc.projectPath = engineQueue[engineQueueIndex]
     parseProjectProc.running = true
   }
@@ -78,6 +95,34 @@ PanelWindow {
     return wallpaperSelectorRoot.wallpapers.some(w =>
       w.type === "engine" && w.id === folderId
     )
+  }
+  
+  function getWallpaperId(wallpaperData) {
+    if (wallpaperData.type === "engine") {
+      return "engine:" + wallpaperData.id
+    } else {
+      return "image:" + wallpaperData.path
+    }
+  }
+  
+  function isFavorite(wallpaperData) {
+    const id = getWallpaperId(wallpaperData)
+    return favorites.indexOf(id) !== -1
+  }
+  
+  function toggleFavorite(wallpaperData) {
+    const id = getWallpaperId(wallpaperData)
+    let newFavorites = favorites.slice()
+    const index = newFavorites.indexOf(id)
+    
+    if (index !== -1) {
+      newFavorites.splice(index, 1)
+    } else {
+      newFavorites.push(id)
+    }
+    
+    favorites = newFavorites
+    saveFavoritesProc.running = true
   }
   
   function checkAndApplyInitialWallpaper() {
@@ -134,18 +179,56 @@ PanelWindow {
   }
   
   function filterWallpapers() {
-    if (searchText.trim() === "") {
-      return wallpapers
-    }
+    let filtered = wallpapers
     
-    const search = searchText.toLowerCase()
-    return wallpapers.filter(item => {
-      const name = item.name.toLowerCase()
-      const folder = item.folder ? item.folder.toLowerCase() : ""
-      return name.includes(search) || folder.includes(search)
-    })
+    if (searchText.trim() !== "") {
+      const search = searchText.toLowerCase()
+      filtered = wallpapers.filter(item => {
+        const name = item.name.toLowerCase()
+        const folder = item.folder ? item.folder.toLowerCase() : ""
+        return name.includes(search) || folder.includes(search)
+      })
+    }
+
+    return filtered
   }
 
+  // Read favorites from config
+  Process {
+    id: readFavoritesProc
+    command: ["cat", favoritesPath]
+    
+    stdout: StdioCollector {
+      onStreamFinished: {
+        const lines = this.text.trim().split('\n').filter(line => line.trim() !== "")
+        wallpaperSelectorRoot.favorites = lines
+        console.log("Loaded", lines.length, "favorites")
+      }
+    }
+    
+    onExited: (exitCode, exitStatus) => {
+      if (exitCode !== 0) {
+        console.log("No favorites file found")
+        wallpaperSelectorRoot.favorites = []
+      }
+    }
+  }
+  
+  // Save favorites to config
+  Process {
+    id: saveFavoritesProc
+    command: [
+      "bash", "-c",
+      "echo \"" + favorites.join('\n') + "\" > " + favoritesPath
+    ]
+    
+    onExited: (exitCode, exitStatus) => {
+      if (exitCode === 0) {
+        console.log("Favorites saved")
+      }
+    }
+  }
+  
   // Read the saved wallpaper from config
   Process {
     id: readWallpaperConf
@@ -201,6 +284,7 @@ PanelWindow {
         // If engine is not enabled, check for initial wallpaper now
         if (!engineEnabled) {
           checkAndApplyInitialWallpaper()
+          sortWallpapers()
         }
       }
     }
@@ -208,29 +292,24 @@ PanelWindow {
 
   property var engineQueue: []
   property int engineQueueIndex: 0
-
   
   // Scan wallpaper engine projects
   Process {
     id: scanEngineProc
     property var buffer: []
-
     command: ["bash", "-c",
       "find -L " + wallpaperSelectorRoot.workshopPath + " -name 'project.json'"
     ]
-
     stdout: SplitParser {
       onRead: (line) => {
         scanEngineProc.buffer.push(line)
       }
     }
-
     onExited: (exitCode, exitStatus) => {
       if (exitCode === 0) {
         wallpaperSelectorRoot.engineQueue = scanEngineProc.buffer.slice()
         wallpaperSelectorRoot.engineQueueIndex = 0
         scanEngineProc.buffer = []
-
         if (engineQueue.length > 0) {
           startNextEngineProject()
         } else {
@@ -240,22 +319,17 @@ PanelWindow {
       }
     }
   }
-
  
   // Parse individual project.json files
-  
   Process {
     id: parseProjectProc
     property string projectPath: ""
-
     command: ["cat", projectPath]
-
     stdout: StdioCollector {
       onStreamFinished: {
         try {
           const projectData = JSON.parse(this.text)
           const contentRating = projectData.contentrating || ""
-
           if (
             (contentRating === "Mature" || contentRating === "Questionable") &&
             !wallpaperSelectorRoot.matureContent
@@ -269,10 +343,8 @@ PanelWindow {
                   0,
                   parseProjectProc.projectPath.lastIndexOf('/')
                 )
-
               const folderId =
                 projectDir.substring(projectDir.lastIndexOf('/') + 1)
-
               let current = wallpaperSelectorRoot.wallpapers.slice()
               if (!hasEngineWallpaper(folderId)) {
                 let current = wallpaperSelectorRoot.wallpapers.slice()
@@ -292,13 +364,11 @@ PanelWindow {
         } catch (e) {
           console.log("Failed to parse project.json:", e)
         }
-
         wallpaperSelectorRoot.engineQueueIndex++
         wallpaperSelectorRoot.startNextEngineProject()
       }
     }
   }
-
   
   // Kill existing wallpaper engine processes and start new one
   Process {
@@ -321,16 +391,13 @@ PanelWindow {
         if (wallpaperSelectorRoot.engineFill) {
           args.push("--scaling", "fill")
         }
-
         console.log(args)
-
         Quickshell.execDetached({
           command: args,
           environment: ["XDG_SESSION_TYPE=wayland"]
         })
       }
       console.log(Quickshell.screens[0].name)
-
       updateConfProc.wallpaperPath = "engine:" + folderId
       updateConfProc.previewPath = previewPath
       console.log(previewPath)
@@ -374,7 +441,6 @@ PanelWindow {
       if (exitCode !== 0) {
         return
       }
-
       Quickshell.execDetached([
         "bash", "-c", 
         "matugen -j hex image \"" + previewPath + "\" 2>/dev/null | grep { | jq . > " + 
@@ -433,6 +499,14 @@ PanelWindow {
         Item { Layout.fillWidth: true }
         
         Text {
+          visible: wallpaperSelectorRoot.favorites.length > 0
+          text: " " + wallpaperSelectorRoot.favorites.length + " favorites"
+          font.pixelSize: Global.format.text_size
+          color: Global.colors.primary
+          font.family: "JetBrainsMono Nerd Font"
+        }
+        
+        Text {
           text: wallpaperSelectorRoot.wallpapers.length + " wallpapers"
           font.pixelSize: Global.format.text_size
           color: Global.colors.outline
@@ -470,7 +544,7 @@ PanelWindow {
             height: wallpaperGrid.cellHeight - Global.format.spacing_small
             radius: Global.format.radius_medium
             color: mouseArea.containsMouse || wallpaperGrid.currentIndex === index ? 
-                   Global.colors.surface_container_high : Global.colors.surface_container
+                  Global.colors.surface_container_high : Global.colors.surface_container
             
             Behavior on color {
               ColorAnimation {
@@ -486,6 +560,7 @@ PanelWindow {
               
               // Image preview
               Rectangle {
+                id: previewContainer
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 radius: Global.format.radius_small
@@ -527,6 +602,49 @@ PanelWindow {
                     color: Global.colors.on_tertiary
                   }
                 }
+                
+                // Favorite star - as a separate clickable item
+                Rectangle {
+                  id: favStar
+                  anchors.top: parent.top
+                  anchors.left: parent.left
+                  anchors.margins: Global.format.spacing_tiny
+                  width: 24
+                  height: 24
+                  radius: 12
+                  color: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 
+                        Global.colors.primary : Global.colors.surface_dim
+                  opacity: favMouseArea.containsMouse || wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 1.0 : 0.6
+                  
+                  Behavior on color {
+                    ColorAnimation { duration: 150 }
+                  }
+                  
+                  Behavior on opacity {
+                    NumberAnimation { duration: 150 }
+                  }
+                  
+                  Text {
+                    anchors.centerIn: parent
+                    text: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? "" : ""
+                    font.family: "JetBrainsMono Nerd Font"
+                    font.pixelSize: 14
+                    color: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 
+                          Global.colors.on_primary : Global.colors.on_surface
+                  }
+                  
+                  // Separate MouseArea for the star only
+                  MouseArea {
+                    id: favMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                      console.log("Toggling favorite for:", wallpaperItem.modelData.name)
+                      wallpaperSelectorRoot.toggleFavorite(wallpaperItem.modelData)
+                    }
+                  }
+                }
               }
               
               // File info
@@ -553,19 +671,26 @@ PanelWindow {
                 }
               }
             }
-            
+
+            // Main MouseArea for the entire item (excluding the star)
             MouseArea {
               id: mouseArea
               anchors.fill: parent
               hoverEnabled: true
               
-              onClicked: {
+              anchors.topMargin: favStar.height + Global.format.spacing_tiny
+              propagateComposedEvents: false
+              
+              onClicked: (mouse) => {
                 wallpaperGrid.currentIndex = wallpaperItem.index
-                console.log(wallpaperItem.path)
               }
               
               onDoubleClicked: {
                 wallpaperSelectorRoot.setWallpaper(wallpaperItem.modelData)
+              }
+              
+              onPressAndHold: {
+                wallpaperGrid.currentIndex = wallpaperItem.index
               }
             }
           }
