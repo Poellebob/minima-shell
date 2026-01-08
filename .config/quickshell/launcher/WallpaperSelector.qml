@@ -552,6 +552,10 @@ PanelWindow {
                 easing.type: Easing.OutCubic
               }
             }
+
+            onVisibleChanged: {
+              console.log(visible + "\n" + index)
+            }
             
             ColumnLayout {
               anchors.fill: parent
@@ -567,19 +571,25 @@ PanelWindow {
                 color: Global.colors.surface_dim
                 clip: true
                 
-                Image {
+                Loader {
                   anchors.fill: parent
-                  source: wallpaperItem.modelData.preview
-                  fillMode: Image.PreserveAspectCrop
+                  active: wallpaperItem.visible
                   asynchronous: true
-                  cache: true
-                  
-                  Rectangle {
+                  sourceComponent: Image {
                     anchors.fill: parent
-                    color: "transparent"
-                    border.width: wallpaperGrid.currentIndex === wallpaperItem.index ? 2 : 0
-                    border.color: Global.colors.primary
-                    radius: parent.radius
+                    source: wallpaperItem.modelData.preview
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    cache: true
+                    mipmap: true
+                    
+                    Rectangle {
+                      anchors.fill: parent
+                      color: "transparent"
+                      border.width: wallpaperGrid.currentIndex === wallpaperItem.index ? 2 : 0
+                      border.color: Global.colors.primary
+                      radius: parent.radius
+                    }
                   }
                 }
                 
