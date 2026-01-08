@@ -7,3 +7,6 @@
 [submodule ".config/quickshell/.matheval"]
 	path = .config/quickshell/matheval
 	url = https://github.com/l8nite/matheval.git
+[submodule "Wallpapers"]
+	path = Wallpapers
+	url = https://github.com/Poellebob/Wallpapers.git
