@@ -51,6 +51,7 @@ PanelWindow {
     stdout: StdioCollector {
       onStreamFinished: {
         mathProc.res = this.text.trim()
+        console.log(this.text.trim())
       }
     }
   }
