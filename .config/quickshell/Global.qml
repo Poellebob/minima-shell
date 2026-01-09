@@ -11,7 +11,8 @@ Singleton {
   readonly property Format format: Format {}
 
   readonly property bool panelAlwaysVisible: settings["Panel"]["panelAlwaysVisible"]
-
+  
+  property var launcher: null
   property var clipboardManager: null
   property var wallpaperSelector: null
 
