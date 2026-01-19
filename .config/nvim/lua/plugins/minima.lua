@@ -63,4 +63,8 @@ return {
   {
     "andweeb/presence.nvim",
   },
+  {
+    "OXY2DEV/markview.nvim",
+    lazy = false,
+  },
 }
