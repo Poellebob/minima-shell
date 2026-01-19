@@ -15,7 +15,7 @@ return {
             "██ ████ ██ ██ ██ ██  ██ ██ ██ ████ ██ ███████ ",
             "██  ██  ██ ██ ██  ██ ██ ██ ██  ██  ██ ██   ██ ",
             "██      ██ ██ ██   ████ ██ ██      ██ ██   ██ ",
-          }, "\n")
+          }, "\n"),
         },
       },
     },
@@ -28,21 +28,21 @@ return {
       vim.g.vimtex_view_method = "zathura"
       vim.g.vimtex_quickfix_mode = 0
       vim.g.vimtex_view_automatic = 1
-      
+
       vim.g.vimtex_compiler_latexmk = {
         continuous = 1,
         callback = 1,
-        build_dir = '',
+        build_dir = "",
         options = {
-          '-pdf',
-          '-verbose',
-          '-file-line-error',
-          '-synctex=1',
-          '-interaction=nonstopmode',
-          '-shell-escape'
+          "-pdf",
+          "-verbose",
+          "-file-line-error",
+          "-synctex=1",
+          "-interaction=nonstopmode",
+          "-shell-escape",
         },
-      } 
-      
+      }
+
       vim.keymap.set("n", "-t", "", { desc = "+VimTeX" })
       vim.keymap.set("n", "-tl", "<cmd>VimtexCompile<cr>", { desc = "Compile LaTeX (VimTeX)" })
       vim.keymap.set("n", "-tc", "<cmd>VimtexClean<cr>", { desc = "Clean LaTeX build (VimTeX)" })
@@ -62,5 +62,10 @@ return {
   },
   {
     "andweeb/presence.nvim",
+  },
+  {
+    "OXY2DEV/markview.nvim",
+    lazy = false,
+    dependencies = { "saghen/blink.cmp" },
   },
 }

@@ -25,3 +25,5 @@ end
 
 require "lazy_setup"
 require "polish"
+require "settings"
+require "community"
