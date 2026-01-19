@@ -21,6 +21,7 @@ PanelWindow {
   property int engineFps: Global.settings["Wallpaper"]["fps"]
   property bool engineFill: Global.settings["Wallpaper"]["fill"]
   property bool matureContent: Global.settings["Wallpaper"]["matureContent"]
+  property int volume: Global.settings["Wallpaper"]["volume"]
   property bool initialLoadComplete: false
   property string savedWallpaper: ""
   property var favorites: []
@@ -167,7 +168,7 @@ PanelWindow {
     
     // If no saved wallpaper or it wasn't found, apply the first wallpaper
     if (wallpapers.length > 0) {
-      console.log("No saved wallpaper found, applying first wallpaper")
+      console.log("No saved wallpaper foAutumnund, applying first wallpaper")
       setWallpaper(wallpapers[0])
     }
   }
@@ -384,7 +385,7 @@ PanelWindow {
           wallpaperSelectorRoot.enginePath,
           "--screen-root", Quickshell.screens[i].name,
           "--bg", workshopPath + folderId,
-          "--volume", 0
+          "--volume", wallpaperSelectorRoot.volume
         ]
         if (wallpaperSelectorRoot.engineFps > 0) {
           args.push("--fps", wallpaperSelectorRoot.engineFps)
