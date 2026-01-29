@@ -12,6 +12,7 @@ PanelWindow {
   property int menuWidth: 786
   property int menuHeight: 600
   property var wallpapers: []
+  property int tab: 0
   property string searchText: ""
   property string wallpapersDir: Quickshell.env("HOME") + "/Wallpapers"
   property bool engineEnabled: Global.settings["Wallpaper"]["engineEnabled"]
@@ -20,6 +21,7 @@ PanelWindow {
   property int engineFps: Global.settings["Wallpaper"]["fps"]
   property bool engineFill: Global.settings["Wallpaper"]["fill"]
   property bool matureContent: Global.settings["Wallpaper"]["matureContent"]
+  property int volume: Global.settings["Wallpaper"]["volume"]
   property bool initialLoadComplete: false
   property string savedWallpaper: ""
   property var favorites: []
@@ -60,6 +62,21 @@ PanelWindow {
       wallpaperGrid.currentIndex = 0
     }
   }
+
+    property var filterWallpapers: {
+      let filtered = wallpapers
+      
+      if (searchText.trim() !== "") {
+        const search = searchText.toLowerCase()
+        filtered = wallpapers.filter(item => {
+          const name = item.name.toLowerCase()
+          const folder = item.folder ? item.folder.toLowerCase() : ""
+          return name.includes(search) || folder.includes(search)
+        })
+      }
+
+      return filtered.slice((4*10)*tab, (4*10)*(tab+1))
+    }
   
   function scanWallpapers() {
     scanImagesProc.running = true
@@ -151,7 +168,7 @@ PanelWindow {
     
     // If no saved wallpaper or it wasn't found, apply the first wallpaper
     if (wallpapers.length > 0) {
-      console.log("No saved wallpaper found, applying first wallpaper")
+      console.log("No saved wallpaper foAutumnund, applying first wallpaper")
       setWallpaper(wallpapers[0])
     }
   }
@@ -176,21 +193,6 @@ PanelWindow {
     engineProc.folderId = folderId
     engineProc.previewPath = previewPath
     engineProc.running = true
-  }
-  
-  function filterWallpapers() {
-    let filtered = wallpapers
-    
-    if (searchText.trim() !== "") {
-      const search = searchText.toLowerCase()
-      filtered = wallpapers.filter(item => {
-        const name = item.name.toLowerCase()
-        const folder = item.folder ? item.folder.toLowerCase() : ""
-        return name.includes(search) || folder.includes(search)
-      })
-    }
-
-    return filtered
   }
 
   // Read favorites from config
@@ -383,7 +385,7 @@ PanelWindow {
           wallpaperSelectorRoot.enginePath,
           "--screen-root", Quickshell.screens[i].name,
           "--bg", workshopPath + folderId,
-          "--volume", 0
+          "--volume", wallpaperSelectorRoot.volume
         ]
         if (wallpaperSelectorRoot.engineFps > 0) {
           args.push("--fps", wallpaperSelectorRoot.engineFps)
@@ -479,6 +481,7 @@ PanelWindow {
       // Title bar
       RowLayout {
         Layout.fillWidth: true
+        Layout.preferredHeight: 24
         spacing: Global.format.spacing_medium
         
         Text {
@@ -496,7 +499,34 @@ PanelWindow {
           color: Global.colors.on_surface_variant
         }
         
-        Item { Layout.fillWidth: true }
+        RowLayout { 
+          Layout.fillWidth: true
+          spacing: Global.format.spacing_large
+          Button {
+            Layout.fillWidth: true
+            text: " < "
+            onPressed: {
+              if (wallpaperSelectorRoot.tab > 0){
+                wallpaperSelectorRoot.tab -= 1
+              }
+              searchBox.focus = true
+            }
+          }
+          Text {
+            color: Global.colors.tertiary
+            text: (wallpaperSelectorRoot.tab + 1) + " of " + (Math.floor(wallpaperSelectorRoot.wallpapers.length/(4*10)) + 1)
+          }
+          Button {
+            Layout.fillWidth: true
+            text: " > "
+            onPressed: {
+              if (wallpaperSelectorRoot.tab < Math.floor(wallpaperSelectorRoot.wallpapers.length/(4*10))) {
+                wallpaperSelectorRoot.tab += 1
+              }
+              searchBox.focus = true
+            }
+          }
+        }
         
         Text {
           visible: wallpaperSelectorRoot.favorites.length > 0
@@ -528,12 +558,13 @@ PanelWindow {
           cellWidth: 180
           cellHeight: 160
           focus: false
+          cacheBuffer: visible ? (4*10)*cellHeight : cellHeight*3
           
           populate: Transition {
             NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 200 }
           }
           
-          model: wallpaperSelectorRoot.filterWallpapers()
+          model: wallpaperSelectorRoot.filterWallpapers
           
           delegate: Rectangle {
             id: wallpaperItem
@@ -545,7 +576,8 @@ PanelWindow {
             radius: Global.format.radius_medium
             color: mouseArea.containsMouse || wallpaperGrid.currentIndex === index ? 
                   Global.colors.surface_container_high : Global.colors.surface_container
-            
+            visible: wallpaperSelectorRoot.visible
+
             Behavior on color {
               ColorAnimation {
                 duration: 150
@@ -566,20 +598,27 @@ PanelWindow {
                 radius: Global.format.radius_small
                 color: Global.colors.surface_dim
                 clip: true
-                
-                Image {
+
+                Loader {
                   anchors.fill: parent
-                  source: wallpaperItem.modelData.preview
-                  fillMode: Image.PreserveAspectCrop
+                  active: wallpaperSelectorRoot.visible || Global.launcher?.visible
                   asynchronous: true
-                  cache: true
-                  
-                  Rectangle {
+
+                  sourceComponent: Image {
                     anchors.fill: parent
-                    color: "transparent"
-                    border.width: wallpaperGrid.currentIndex === wallpaperItem.index ? 2 : 0
-                    border.color: Global.colors.primary
-                    radius: parent.radius
+                    source: wallpaperItem.modelData.preview
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    cache: true
+                    mipmap: true
+                    retainWhileLoading: true
+                    Rectangle {
+                      anchors.fill: parent
+                      color: "transparent"
+                      border.width: wallpaperGrid.currentIndex === wallpaperItem.index ? 2 : 0
+                      border.color: Global.colors.primary
+                      radius: parent.radius
+                    }
                   }
                 }
                 

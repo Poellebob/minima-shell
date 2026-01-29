@@ -11,6 +11,7 @@ PanelWindow {
   id: launcherMenuRoot
   property int menuWidth: 600
 
+  property string mathjsPath: Global.settings["Launcher"]["mathjsPath"]
   anchors {
     left: true
     bottom: true
@@ -46,7 +47,7 @@ PanelWindow {
     id: mathProc
     property string expr: "0+0"
     property string res: ""
-    command: ["sh","-c","mathjs \""+expr+"\""]
+    command: [launcherMenuRoot.mathjsPath, expr]
 
     stdout: StdioCollector {
       onStreamFinished: {
@@ -133,7 +134,9 @@ PanelWindow {
           let allEntries = []
 
           if (launcherMenuRoot.isCustomCommand) {
-            allEntries = launcherMenuRoot.customCommands
+            allEntries = launcherMenuRoot.customCommands.filter(entry =>
+              !('active' in entry) || entry.active === true
+            )
           } else if (launcherMenuRoot.isExpr) {
             return [{
               name: "minimaMathProc",
