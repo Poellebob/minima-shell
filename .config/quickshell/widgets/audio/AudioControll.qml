@@ -118,7 +118,7 @@ DropdownWindow {
                   elide: Text.ElideRight
                 }
                 
-                Slider {
+                StyledSlider {
                   id: volumeSlider
                   Layout.fillWidth: true
                   visible: tabs.index == 1 && modelData.audio
@@ -130,53 +130,6 @@ DropdownWindow {
                   onValueChanged: {
                     if (modelData.audio)
                       modelData.audio.volume = value / 100
-                  }
-
-                  
-                  background: Item {
-                    implicitWidth: 200
-                    implicitHeight: 24
-
-                    x: volumeSlider.leftPadding
-                    y: volumeSlider.topPadding
-                    width: volumeSlider.availableWidth
-                    height: implicitHeight
-
-                    MouseArea {
-                      anchors.fill: parent
-                      onPressed: (mouse) => {
-                        let pos = Math.max(0, Math.min(1, mouse.x / width))
-                        volumeSlider.value =
-                          volumeSlider.from + pos * (volumeSlider.to - volumeSlider.from)
-                      }
-                    }
-
-                    Rectangle {
-                      anchors.verticalCenter: parent.verticalCenter
-                      width: parent.width
-                      height: 4
-                      radius: 2
-                      color: Global.colors.surface_container_highest
-
-                      Rectangle {
-                        width: volumeSlider.visualPosition * parent.width
-                        height: parent.height
-                        radius: 2
-                        color: Global.colors.primary
-                      }
-                    }
-                  }
-
-
-                  handle: Rectangle {
-                    implicitWidth: 16
-                    implicitHeight: 16
-
-                    x: volumeSlider.leftPadding + volumeSlider.visualPosition * (volumeSlider.availableWidth - width)
-                    y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
-
-                    radius: 8
-                    color: Global.colors.secondary
                   }
                 }
               }
