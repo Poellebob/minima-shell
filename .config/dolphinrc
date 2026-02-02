@@ -10,7 +10,8 @@ PreviewSize=22
 1920x1080 screen: Width=955
 2 screens: Height=1045
 2 screens: Width=1135
-DirHistory[$e]=$HOME/Downloads/,$HOME/Desktop/,$HOME/Desktop/cp2077 mods/mods/,$HOME/Desktop/cp2077 mods/
+2 screens: Window-Maximized=true
+DirHistory[$e]=$HOME/Downloads/cp2077/,$HOME/Downloads/,$HOME/Desktop/,$HOME/Desktop/cp2077 mods/mods/,$HOME/Desktop/cp2077 mods/
 
 [General]
 LockPanels=false
