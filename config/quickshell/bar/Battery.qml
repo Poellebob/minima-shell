@@ -13,6 +13,8 @@ ModuleBase {
   border.color: Global.colors.primary
   border.width: UPower.onBattery ? 0 : 1
 
+  Component.onCompleted: displayInfo();
+
   RowLayout {
     id: column
     anchors.centerIn: parent
