@@ -1,9 +1,8 @@
-[submodule ".zsh-defer"]
-	path = .zsh-defer
+[submodule "zsh-defer"]
+	path = zsh-defer
 	url = https://github.com/romkatv/zsh-defer.git
-[submodule ".config/quickshell/.matheval"]
-	path = .config/quickshell/matheval
-	url = https://github.com/l8nite/matheval.git
+
 [submodule "Wallpapers"]
 	path = Wallpapers
 	url = https://github.com/Poellebob/Wallpapers.git
+
