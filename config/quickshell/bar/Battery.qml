@@ -48,7 +48,6 @@ ModuleBase {
   }
 
   function getBatteryIcon(name) {
-    console.log(name)
     switch (name) {
     case "battery-empty-symbolic":
       return "󰂎";

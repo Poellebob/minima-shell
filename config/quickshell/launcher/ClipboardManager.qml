@@ -3,34 +3,15 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
-import Quickshell.Hyprland
 import Quickshell.Io
+import qs.components.widget
 import qs
 
-PanelWindow {
+MenuPanel {
   id: clipboardManagerRoot
-  property int menuWidth: 600
+  menuWidth: 600
   property var clipboardEntries: []
   property string searchText: ""
-  
-  anchors {
-    left: true
-    bottom: true
-    right: true
-  }
-  
-  margins {
-    left: (Screen.width - menuWidth) / 2
-    right: (Screen.width - menuWidth) / 2
-    bottom: 0
-  }
-  
-  implicitHeight: 400
-  visible: false
-  exclusiveZone: 0
-  aboveWindows: true
-  color: "transparent"
-  focusable: true
   
   onVisibleChanged: {
     if (visible) {
@@ -117,21 +98,14 @@ PanelWindow {
     }
   }
   
-  GlobalShortcut {
-    id: clipboardShortcut
-    appid: "minima"
-    name: "clipboardManager"
-    description: "Opens the minima-shell clipboard manager"
-    onPressed: {
+  IpcHandler {
+    target: "minimaClipboard"
+
+    function open(): void {
       clipboardManagerRoot.visible = !clipboardManagerRoot.visible
-      grab.active = clipboardManagerRoot.visible
+      clipboardManagerRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
     }
-  }
-  
-  HyprlandFocusGrab {
-    id: grab
-    windows: [clipboardManagerRoot]
-  }
+  } 
   
   Rectangle {
     anchors.fill: parent
