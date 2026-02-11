@@ -3,14 +3,16 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
-import Quickshell.Hyprland
 import qs
 
 PanelWindow {
-  id: WindowRoot
+  id: windowRoot
   property int menuWidth: 600
+  property int menuHeight: 400
   property var clipboardEntries: []
   property string searchText: ""
+
+  property bool floating: false
   
   anchors {
     left: true
@@ -21,20 +23,22 @@ PanelWindow {
   margins {
     left: (Screen.width - menuWidth) / 2
     right: (Screen.width - menuWidth) / 2
-    bottom: 0
+    bottom: floating ? (Screen.height - menuHeight) / 2 : 0
   }
   
-  implicitHeight: 400
+  implicitHeight: menuHeight
   visible: false
   exclusiveZone: 0
   aboveWindows: true
   color: "transparent"
   focusable: true
-  
-  HyprlandFocusGrab {
-    id: grab
-    windows: [clipboardManagerRoot]
+
+  Rectangle {
+    anchors.fill: parent
+    topLeftRadius: Global.format.radius_xlarge + Global.format.spacing_small
+    topRightRadius: Global.format.radius_xlarge + Global.format.spacing_small
+    bottomLeftRadius: windowRoot.floating ? Global.format.radius_xlarge + Global.format.spacing_small : 0
+    bottomRightRadius: windowRoot.floating ? Global.format.radius_xlarge + Global.format.spacing_small : 0
+    color: Global.colors.surface_variant
   }
-
-
 }

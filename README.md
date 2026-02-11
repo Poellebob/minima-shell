@@ -33,7 +33,14 @@ rm -rf ./**.git*
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
 
-cp -r ./* ~
+cp -r ./config/*      ~/.config/
+cp -r ./zsh-defer/*   ~/.zsh-defer/
+cp -r ./Wallpapers/   ~/
+
+# run if first time install
+
+# cp ./defaults/hypr.conf    ~/config/hypr/config.conf
+# cp ./defaults/config.ini   ~/config/quickshell/config.ini
 
 chmod +x ~/.config/quickshell/scripts/generate-colors.sh
 chmod +x ~/.config/quickshell/scripts/sysfetch.sh

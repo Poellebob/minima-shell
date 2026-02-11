@@ -3,14 +3,15 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
-import Quickshell.Hyprland
 import Quickshell.Io
+import qs.components.widget
 import qs
 
-PanelWindow {
+MenuPanel {
   id: wallpaperSelectorRoot
-  property int menuWidth: 786
-  property int menuHeight: 600
+  menuWidth: 786
+  menuHeight: 600
+  floating: true
   property var wallpapers: []
   property int tab: 0
   property string searchText: ""
@@ -26,25 +27,6 @@ PanelWindow {
   property string savedWallpaper: ""
   property var favorites: []
   property string favoritesPath: Quickshell.env("HOME") + "/.config/wallpaper-favorites.conf"
-  
-  anchors {
-    left: true
-    bottom: true
-    right: true
-  }
-  
-  margins {
-    left: (Screen.width - menuWidth) / 2
-    right: (Screen.width - menuWidth) / 2
-    bottom: (Screen.height - menuHeight) / 2
-  }
-  
-  implicitHeight: menuHeight
-  visible: false
-  exclusiveZone: 0
-  aboveWindows: true
-  color: "transparent"
-  focusable: true
     
   Component.onCompleted: {
     // Load favorites first
@@ -63,20 +45,20 @@ PanelWindow {
     }
   }
 
-    property var filterWallpapers: {
-      let filtered = wallpapers
-      
-      if (searchText.trim() !== "") {
-        const search = searchText.toLowerCase()
-        filtered = wallpapers.filter(item => {
-          const name = item.name.toLowerCase()
-          const folder = item.folder ? item.folder.toLowerCase() : ""
-          return name.includes(search) || folder.includes(search)
-        })
-      }
-
-      return filtered.slice((4*10)*tab, (4*10)*(tab+1))
+  property var filterWallpapers: {
+    let filtered = wallpapers
+    
+    if (searchText.trim() !== "") {
+      const search = searchText.toLowerCase()
+      filtered = wallpapers.filter(item => {
+        const name = item.name.toLowerCase()
+        const folder = item.folder ? item.folder.toLowerCase() : ""
+        return name.includes(search) || folder.includes(search)
+      })
     }
+
+    return filtered.slice((4*10)*tab, (4*10)*(tab+1))
+  }
   
   function scanWallpapers() {
     scanImagesProc.running = true
@@ -451,392 +433,379 @@ PanelWindow {
     }
   }
     
-  GlobalShortcut {
-    id: wallpaperShortcut
-    appid: "minima"
-    name: "wallpaperSelector"
-    description: "Opens the minima-shell wallpaper selector"
-    onPressed: {
+  IpcHandler {
+    target: "minimaWallpaperSelector"
+    
+    function open(): void {
       wallpaperSelectorRoot.visible = !wallpaperSelectorRoot.visible
-      grab.active = wallpaperSelectorRoot.visible
+      wallpaperSelectorRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
       searchBox.focus = true
     }
   }
   
-  HyprlandFocusGrab {
-    id: grab
-    windows: [wallpaperSelectorRoot]
-  }
-  
-  Rectangle {
+  ColumnLayout {
     anchors.fill: parent
-    radius: Global.format.radius_xlarge + Global.format.spacing_small
-    color: Global.colors.surface_variant
+    anchors.margins: Global.format.spacing_large
+    spacing: Global.format.spacing_large
     
-    ColumnLayout {
-      anchors.fill: parent
-      anchors.margins: Global.format.spacing_large
-      spacing: Global.format.spacing_large
+    // Title bar
+    RowLayout {
+      Layout.fillWidth: true
+      Layout.preferredHeight: 24
+      spacing: Global.format.spacing_medium
       
-      // Title bar
-      RowLayout {
-        Layout.fillWidth: true
-        Layout.preferredHeight: 24
-        spacing: Global.format.spacing_medium
-        
-        Text {
-          text: "󰸉"
-          font.family: "JetBrainsMono Nerd Font"
-          font.pixelSize: Global.format.font_size_large
-          color: Global.colors.primary
-        }
-        
-        Text {
-          text: "Wallpaper Selector"
-          font.family: "JetBrainsMono Nerd Font"
-          font.pixelSize: Global.format.font_size_large
-          font.bold: true
-          color: Global.colors.on_surface_variant
-        }
-        
-        RowLayout { 
-          Layout.fillWidth: true
-          spacing: Global.format.spacing_large
-          Button {
-            Layout.fillWidth: true
-            text: " < "
-            onPressed: {
-              if (wallpaperSelectorRoot.tab > 0){
-                wallpaperSelectorRoot.tab -= 1
-              }
-              searchBox.focus = true
-            }
-          }
-          Text {
-            color: Global.colors.tertiary
-            text: (wallpaperSelectorRoot.tab + 1) + " of " + (Math.floor(wallpaperSelectorRoot.wallpapers.length/(4*10)) + 1)
-          }
-          Button {
-            Layout.fillWidth: true
-            text: " > "
-            onPressed: {
-              if (wallpaperSelectorRoot.tab < Math.floor(wallpaperSelectorRoot.wallpapers.length/(4*10))) {
-                wallpaperSelectorRoot.tab += 1
-              }
-              searchBox.focus = true
-            }
-          }
-        }
-        
-        Text {
-          visible: wallpaperSelectorRoot.favorites.length > 0
-          text: " " + wallpaperSelectorRoot.favorites.length + " favorites"
-          font.pixelSize: Global.format.text_size
-          color: Global.colors.primary
-          font.family: "JetBrainsMono Nerd Font"
-        }
-        
-        Text {
-          text: wallpaperSelectorRoot.wallpapers.length + " wallpapers"
-          font.pixelSize: Global.format.text_size
-          color: Global.colors.outline
-        }
+      Text {
+        text: "󰸉"
+        font.family: "JetBrainsMono Nerd Font"
+        font.pixelSize: Global.format.font_size_large
+        color: Global.colors.primary
       }
       
-      // Wallpaper grid
-      Rectangle {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        radius: Global.format.radius_large
-        color: Global.colors.surface
-        
-        GridView {
-          id: wallpaperGrid
-          anchors.fill: parent
-          anchors.margins: Global.format.spacing_medium
-          clip: true
-          cellWidth: 180
-          cellHeight: 160
-          focus: false
-          cacheBuffer: visible ? (4*10)*cellHeight : cellHeight*3
-          
-          populate: Transition {
-            NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 200 }
-          }
-          
-          model: wallpaperSelectorRoot.filterWallpapers
-          
-          delegate: Rectangle {
-            id: wallpaperItem
-            required property var modelData
-            required property int index
-            
-            width: wallpaperGrid.cellWidth - Global.format.spacing_small
-            height: wallpaperGrid.cellHeight - Global.format.spacing_small
-            radius: Global.format.radius_medium
-            color: mouseArea.containsMouse || wallpaperGrid.currentIndex === index ? 
-                  Global.colors.surface_container_high : Global.colors.surface_container
-            visible: wallpaperSelectorRoot.visible
-
-            Behavior on color {
-              ColorAnimation {
-                duration: 150
-                easing.type: Easing.OutCubic
-              }
-            }
-            
-            ColumnLayout {
-              anchors.fill: parent
-              anchors.margins: Global.format.spacing_small
-              spacing: Global.format.spacing_tiny
-              
-              // Image preview
-              Rectangle {
-                id: previewContainer
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                radius: Global.format.radius_small
-                color: Global.colors.surface_dim
-                clip: true
-
-                Loader {
-                  anchors.fill: parent
-                  active: wallpaperSelectorRoot.visible || Global.launcher?.visible
-                  asynchronous: true
-
-                  sourceComponent: Image {
-                    anchors.fill: parent
-                    source: wallpaperItem.modelData.preview
-                    fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
-                    cache: true
-                    mipmap: true
-                    retainWhileLoading: true
-                    Rectangle {
-                      anchors.fill: parent
-                      color: "transparent"
-                      border.width: wallpaperGrid.currentIndex === wallpaperItem.index ? 2 : 0
-                      border.color: Global.colors.primary
-                      radius: parent.radius
-                    }
-                  }
-                }
-                
-                // Wallpaper Engine badge
-                Rectangle {
-                  visible: wallpaperItem.modelData.type === "engine"
-                  anchors.top: parent.top
-                  anchors.right: parent.right
-                  anchors.margins: Global.format.spacing_tiny
-                  width: 24
-                  height: 24
-                  radius: 12
-                  color: Global.colors.tertiary
-                  
-                  Text {
-                    anchors.centerIn: parent
-                    text: "󰇻"
-                    font.family: "JetBrainsMono Nerd Font"
-                    font.pixelSize: 14
-                    color: Global.colors.on_tertiary
-                  }
-                }
-                
-                // Favorite star - as a separate clickable item
-                Rectangle {
-                  id: favStar
-                  anchors.top: parent.top
-                  anchors.left: parent.left
-                  anchors.margins: Global.format.spacing_tiny
-                  width: 24
-                  height: 24
-                  radius: 12
-                  color: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 
-                        Global.colors.primary : Global.colors.surface_dim
-                  opacity: favMouseArea.containsMouse || wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 1.0 : 0.6
-                  
-                  Behavior on color {
-                    ColorAnimation { duration: 150 }
-                  }
-                  
-                  Behavior on opacity {
-                    NumberAnimation { duration: 150 }
-                  }
-                  
-                  Text {
-                    anchors.centerIn: parent
-                    text: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? "" : ""
-                    font.family: "JetBrainsMono Nerd Font"
-                    font.pixelSize: 14
-                    color: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 
-                          Global.colors.on_primary : Global.colors.on_surface
-                  }
-                  
-                  // Separate MouseArea for the star only
-                  MouseArea {
-                    id: favMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                      console.log("Toggling favorite for:", wallpaperItem.modelData.name)
-                      wallpaperSelectorRoot.toggleFavorite(wallpaperItem.modelData)
-                    }
-                  }
-                }
-              }
-              
-              // File info
-              ColumnLayout {
-                Layout.fillWidth: true
-                Layout.preferredHeight: Global.format.font_size_small * 3
-                spacing: 0
-                
-                Text {
-                  Layout.fillWidth: true
-                  text: wallpaperItem.modelData.name
-                  font.pixelSize: Global.format.font_size_small
-                  color: Global.colors.on_surface_variant
-                  elide: Text.ElideMiddle
-                  font.bold: true
-                }
-                
-                Text {
-                  Layout.fillWidth: true
-                  text: wallpaperItem.modelData.folder
-                  font.pixelSize: Global.format.font_size_small - 2
-                  color: Global.colors.outline
-                  elide: Text.ElideRight
-                }
-              }
-            }
-
-            // Main MouseArea for the entire item (excluding the star)
-            MouseArea {
-              id: mouseArea
-              anchors.fill: parent
-              hoverEnabled: true
-              
-              anchors.topMargin: favStar.height + Global.format.spacing_tiny
-              propagateComposedEvents: false
-              
-              onClicked: (mouse) => {
-                wallpaperGrid.currentIndex = wallpaperItem.index
-              }
-              
-              onDoubleClicked: {
-                wallpaperSelectorRoot.setWallpaper(wallpaperItem.modelData)
-              }
-              
-              onPressAndHold: {
-                wallpaperGrid.currentIndex = wallpaperItem.index
-              }
-            }
-          }
-          
-          ScrollBar.vertical: ScrollBar {
-            policy: ScrollBar.AsNeeded
-          }
-        }
-        
-        Text {
-          anchors.centerIn: parent
-          visible: wallpaperGrid.count === 0
-          text: wallpaperSelectorRoot.searchText ? 
-                "No wallpapers match your search" : 
-                "No wallpapers found"
-          color: Global.colors.outline
-          font.pixelSize: Global.format.text_size
-        }
+      Text {
+        text: "Wallpaper Selector"
+        font.family: "JetBrainsMono Nerd Font"
+        font.pixelSize: Global.format.font_size_large
+        font.bold: true
+        color: Global.colors.on_surface_variant
       }
       
-      // Search bar
-      RowLayout {
+      RowLayout { 
         Layout.fillWidth: true
-        spacing: Global.format.spacing_medium
-        
-        TextField {
-          id: searchBox
-          Layout.fillWidth: true
-          implicitHeight: 39
-          color: Global.colors.on_surface
-          font.pixelSize: Global.format.text_size
-          placeholderText: "Search by name or folder..."
-          focus: wallpaperSelectorRoot.visible
-          
-          onTextChanged: {
-            wallpaperSelectorRoot.searchText = text
-            wallpaperGrid.currentIndex = 0
-          }
-          
-          onAccepted: {
-            if (wallpaperGrid.count > 0) {
-              wallpaperSelectorRoot.setWallpaper(wallpaperGrid.model[wallpaperGrid.currentIndex])
-            }
-          }
-          
-          Keys.onPressed: (event) => {
-            if (event.key === Qt.Key_Up) {
-              const cols = Math.floor(wallpaperGrid.width / wallpaperGrid.cellWidth)
-              if (wallpaperGrid.currentIndex >= cols) {
-                wallpaperGrid.currentIndex -= cols
-              }
-              event.accepted = true
-            } else if (event.key === Qt.Key_Down) {
-              const cols = Math.floor(wallpaperGrid.width / wallpaperGrid.cellWidth)
-              if (wallpaperGrid.currentIndex < wallpaperGrid.count - cols) {
-                wallpaperGrid.currentIndex += cols
-              }
-              event.accepted = true
-            } else if (event.key === Qt.Key_Left) {
-              if (wallpaperGrid.currentIndex > 0) {
-                wallpaperGrid.currentIndex -= 1
-              }
-              event.accepted = true
-            } else if (event.key === Qt.Key_Right) {
-              if (wallpaperGrid.currentIndex < wallpaperGrid.count - 1) {
-                wallpaperGrid.currentIndex += 1
-              }
-              event.accepted = true
-            } else if (event.key === Qt.Key_Escape) {
-              searchBox.clear()
-              wallpaperSelectorRoot.visible = false
-              grab.active = false
-              event.accepted = true
-            }
-          }
-          
-          background: Rectangle {
-            anchors.fill: parent
-            color: Global.colors.surface
-            radius: Global.format.radius_large
-          }
-        }
-        
+        spacing: Global.format.spacing_large
         Button {
-          implicitHeight: 39
-          implicitWidth: contentItem.implicitWidth + Global.format.spacing_large
-          text: "󰑐 Refresh"
-          
-          onClicked: {
-            wallpaperSelectorRoot.scanWallpapers()
+          Layout.fillWidth: true
+          text: " < "
+          onPressed: {
+            if (wallpaperSelectorRoot.tab > 0){
+              wallpaperSelectorRoot.tab -= 1
+            }
             searchBox.focus = true
           }
+        }
+        Text {
+          color: Global.colors.tertiary
+          text: (wallpaperSelectorRoot.tab + 1) + " of " + (Math.floor(wallpaperSelectorRoot.wallpapers.length/(4*10)) + 1)
+        }
+        Button {
+          Layout.fillWidth: true
+          text: " > "
+          onPressed: {
+            if (wallpaperSelectorRoot.tab < Math.floor(wallpaperSelectorRoot.wallpapers.length/(4*10))) {
+              wallpaperSelectorRoot.tab += 1
+            }
+            searchBox.focus = true
+          }
+        }
+      }
+      
+      Text {
+        visible: wallpaperSelectorRoot.favorites.length > 0
+        text: " " + wallpaperSelectorRoot.favorites.length + " favorites"
+        font.pixelSize: Global.format.text_size
+        color: Global.colors.primary
+        font.family: "JetBrainsMono Nerd Font"
+      }
+      
+      Text {
+        text: wallpaperSelectorRoot.wallpapers.length + " wallpapers"
+        font.pixelSize: Global.format.text_size
+        color: Global.colors.outline
+      }
+    }
+    
+    // Wallpaper grid
+    Rectangle {
+      Layout.fillWidth: true
+      Layout.fillHeight: true
+      radius: Global.format.radius_large
+      color: Global.colors.surface
+      
+      GridView {
+        id: wallpaperGrid
+        anchors.fill: parent
+        anchors.margins: Global.format.spacing_medium
+        clip: true
+        cellWidth: 180
+        cellHeight: 160
+        focus: false
+        cacheBuffer: visible ? (4*10)*cellHeight : cellHeight*3
+        
+        populate: Transition {
+          NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 200 }
+        }
+        
+        model: wallpaperSelectorRoot.filterWallpapers
+        
+        delegate: Rectangle {
+          id: wallpaperItem
+          required property var modelData
+          required property int index
           
-          background: Rectangle {
-            color: parent.pressed ? Global.colors.primary : 
-                   (parent.hovered ? Global.colors.primary_container : Global.colors.surface)
-            radius: Global.format.radius_large
+          width: wallpaperGrid.cellWidth - Global.format.spacing_small
+          height: wallpaperGrid.cellHeight - Global.format.spacing_small
+          radius: Global.format.radius_medium
+          color: mouseArea.containsMouse || wallpaperGrid.currentIndex === index ? 
+                Global.colors.surface_container_high : Global.colors.surface_container
+          visible: wallpaperSelectorRoot.visible
+
+          Behavior on color {
+            ColorAnimation {
+              duration: 150
+              easing.type: Easing.OutCubic
+            }
           }
           
-          contentItem: Text {
-            text: parent.text
-            color: parent.pressed ? Global.colors.on_primary : Global.colors.on_surface_variant
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: Global.format.text_size
-            font.family: "JetBrainsMono Nerd Font"
+          ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: Global.format.spacing_small
+            spacing: Global.format.spacing_tiny
+            
+            // Image preview
+            Rectangle {
+              id: previewContainer
+              Layout.fillWidth: true
+              Layout.fillHeight: true
+              radius: Global.format.radius_small
+              color: Global.colors.surface_dim
+              clip: true
+
+              Loader {
+                anchors.fill: parent
+                active: wallpaperSelectorRoot.visible || Global.launcher?.visible
+                asynchronous: true
+
+                sourceComponent: Image {
+                  anchors.fill: parent
+                  source: wallpaperItem.modelData.preview
+                  fillMode: Image.PreserveAspectCrop
+                  asynchronous: true
+                  cache: true
+                  mipmap: true
+                  retainWhileLoading: true
+                  Rectangle {
+                    anchors.fill: parent
+                    color: "transparent"
+                    border.width: wallpaperGrid.currentIndex === wallpaperItem.index ? 2 : 0
+                    border.color: Global.colors.primary
+                    radius: parent.radius
+                  }
+                }
+              }
+              
+              // Wallpaper Engine badge
+              Rectangle {
+                visible: wallpaperItem.modelData.type === "engine"
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: Global.format.spacing_tiny
+                width: 24
+                height: 24
+                radius: 12
+                color: Global.colors.tertiary
+                
+                Text {
+                  anchors.centerIn: parent
+                  text: "󰇻"
+                  font.family: "JetBrainsMono Nerd Font"
+                  font.pixelSize: 14
+                  color: Global.colors.on_tertiary
+                }
+              }
+              
+              // Favorite star - as a separate clickable item
+              Rectangle {
+                id: favStar
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.margins: Global.format.spacing_tiny
+                width: 24
+                height: 24
+                radius: 12
+                color: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 
+                      Global.colors.primary : Global.colors.surface_dim
+                opacity: favMouseArea.containsMouse || wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 1.0 : 0.6
+                
+                Behavior on color {
+                  ColorAnimation { duration: 150 }
+                }
+                
+                Behavior on opacity {
+                  NumberAnimation { duration: 150 }
+                }
+                
+                Text {
+                  anchors.centerIn: parent
+                  text: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? "" : ""
+                  font.family: "JetBrainsMono Nerd Font"
+                  font.pixelSize: 14
+                  color: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 
+                        Global.colors.on_primary : Global.colors.on_surface
+                }
+                
+                // Separate MouseArea for the star only
+                MouseArea {
+                  id: favMouseArea
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: {
+                    console.log("Toggling favorite for:", wallpaperItem.modelData.name)
+                    wallpaperSelectorRoot.toggleFavorite(wallpaperItem.modelData)
+                  }
+                }
+              }
+            }
+            
+            // File info
+            ColumnLayout {
+              Layout.fillWidth: true
+              Layout.preferredHeight: Global.format.font_size_small * 3
+              spacing: 0
+              
+              Text {
+                Layout.fillWidth: true
+                text: wallpaperItem.modelData.name
+                font.pixelSize: Global.format.font_size_small
+                color: Global.colors.on_surface_variant
+                elide: Text.ElideMiddle
+                font.bold: true
+              }
+              
+              Text {
+                Layout.fillWidth: true
+                text: wallpaperItem.modelData.folder
+                font.pixelSize: Global.format.font_size_small - 2
+                color: Global.colors.outline
+                elide: Text.ElideRight
+              }
+            }
           }
+
+          // Main MouseArea for the entire item (excluding the star)
+          MouseArea {
+            id: mouseArea
+            anchors.fill: parent
+            hoverEnabled: true
+            
+            anchors.topMargin: favStar.height + Global.format.spacing_tiny
+            propagateComposedEvents: false
+            
+            onClicked: (mouse) => {
+              wallpaperGrid.currentIndex = wallpaperItem.index
+            }
+            
+            onDoubleClicked: {
+              wallpaperSelectorRoot.setWallpaper(wallpaperItem.modelData)
+            }
+            
+            onPressAndHold: {
+              wallpaperGrid.currentIndex = wallpaperItem.index
+            }
+          }
+        }
+        
+        ScrollBar.vertical: ScrollBar {
+          policy: ScrollBar.AsNeeded
+        }
+      }
+      
+      Text {
+        anchors.centerIn: parent
+        visible: wallpaperGrid.count === 0
+        text: wallpaperSelectorRoot.searchText ? 
+              "No wallpapers match your search" : 
+              "No wallpapers found"
+        color: Global.colors.outline
+        font.pixelSize: Global.format.text_size
+      }
+    }
+    
+    // Search bar
+    RowLayout {
+      Layout.fillWidth: true
+      spacing: Global.format.spacing_medium
+      
+      TextField {
+        id: searchBox
+        Layout.fillWidth: true
+        implicitHeight: 39
+        color: Global.colors.on_surface
+        font.pixelSize: Global.format.text_size
+        placeholderText: "Search by name or folder..."
+        focus: wallpaperSelectorRoot.visible
+        
+        onTextChanged: {
+          wallpaperSelectorRoot.searchText = text
+          wallpaperGrid.currentIndex = 0
+        }
+        
+        onAccepted: {
+          if (wallpaperGrid.count > 0) {
+            wallpaperSelectorRoot.setWallpaper(wallpaperGrid.model[wallpaperGrid.currentIndex])
+          }
+        }
+        
+        Keys.onPressed: (event) => {
+          if (event.key === Qt.Key_Up) {
+            const cols = Math.floor(wallpaperGrid.width / wallpaperGrid.cellWidth)
+            if (wallpaperGrid.currentIndex >= cols) {
+              wallpaperGrid.currentIndex -= cols
+            }
+            event.accepted = true
+          } else if (event.key === Qt.Key_Down) {
+            const cols = Math.floor(wallpaperGrid.width / wallpaperGrid.cellWidth)
+            if (wallpaperGrid.currentIndex < wallpaperGrid.count - cols) {
+              wallpaperGrid.currentIndex += cols
+            }
+            event.accepted = true
+          } else if (event.key === Qt.Key_Left) {
+            if (wallpaperGrid.currentIndex > 0) {
+              wallpaperGrid.currentIndex -= 1
+            }
+            event.accepted = true
+          } else if (event.key === Qt.Key_Right) {
+            if (wallpaperGrid.currentIndex < wallpaperGrid.count - 1) {
+              wallpaperGrid.currentIndex += 1
+            }
+            event.accepted = true
+          } else if (event.key === Qt.Key_Escape) {
+            searchBox.clear()
+            wallpaperSelectorRoot.visible = false
+            grab.active = false
+            event.accepted = true
+          }
+        }
+        
+        background: Rectangle {
+          anchors.fill: parent
+          color: Global.colors.surface
+          radius: Global.format.radius_large
+        }
+      }
+      
+      Button {
+        implicitHeight: 39
+        implicitWidth: contentItem.implicitWidth + Global.format.spacing_large
+        text: "󰑐 Refresh"
+        
+        onClicked: {
+          wallpaperSelectorRoot.scanWallpapers()
+          searchBox.focus = true
+        }
+        
+        background: Rectangle {
+          color: parent.pressed ? Global.colors.primary : 
+                  (parent.hovered ? Global.colors.primary_container : Global.colors.surface)
+          radius: Global.format.radius_large
+        }
+        
+        contentItem: Text {
+          text: parent.text
+          color: parent.pressed ? Global.colors.on_primary : Global.colors.on_surface_variant
+          horizontalAlignment: Text.AlignHCenter
+          verticalAlignment: Text.AlignVCenter
+          font.pixelSize: Global.format.text_size
+          font.family: "JetBrainsMono Nerd Font"
         }
       }
     }
