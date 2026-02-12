@@ -1,0 +1,255 @@
+import Quickshell
+import Quickshell.Io
+import Quickshell.Services.Pipewire
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import QtQml.Models
+import qs.components.widget
+import qs
+
+DropdownWindow {
+  id: menuRoot
+  implicitWidth: 550
+  implicitHeight: 200
+  color: "transparent" 
+  
+  Rectangle {
+    anchors.margins: Global.format.spacing_large
+    anchors.fill: parent
+    radius: Global.format.radius_large
+    color: Global.colors.inverse_on_surface
+    
+    ColumnLayout {
+      anchors.fill: parent
+      anchors.margins: Global.format.spacing_large
+      spacing: Global.format.spacing_medium
+      
+      Tabbar {
+        id: tabs
+        model: [
+          {text: "Devices"},
+          {text: "Sourses"}
+        ]
+      }
+
+      RowLayout {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        spacing: Global.format.spacing_medium
+
+        Rectangle {
+          Layout.fillWidth: true
+          Layout.fillHeight: true
+          color: Global.colors.surface_variant
+          radius: Global.format.radius_large
+
+          Text {
+            anchors.fill: parent
+
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+
+            text: tabs.index == 0 ? "No inputs detected" : "No programs currently playing audio"
+            font.pixelSize: Global.format.text_size
+            visible: inputList.count <= 0
+            color: Global.colors.on_surface_variant
+          }
+
+          ListView {
+            id: inputList
+            anchors.fill: parent
+            anchors.margins: Global.format.spacing_small
+            spacing: Global.format.spacing_tiny
+            clip: true
+            focus: false
+
+            populate: Transition {
+              NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 100 }
+            }
+
+            model: {
+              const sources = []
+              for (const val in Pipewire.nodes.values) {
+                const node = Pipewire.nodes.values[val]
+                if (tabs.index == 0 && (!node.isSink && !node.isStream && node.audio) ||
+                    tabs.index == 1 && (node.isStream && node.isSink && node.audio)) {
+                  sources.push(node)
+                }
+              }
+              return sources
+            }
+
+            visible: model.legth() > 0
+
+            delegate: Rectangle {
+              id: inputItem
+              required property var modelData
+              property bool selected: inputList.currentItem?.modelData.id === modelData.id
+              width: inputList.width - scrollBar2.width
+              height: Global.format.module_height + Global.format.spacing_medium
+              radius: Global.format.radius_medium
+              color: tabs.index == 0 ? 
+                     (mouseArea.containsMouse || Pipewire.defaultAudioSource.id == modelData.id ? Global.colors.surface_container_high : "transparent") :
+                     Global.colors.surface_container_low
+              
+              Behavior on color {
+                ColorAnimation {
+                  duration: 150
+                  easing.type: Easing.OutCubic
+                }
+              }
+              
+              PwObjectTracker {
+                id: nodeTracker
+                objects: [modelData]
+              }
+
+              RowLayout {
+                anchors.fill: parent
+                anchors.margins: Global.format.spacing_small
+                spacing: Global.format.spacing_medium
+                  
+                Text {
+                  text: (tabs.index == 1 ? "   " : "  ") + (modelData.nickname || modelData.name || "Unnamed Node")
+                  color: Global.colors.on_surface_variant
+                  font.pixelSize: Global.format.text_size
+                  font.bold: true
+                  elide: Text.ElideRight
+                }
+                
+                StyledSlider {
+                  id: volumeSlider
+                  Layout.fillWidth: true
+                  visible: tabs.index == 1 && modelData.audio
+
+                  from: 0
+                  to: 100
+                  value: modelData.audio.volume * 100
+
+                  onValueChanged: {
+                    if (modelData.audio)
+                      modelData.audio.volume = value / 100
+                  }
+                }
+              }
+
+              MouseArea {
+                id: mouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                enabled: tabs.index == 0
+                onClicked: {
+                  if (tabs.index == 0) Pipewire.preferredDefaultAudioSource = modelData
+                }
+                propagateComposedEvents: true
+              }
+            }
+
+            ScrollBar.vertical: ScrollBar {
+              id: scrollBar2
+              policy: ScrollBar.AsNeeded
+            }
+          }
+        }
+
+        Rectangle {
+          Layout.preferredWidth: tabs.index == 0 ? 
+                                 parent.width / 2 - Global.format.spacing_medium / 2 : 
+                                 0
+          Layout.fillHeight: true
+          color: Global.colors.surface_variant
+          radius: Global.format.radius_large
+
+          visible: Layout.preferredWidth != 0
+
+          Behavior on Layout.preferredWidth {
+            NumberAnimation {
+              duration: 150
+              easing.type: Easing.OutCubic
+            }
+          }
+
+          Text {
+            anchors.fill: parent
+
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+
+            text: "No outputs detected"
+            font.pixelSize: Global.format.text_size
+            visible: outputList.count <= 0
+            color: Global.colors.on_surface_variant
+          }
+
+          ListView {
+            id: outputList
+            anchors.fill: parent
+            anchors.margins: Global.format.spacing_small
+            spacing: Global.format.spacing_tiny
+            clip: true
+            focus: false
+            visible: tabs.index == 0
+            populate: Transition {
+              NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 100 }
+            }
+            model: {
+              const sinks = []
+              for (const val in Pipewire.nodes.values) {
+                const node = Pipewire.nodes.values[val]
+                if (node.isSink && !node.isStream) {
+                  sinks.push(node)
+                }
+              }
+              return sinks
+            }
+
+            delegate: Rectangle {
+              id: outputItem
+              required property var modelData
+              property bool selected: outputList.currentItem?.modelData.id === modelData.id
+              width: outputList.width - scrollBar.width
+              height: Global.format.module_height + Global.format.spacing_medium
+              radius: Global.format.radius_medium
+              color: mouseArea.containsMouse || Pipewire.defaultAudioSink.id == modelData.id ? Global.colors.surface_container_high : "transparent"
+              Behavior on color {
+                ColorAnimation {
+                  duration: 150
+                  easing.type: Easing.OutCubic
+                }
+              }
+              RowLayout {
+                anchors.fill: parent
+                anchors.margins: Global.format.spacing_small
+                spacing: Global.format.spacing_medium
+                ColumnLayout {
+                  Layout.fillWidth: true
+                  Layout.alignment: Qt.AlignVCenter
+                  spacing: 0
+                  Text {
+                    Layout.fillWidth: true
+                    text: "  " + (modelData.nickname || modelData.name || "Unnamed Node")
+                    color: Global.colors.on_surface_variant
+                    font.pixelSize: Global.format.text_size
+                    font.bold: true
+                    elide: Text.ElideRight
+                  }
+                }
+              }
+              MouseArea {
+                id: mouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: Pipewire.preferredDefaultAudioSink = modelData
+              }
+            }
+            ScrollBar.vertical: ScrollBar {
+              id: scrollBar
+              policy: ScrollBar.AsNeeded
+            }
+          }
+        }
+      }
+    }
+  } 
+}
