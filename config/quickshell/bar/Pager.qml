@@ -92,8 +92,9 @@ ModuleBase {
           return ""
         }
 
-        visible: (pagerRoot.i3 || wsId >= 1)
-                && wsOutput.toString() === pagerRoot.screen.name.toString()
+        visible: (wsId > 0
+          && wsOutput.toString() === pagerRoot.screen.name.toString())
+          || (wsId < 0 && pagerRoot.i3)
 
         color: wsActive
           ? Global.colors.primary
@@ -115,7 +116,11 @@ ModuleBase {
           anchors.fill: parent
           onClicked: {
             if (pagerRoot.i3) {
-              I3.dispatch(`workspace ${wsLabel}`);
+              if (wsId >= 0) {
+                I3.dispatch(`workspace ${wsLabel}`)
+              } else {
+                I3.dispatch(`[workspace=${wsLabel}] move workspace to output current; workspace ${wsLabel}`)
+              }
               return
             }
 
