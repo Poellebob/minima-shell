@@ -10,6 +10,10 @@ bindsym $mod+v exec qs ipc call minimaClipboard open
 bindsym $mod+d exec qs ipc call minimaLauncher open
 bindsym $mod+Shift+c exec scrollmsg reload
 
+bindsym $mod+Mod1+j move left nomode after
+bindsym $mod+Mod1+k move right nomode after
+bindsym --no-repeat $mod+tab scale_workspace overview
+
 # Screenshots
 bindsym Print exec grim -g "$(slurp)" - | convert - -shave 1x1 PNG:- | wl-copy
 bindsym Shift+Print exec grim - | wl-copy
