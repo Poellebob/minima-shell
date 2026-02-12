@@ -6,6 +6,7 @@ layout_default_height 1.0
 gaps inner 3
 gaps outer 3
 default_border pixel 2
+default_decoration border_radius 8
 
 # Animations
 animations {
