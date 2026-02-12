@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import Quickshell.Hyprland
+import Quickshell.I3
 import Quickshell.Io
 import qs.components.bar
 import qs.components.text
@@ -15,12 +16,18 @@ ModuleBase {
 
   required property var screen
   property bool hyprland: false
+  property bool i3: false
 
   Component.onCompleted: {
     switch (Quickshell.env("XDG_CURRENT_DESKTOP")) {
       case "Hyprland":
         pagerRoot.hyprland = true
-        break;
+        break
+      case "sway":
+      case "i3":
+      case "scroll":
+        pagerRoot.i3 = true
+        break
     }
   }
 
@@ -29,34 +36,91 @@ ModuleBase {
     anchors.fill: parent
     anchors.margins: Global.format.spacing_small
     spacing: Global.format.spacing_small
-
+    
     Repeater {
       model: {
         if (pagerRoot.hyprland) {
           return Hyprland.workspaces
-        } else {
-          return {}
         }
+        if (pagerRoot.i3) {
+          return I3.workspaces
+        }
+        return []
       }
-      delegate: Rectangle {
-        visible: (pagerRoot.screen.name === modelData.monitor.name) && modelData.id >= 1
 
-        color: modelData.active ? Global.colors.primary : Global.colors.secondary
-        
+      delegate: Rectangle {
+
+        property int wsId: {
+          if (pagerRoot.hyprland) {
+            return modelData.id
+          }
+
+          if (pagerRoot.i3) {
+            return modelData.number
+          }
+        }
+
+        property bool wsActive: {
+          if (pagerRoot.hyprland) {
+            return modelData.active
+          }
+
+          if (pagerRoot.i3) {
+            return modelData.focused
+          }
+        }
+
+        property string wsOutput: {
+          if (pagerRoot.hyprland) {
+            return modelData.monitor.name
+          }
+
+          if (pagerRoot.i3) {
+            return modelData.monitor.name          
+          }
+        }
+
+        property string wsLabel: {
+          if (pagerRoot.hyprland) {
+            return wsId.toString()
+          }
+
+          if (pagerRoot.i3) {
+            return modelData.name
+          }
+
+          return ""
+        }
+
+        visible: (pagerRoot.i3 || wsId >= 1)
+                && wsOutput.toString() === pagerRoot.screen.name.toString()
+
+        color: wsActive
+          ? Global.colors.primary
+          : Global.colors.secondary
+
         implicitHeight: Global.format.module_height - Global.format.spacing_small
-        implicitWidth: implicitHeight
+        implicitWidth: Math.max(implicitHeight, text.width + Global.format.spacing_small)
         anchors.verticalCenter: parent.verticalCenter
         radius: Global.format.module_radius
 
-        StyledText{
-          text: modelData.id
+        StyledText {
+          id: text
+          text: wsLabel
           color: Global.colors.on_primary
           anchors.horizontalCenter: parent.horizontalCenter
         }
-        
+
         MouseArea {
           anchors.fill: parent
-          onClicked: modelData.activate()
+          onClicked: {
+            if (pagerRoot.i3) {
+              I3.dispatch(`workspace ${wsLabel}`);
+              return
+            }
+
+            modelData.activate()
+          }
         }
       }
     }

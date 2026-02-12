@@ -1,0 +1,19 @@
+# Output configuration
+layout_default_width 0.5
+layout_default_height 1.0
+
+# Gaps and borders
+gaps inner 3
+gaps outer 3
+default_border pixel 1
+
+# Animations
+animations {
+    enabled yes
+    style scale
+    default yes 30 var simple [ 0.16 1 0.3 1 ]
+
+    window_open yes 30 var 3 [ 0 0 1 1 ]
+    window_move yes 30 var 3 [ 0.215 0.61 0.355 1 ] off 0.05 6 [0 0.6 0.4 0 1 0 0.4 -0.6 1 -0.6]
+    window_size yes 30 var 3 [ -0.35 0 0 0.5 ]
+}
