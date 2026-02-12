@@ -5,10 +5,12 @@ bindsym $mod+e exec $fileManager
 bindsym $mod+q kill
 bindsym $mod+space floating toggle
 bindsym $mod+f fullscreen toggle
-bindsym $mod+Mod1+l exec hyprlock
+bindsym $mod+Mod1+Delete exec hyprlock
 bindsym $mod+v exec qs ipc call minimaClipboard open
 bindsym $mod+d exec qs ipc call minimaLauncher open
 bindsym $mod+Shift+c exec scrollmsg reload
+bindsym $mod+Mod1+l set_size h 1.0
+bindsym $mod+Mod1+h set_size h 0.5
 
 bindsym $mod+Mod1+j move left nomode after
 bindsym $mod+Mod1+k move right nomode after
