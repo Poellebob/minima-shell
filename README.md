@@ -1,10 +1,15 @@
-# Install
-**Warning backup your configs**
 # minima-shell
 
-minima-shell is a userspace shell and a hyprland config in one.
+minima-shell is a userspace shell and a [scroll](https://github.com/dawsers/scroll/) and [hyprland](https://hypr.land/) config in one.
 
-**warning:** this project is not done and is still pre-alpha, it will contain bugs
+Even tho it it supports hyprland fully it is not as featrue complete as scroll.
+
+i3 and sway is also supported but a config is not provided yet.
+
+**Warning:** this project is not done and is still pre-alpha, it will contain bugs
+
+# Install
+**Warning backup your configs**
 
 ## Manual
 
@@ -65,4 +70,43 @@ sudo usermod -aG libvirt,video,render,kvm $(whoami)
 
 sudo virsh net-start default
 sudo virsh net-autostart default
+```
+
+# Sway/Scroll/i3
+
+## Screen
+
+```conf
+# display definitions
+output DP-1 {
+    res 1920x1080
+    position 0 0
+    scale 1.0
+}
+
+output HDMI-A-1 {
+    res 1920x1080
+    position -1920 0
+    scale 1.0
+}
+
+# define workspases for screens
+workspace 1 output DP-1
+workspace 10 output HDMI-A-1
+
+exec swaymsg workspace 1
+exec swaymsg workspace 10
+```
+
+## Make a app workspace
+
+This will be shown in the pager
+
+```conf
+set $ws "stremio" # name that will be shown in the pager
+
+for_window [app_id="com.stremio.stremio"] move to workspace $ws
+
+# force fullscreen
+for_window [app_id="com.stremio.stremio"] fullscreen enable
 ```

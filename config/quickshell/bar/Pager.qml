@@ -60,16 +60,6 @@ ModuleBase {
           }
         }
 
-        property bool wsActive: {
-          if (pagerRoot.hyprland) {
-            return modelData.active
-          }
-
-          if (pagerRoot.i3) {
-            return modelData.focused
-          }
-        }
-
         property string wsOutput: {
           if (pagerRoot.hyprland) {
             return modelData.monitor.name
@@ -77,6 +67,16 @@ ModuleBase {
 
           if (pagerRoot.i3) {
             return modelData.monitor.name          
+          }
+        }
+
+        property bool wsActive: {
+          if (pagerRoot.hyprland) {
+            return modelData.active
+          }
+
+          if (pagerRoot.i3) {
+            return modelData.focused && (wsOutput.toString() === pagerRoot.screen.name.toString())
           }
         }
 
