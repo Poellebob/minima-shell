@@ -1,0 +1,32 @@
+MenuBar=Disabled
+
+[DetailsMode]
+PreviewSize=22
+
+[ExtractDialog]
+1671x1114 screen: Height=1080
+1671x1114 screen: Width=856
+1920x1080 screen: Height=1050
+1920x1080 screen: Width=955
+2 screens: Height=1045
+2 screens: Width=1135
+2 screens: Window-Maximized=true
+DirHistory[$e]=$HOME/Downloads/cp2077/,$HOME/Downloads/,$HOME/Desktop/,$HOME/Desktop/cp2077 mods/mods/,$HOME/Desktop/cp2077 mods/
+
+[General]
+LockPanels=false
+Version=202
+ViewPropsTimestamp=2026,2,6,8,49,53.591
+
+[IconsMode]
+PreviewSize=256
+
+[KFileDialog Settings]
+Places Icons Auto-resize=false
+Places Icons Static Size=22
+
+[MainWindow]
+MenuBar=Disabled
+
+[Search]
+SearchTool=Baloo
