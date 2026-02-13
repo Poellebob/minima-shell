@@ -1,0 +1,27 @@
+# Temeing
+export QT_QPA_PLATFORMTHEME=qt6ct 
+export GTK_THEME=Breeze-Dark
+
+export XCURSOR_THEME=BreezeX-RosePine-Linux
+export XCURSOR_SIZE=24
+
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+
+# Backend
+export GDK_BACKEND="wayland,x11"
+export SDL_VIDEODRIVER=wayland
+export CLUTTER_BACKEND=wayland
+#export ELECTRON_OZONE_PLATFORM_HINT=wayland
+
+export QT_SCALE_FACTOR_ROUNDING_POLICY=RoundPreferFloor
+
+
+# XDG desktop variables to set scroll as the desktop
+export XDG_CURRENT_DESKTOP=scroll
+export XDG_SESSION_TYPE=wayland
+export XDG_SESSION_DESKTOP=scroll
+
+# Nvidia
+#export LIBVA_DRIVER_NAME=nvidia
+#export GBM_BACKEND=nvidia-drm
+#export __GLX_VENDOR_LIBRARY_NAME=nvidia

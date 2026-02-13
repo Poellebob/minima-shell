@@ -1,7 +1,0 @@
-*
-!.gitignore
-
-!profiles.ini
-!Profile/
-!Profile/chrome
-!Profile/chrome/**

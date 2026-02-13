@@ -1,0 +1,6 @@
+exec systemctl --user import-environment GTK_THEME QT_QPA_PLATFORMTHEME
+set $gtk_theme Breeze-Dark
+set $qt_theme qt6ct
+exec_always gsettings set org.gnome.desktop.interface gtk-theme $gtk_theme
+
+seat seat0 xcursor_theme BreezeX-RosePine-Linux 24
