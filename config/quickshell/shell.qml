@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import qs.bar
 import qs.launcher
+import qs.widgets.logout
 
 ShellRoot {
   id: root
@@ -29,4 +30,6 @@ ShellRoot {
       Component.onCompleted: Global.wallpaperSelector = wallpaperSelector
     }
   }
+
+  Logout { id: logout }
 }

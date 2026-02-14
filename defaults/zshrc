@@ -25,6 +25,27 @@ export PATH=~/.npm-global/bin:$PATH
 
 zsh-defer source /usr/share/nvm/init-nvm.sh
 
+zv() {
+  local prev="$PWD"
+  z "$1" || return
+  nvim .
+  cd "$prev"
+}
+
+ziv() {
+  local prev="$PWD"
+  zi || return
+  nvim .
+  cd "$prev"
+}
+
+alias lock='hyprlock'
+alias hibernate='systemctl hibernate'
+alias suspend='systemctl suspend'
+alias reboot='systemctl reboot'
+alias poweroff='systemctl poweroff'
+alias logout='loginctl terminate-session "$XDG_SESSION_ID"'
+
 # ---------------------------
 # Start Fetch
 # ---------------------------
