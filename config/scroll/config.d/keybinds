@@ -41,6 +41,9 @@ bindsym $mod+Shift+l resize grow width 100px
 bindsym $mod+Shift+k resize shrink height 100px
 bindsym $mod+Shift+j resize grow height 100px
 
+# Screenlock
+bindsym XF86PowerOff exec qs ipc call minimaLogout open
+
 # Multimedia keys
 bindsym XF86AudioRaiseVolume exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
 bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
