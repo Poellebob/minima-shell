@@ -101,7 +101,7 @@ Item {
         Layout.bottomMargin: Global.format.font_size_small
         horizontalAlignment: Text.AlignHCenter
         text: ""
-        font.family: "CommitMono Nerd Font Mono"
+        font.family: "JetBrainsMono Nerd Font Mono"
         font.pixelSize: Global.format.font_size_xlarge
         font.bold: true
         color: Global.colors.on_surface_variant
@@ -144,7 +144,7 @@ Item {
         Layout.bottomMargin: Global.format.font_size_small
         horizontalAlignment: Text.AlignHCenter
         text: ""
-        font.family: "CommitMono Nerd Font Mono"
+        font.family: "JetBrainsMono Nerd Font Mono"
         font.pixelSize: Global.format.font_size_xlarge
         font.bold: true
         color: Global.colors.on_surface_variant
@@ -187,7 +187,7 @@ Item {
         Layout.bottomMargin: Global.format.font_size_small
         horizontalAlignment: Text.AlignHCenter
         text: "󰋊"
-        font.family: "CommitMono Nerd Font Mono"
+        font.family: "JetBrainsMono Nerd Font Mono"
         font.pixelSize: Global.format.font_size_large
         font.bold: true
         color: Global.colors.on_surface_variant
