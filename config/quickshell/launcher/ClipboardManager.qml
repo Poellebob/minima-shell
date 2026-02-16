@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Io
+import Quickshell.Wayland
 import qs.components.widget
 import qs
 
@@ -12,6 +13,8 @@ MenuPanel {
   menuWidth: 600
   property var clipboardEntries: []
   property string searchText: ""
+
+  WlrLayershell.layer: WlrLayer.Overlay
   
   onVisibleChanged: {
     if (visible) {
