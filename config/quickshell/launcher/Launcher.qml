@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
+import Quickshell.Wayland
 import qs.components.widget
 import qs
 
@@ -13,6 +14,8 @@ MenuPanel {
   menuHeight: 400
 
   property string mathjsPath: Global.settings["Launcher"]["mathjsPath"]
+
+  WlrLayershell.layer: WlrLayer.Overlay
 
   IpcHandler {
     target: "minimaLauncher"

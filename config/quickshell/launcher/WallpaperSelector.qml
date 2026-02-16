@@ -472,7 +472,7 @@ MenuPanel {
       RowLayout { 
         Layout.fillWidth: true
         spacing: Global.format.spacing_large
-        Button {
+        StyledButton {
           Layout.fillWidth: true
           text: " < "
           onPressed: {
@@ -486,7 +486,7 @@ MenuPanel {
           color: Global.colors.tertiary
           text: (wallpaperSelectorRoot.tab + 1) + " of " + (Math.floor(wallpaperSelectorRoot.wallpapers.length/(4*10)) + 1)
         }
-        Button {
+        StyledButton {
           Layout.fillWidth: true
           text: " > "
           onPressed: {

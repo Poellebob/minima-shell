@@ -1,8 +1,10 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import qs.components.widget
 
 PanelWindow {
   id: logoutRoot
@@ -42,19 +44,22 @@ PanelWindow {
     visible = false
   }
 
-  Grid {
+  GridLayout {
     id: buttonGrid
 
     columns: 3
-    rows: 2
-    spacing: Global.format.spacing_large
+    columnSpacing: Global.format.spacing_large
+    rowSpacing: Global.format.spacing_large
 
-    Button {
+    StyledButton {
       width: 200
       height: 200
       text: "Logout"
 
-      onClicked: {
+      implicitWidth: 200
+      implicitHeight: 200
+
+      onPressed: {
         Quickshell.execDetached([
           "sh",
           "-c",
@@ -64,52 +69,67 @@ PanelWindow {
       }
     }
 
-    Button {
+    StyledButton {
       width: 200
       height: 200
       text: "Poweroff"
 
-      onClicked: {
+      implicitWidth: 200
+      implicitHeight: 200
+
+      onPressed: {
         logoutRoot.run(["systemctl", "poweroff"])
       }
     }
 
-    Button {
+    StyledButton {
       width: 200
       height: 200
       text: "Reboot"
 
-      onClicked: {
+      implicitWidth: 200
+      implicitHeight: 200
+
+      onPressed: {
         logoutRoot.run(["systemctl", "reboot"])
       }
     }
 
-    Button {
+    StyledButton {
       width: 200
       height: 200
       text: "Sleep"
 
-      onClicked: {
+      implicitWidth: 200
+      implicitHeight: 200
+
+      onPressed: {
         logoutRoot.run(["systemctl", "suspend"])
       }
     }
 
-    Button {
+    StyledButton {
       width: 200
       height: 200
       text: "Lock"
 
-      onClicked: {
+      implicitWidth: 200
+      implicitHeight: 200
+
+      onPressed: {
         logoutRoot.run(["hyprlock"])
       }
     }
 
-    Button {
+    StyledButton {
       width: 200
       height: 200
       text: "Hibernate"
 
-      onClicked: {
+      implicitWidth: 200
+      implicitHeight: 200
+
+      onPressed: {
         logoutRoot.run(["systemctl", "hibernate"])
       }
     }
