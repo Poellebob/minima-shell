@@ -1,8 +1,8 @@
-
 import QtQuick
 import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
+import Quickshell.Wayland
 
 PanelWindow {
   id: logoutRoot
@@ -13,6 +13,8 @@ PanelWindow {
   visible: false
   color: "transparent"
   focusable: true
+
+  WlrLayershell.layer: WlrLayer.Overlay
 
   Process {
     command: [

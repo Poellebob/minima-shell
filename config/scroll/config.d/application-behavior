@@ -16,14 +16,3 @@ layout_default_width 0.5
 layout_default_height 1.0
 layout_widths [0.33333333 0.5 0.666666667 1.0]
 layout_heights [0.33333333 0.5 0.666666667 1.0]
-
-# Define the Special Workspaces
-set $ws_discord "discord"
-set $ws_spotify "spotify"
-set $ws_obs     "obs"
-
-# Assign Apps to Special Workspaces
-assign [class="discord|WebCord"] workspace $ws_discord
-assign [class="spotify|spotify-launcher|Spotify"] workspace $ws_spotify
-assign [app_id="spotify|spotify-launcher|Spotify"] workspace $ws_spotify
-assign [class="obs-studio"] workspace $ws_obs
