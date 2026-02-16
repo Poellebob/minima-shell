@@ -27,8 +27,3 @@ bindsym $mod+Shift+0 move container to workspace number 10
 # Scroll through workspaces
 bindsym $mod+Control+Right workspace next
 bindsym $mod+Control+Left workspace prev
-
-# Specail
-bindsym $mod+m [workspace=$ws_discord] move workspace to output current, workspace $ws_discord
-bindsym $mod+s [workspace=$ws_spotify] move workspace to output current, workspace $ws_spotify
-bindsym $mod+o [workspace=$ws_obs] move workspace to output current, workspace $ws_obs
