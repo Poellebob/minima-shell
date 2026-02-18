@@ -1,0 +1,10 @@
+include ~/.config/sway/config.d/*
+include ~/.config/scroll/config.d/*
+
+# Autostart applications
+exec swww-daemon
+exec dunst
+exec env QT_QPA_PLATFORMTHEME=qt6ct GTK_THEME=Breeze-Dark
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+exec systemctl --user start polkit-gnome
+exec wl-paste --watch cliphist store

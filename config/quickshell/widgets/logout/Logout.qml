@@ -5,12 +5,13 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs.components.widget
+import qs
 
-PanelWindow {
+MenuPanel {
   id: logoutRoot
 
-  implicitHeight: buttonGrid.height
-  implicitWidth: buttonGrid.width
+  implicitHeight: buttonGrid.height + Global.format.spacing_large * 2
+  implicitWidth: buttonGrid.width + Global.format.spacing_large * 2
 
   visible: false
   color: "transparent"
@@ -50,6 +51,7 @@ PanelWindow {
     columns: 3
     columnSpacing: Global.format.spacing_large
     rowSpacing: Global.format.spacing_large
+    anchors.centerIn: parent 
 
     StyledButton {
       width: 200

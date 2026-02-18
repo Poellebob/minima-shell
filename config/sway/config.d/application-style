@@ -1,0 +1,13 @@
+# Output configuration
+
+# Gaps and borders
+gaps inner 3
+gaps outer 3
+default_border pixel 2
+default_border_radius 8
+
+# Smart gaps
+smart_gaps on
+
+# Smart borders
+smart_borders on

@@ -1,0 +1,12 @@
+# Application Behavior and Rules
+
+# Window rules
+# Float utility windows
+for_window [app_id="^(nmtui|bluedevil-wizard)$"] floating enable
+
+# VR applications
+for_window [class="^(vrmonitor)$"] floating enable
+for_window [title="^(SteamVR.*)$"] floating enable
+
+# Xwayland drag fix
+for_window [class="^$" title="^$"] floating enable, border none
