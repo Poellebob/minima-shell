@@ -9,9 +9,8 @@ import qs
 
 MenuPanel {
   id: wallpaperSelectorRoot
-  menuWidth: 786
-  menuHeight: 600
-  floating: true
+  implicitWidth: 786
+  implicitHeight: 600
   property var wallpapers: []
   property int tab: 0
   property string searchText: ""

@@ -10,12 +10,14 @@ import qs
 
 MenuPanel {
   id: launcherMenuRoot
-  menuWidth: 600
-  menuHeight: 400
 
   property string mathjsPath: Global.settings["Launcher"]["mathjsPath"]
 
   WlrLayershell.layer: WlrLayer.Overlay
+
+  anchors {
+    bottom: true  
+  }
 
   IpcHandler {
     target: "minimaLauncher"
