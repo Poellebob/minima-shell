@@ -282,7 +282,7 @@ exec swaymsg workspace 1
 exec swaymsg workspace 10
 ```
 
-## Make a app workspace
+### Make a app workspace
 
 This will be shown in the pager
 
