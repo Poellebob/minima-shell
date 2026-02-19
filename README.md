@@ -312,7 +312,19 @@ and follows the same syntax of hyprlands monitors.
 
 ### Special workspaces
 
+> this might not work currently because hyprland broke this recently
+
 ```hyprlang
+
+bind = $mainMod, M, togglespecialworkspace, Discord
+
+workspace = special:Discord
+
+windowrule {
+  name = discord
+  workspace = special:Discord
+  match:class = ^(WebCord|discord-canary|discord)$
+}
+
 exec-once = /usr/bin/discord
-exec-once = /usr/bin/spotify-launcher
 ```
