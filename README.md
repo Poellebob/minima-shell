@@ -186,10 +186,6 @@ sudo virsh net-autostart default
 | `$mod + Shift + 1-0` | Move window to workspace |
 | `$mod + Ctrl + Right` | Next workspace |
 | `$mod + Ctrl + Left` | Previous workspace |
-| `$mod + M` | Toggle special: Discord |
-| `$mod + N` | Toggle special: Notes |
-| `$mod + S` | Toggle special: Spotify |
-| `$mod + O` | Toggle special: Obs |
 
 ### Focus Movement (vim-style)
 
