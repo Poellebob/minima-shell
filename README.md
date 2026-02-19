@@ -58,6 +58,9 @@ rm -rf ./**.git*
 cp -r ./config/*      ~/.config/
 cp -r ./zsh-defer/*   ~/.zsh-defer/
 cp -r ./Wallpapers/   ~/
+# cp ./defaults/zprofile ~/.zprofile # this is nessesary for sway or scroll to work
+# if you dont want to destroy your zprofile consider appending it to the end
+# cat ./defaults/zprofile >> ~/.zprofile
 
 mkdir -p "$HOME/.config/minima" "$HOME/.config/quickshell"
 [ ! -f "$HOME/.config/minima/hypr.conf" ] && cp ./defaults/hypr.conf "$HOME/.config/minima/"
