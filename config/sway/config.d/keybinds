@@ -36,12 +36,12 @@ bindsym $mod+Shift+k resize shrink height 100px
 bindsym $mod+Shift+j resize grow height 100px
 
 # Layout & Splitting
-bindsym $mod+t split v
-bindsym $mod+y split h
+bindsym $mod+Mod1+j split v
+bindsym $mod+Mod1+k split h
 
-bindsym $mod+u layout stacking
-bindsym $mod+i layout tabbed
-bindsym $mod+o layout toggle split
+bindsym $mod+Mod1+h layout stacking
+bindsym $mod+Mod1+l layout tabbed
+bindsym $mod+Escape layout default
 
 bindsym $mod+a focus parent
 bindsym $mod+Shift+a focus child
