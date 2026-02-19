@@ -1,26 +1,16 @@
-# SwayFX Effects Configuration
+# corner rounding
+corner_radius 10
 
-# Border radius (SwayFX only)
-default_decoration border_radius 8
+# window shadows
+shadows enable
+shadow_blur_radius 4
+shadow_color #1a1a1aee
+shadow_offset 0 2
 
-# Layout settings (SwayFX only)
-layout_default_width 0.5
-layout_default_height 1.0
-layout_widths [0.33333333 0.5 0.666666667 1.0]
-layout_heights [0.33333333 0.5 0.666666667 1.0]
+# blur
+blur enable
+blur_radius 3
+blur_passes 1
 
-# Animations (SwayFX only)
-animations {
-    enabled yes
-    style scale
-    default yes 30 var simple [ 0.16 1 0.3 1 ]
-
-    window_open yes 30 var 3 [ 0 0 1 1 ]
-    window_move yes 30 var 3 [ 0.215 0.61 0.355 1 ] off 0.05 6 [0 0.6 0.4 0 1 0 0.4 -0.6 1 -0.6]
-    window_size yes 30 var 3 [ -0.35 0 0 0.5 ]
-}
-
-# Additional swayfx-only binds
-bindsym --no-repeat $mod+tab scale_workspace overview
-bindsym $mod+Mod1+l set_size h 1.0
-bindsym $mod+Mod1+h set_size h 0.5
+for_window [app_id=".*"] blur enable
+for_window [class=".*"] blur enable
