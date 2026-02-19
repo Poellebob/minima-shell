@@ -20,7 +20,8 @@ sudo pacman -Sy wireplumber libgtop bluez bluez-utils btop networkmanager \
 ```
 
 ```sh
-yay -Sy --noconfirm qt6ct-kde rose-pine-hyprcursor rose-pine-cursor quickshell-git matugen-bin afetch```
+yay -Sy --noconfirm qt6ct-kde rose-pine-hyprcursor rose-pine-cursor quickshell-git matugen-bin afetch
+```
 
 ```sh
 sudo update-desktop-database
