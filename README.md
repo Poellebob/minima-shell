@@ -34,6 +34,12 @@ sudo mv /etc/xdg/menus/arch-applications.menu /etc/xdg/menus/applications.menu
 sudo pacman -Sy hyprland xdg-desktop-portal-hyprland hyprpolkitagent hypremoji 
 ```
 
+### sway
+
+```sh
+sudo pacman -Sy sway
+```
+
 ### scroll
 
 ```sh
