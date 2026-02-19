@@ -7,6 +7,7 @@ bindsym $mod+space floating toggle
 bindsym $mod+f fullscreen toggle
 bindsym $mod+Shift+s sticky toggle
 bindsym $mod+Mod1+Delete exec hyprlock
+bindsym $mod+Shift+c exec swaymsg reload
 bindsym $mod+v exec qs ipc call minimaClipboard open
 bindsym $mod+d exec qs ipc call minimaLauncher open
 
@@ -34,7 +35,22 @@ bindsym $mod+Shift+l resize grow width 100px
 bindsym $mod+Shift+k resize shrink height 100px
 bindsym $mod+Shift+j resize grow height 100px
 
-# Screenlock
+# Layout & Splitting
+bindsym $mod+t split v
+bindsym $mod+y split h
+
+bindsym $mod+u layout stacking
+bindsym $mod+i layout tabbed
+bindsym $mod+o layout toggle split
+
+bindsym $mod+a focus parent
+bindsym $mod+Shift+a focus child
+
+# Scratchpad
+bindsym $mod+minus move scratchpad
+bindsym $mod+Shift+minus scratchpad show
+
+# Logout
 bindsym XF86PowerOff exec qs ipc call minimaLogout open
 
 # Multimedia keys
