@@ -1,6 +1,5 @@
 include ~/.config/minima/sway.conf
 include ~/.config/sway/config.d/*
-include ~/.config/sway/fx
 
 # Autostart applications
 exec swww-daemon
