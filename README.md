@@ -126,8 +126,8 @@ sudo virsh net-autostart default
 | `$mod + Alt + j` | Split vertical | Move window left |
 | `$mod + Alt + k` | Split horizontal | Move window right |
 | `$mod + Tab` | - | Toggle workspace overview |
-| `$mod + t` | - | Enter vertical resize mode |
-| `$mod + y` | - | Enter horizontal resize mode |
+| `$mod + t` | - | Enter vertical mode |
+| `$mod + y` | - | Enter horizontal mode |
 | `$mod + a` | Focus parent | - |
 | `$mod + Shift + a` | Focus child | - |
 | `$mod + Escape` | Default layout | - |
