@@ -1,10 +1,6 @@
 # minima-shell
 
-minima-shell is a userspace shell and a [scroll](https://github.com/dawsers/scroll/) and [hyprland](https://hypr.land/) config in one.
-
-Even tho it it supports hyprland fully it is not as featrue complete as scroll.
-
-i3 and sway is also supported but a config is not provided yet.
+minima-shell is a userspace shell and a [scroll](https://github.com/dawsers/scroll/)/[sway](https://swaywm.org/) and [hyprland](https://hypr.land/) config in one.
 
 **Warning:** this project is not done and is still pre-alpha, it will contain bugs
 
@@ -24,8 +20,7 @@ sudo pacman -Sy wireplumber libgtop bluez bluez-utils btop networkmanager \
 ```
 
 ```sh
-yay -Sy --noconfirm qt6ct-kde rose-pine-hyprcursor rose-pine-cursor quickshell-git matugen-bin afetch hypremoji
-```
+yay -Sy --noconfirm qt6ct-kde rose-pine-hyprcursor rose-pine-cursor quickshell-git matugen-bin afetch```
 
 ```sh
 sudo update-desktop-database
@@ -35,7 +30,7 @@ sudo mv /etc/xdg/menus/arch-applications.menu /etc/xdg/menus/applications.menu
 ### hyprland
 
 ```sh
-sudo pacman -Sy hyprland xdg-desktop-portal-hyprland hyprpolkitagent 
+sudo pacman -Sy hyprland xdg-desktop-portal-hyprland hyprpolkitagent hypremoji 
 ```
 
 ### scroll
@@ -93,9 +88,171 @@ sudo virsh net-start default
 sudo virsh net-autostart default
 ```
 
-# Sway/Scroll/i3
+# Keybinds
 
-## Screen
+## Sway/Scroll (i3-like)
+
+> **Note:** Scroll has a few unique keybinds not available in Sway, and vice versa.
+
+### General (Sway/Scroll)
+
+| Keybind | Action (Sway) | Action (Scroll) |
+
+| Keybind | Action (Sway) | Action (Scroll) |
+|---------|---------------|------------------|
+| `$mod + Return` | Open terminal | Open terminal |
+| `$mod + b` | Open browser | Open browser |
+| `$mod + e` | Open file manager | Open file manager |
+| `$mod + q` | Kill focused window | Kill focused window |
+| `$mod + space` | Toggle floating | Toggle floating |
+| `$mod + f` | Toggle fullscreen | Toggle fullscreen |
+| `$mod + Shift + s` | Toggle sticky | Toggle sticky |
+| `$mod + Alt + Delete` | Lock screen (hyprlock) | Lock screen (hyprlock) |
+| `$mod + v` | Open clipboard manager | Open clipboard manager |
+| `$mod + d` | Open app launcher | Open app launcher |
+| `$mod + Shift + c` | Reload config | Reload config |
+| `$mod + Alt + l` | Tabbed layout | Set window height to 100% |
+| `$mod + Alt + h` | Stacking layout | Set window height to 50% |
+| `$mod + Alt + j` | Split vertical | Move window left |
+| `$mod + Alt + k` | Split horizontal | Move window right |
+| `$mod + Tab` | - | Toggle workspace overview |
+| `$mod + t` | - | Enter vertical resize mode |
+| `$mod + y` | - | Enter horizontal resize mode |
+| `$mod + a` | Focus parent | - |
+| `$mod + Shift + a` | Focus child | - |
+| `$mod + Escape` | Default layout | - |
+
+### Focus Movement (vim-style)
+
+| Keybind | Action |
+|---------|--------|
+| `$mod + h` | Focus left |
+| `$mod + l` | Focus right |
+| `$mod + k` | Focus up |
+| `$mod + j` | Focus down |
+
+### Move Windows (vim-style)
+
+| Keybind | Action |
+|---------|--------|
+| `$mod + Ctrl + h` | Move window left |
+| `$mod + Ctrl + l` | Move window right |
+| `$mod + Ctrl + k` | Move window up |
+| `$mod + Ctrl + j` | Move window down |
+
+### Resize Windows
+
+| Keybind | Action |
+|---------|--------|
+| `$mod + Shift + h` | Shrink width 100px |
+| `$mod + Shift + l` | Grow width 100px |
+| `$mod + Shift + k` | Shrink height 100px |
+| `$mod + Shift + j` | Grow height 100px |
+
+### Workspaces
+
+| Keybind | Action |
+|---------|--------|
+| `$mod + 1-9, 0` | Switch to workspace 1-10 |
+| `$mod + Shift + 1-0` | Move window to workspace |
+| `$mod + Ctrl + Right` | Next workspace |
+| `$mod + Ctrl + Left` | Previous workspace |
+
+---
+
+## Hyprland
+
+### General
+
+| Keybind | Action |
+|---------|--------|
+| `$mod + Return` | Open terminal |
+| `$mod + Q` | Kill focused window |
+| `$mod + E` | Open file manager |
+| `$mod + B` | Open browser |
+| `$mod + Space` | Toggle floating |
+| `$mod + F` | Toggle fullscreen |
+| `$mod + Alt + Delete` | Lock screen |
+| `$mod + C` | Copy window class to clipboard |
+| `$mod + V` | Open clipboard manager |
+| `$mod + D` | Open app launcher |
+| `XF86PowerOff` | Open logout menu |
+
+### Workspaces
+
+| Keybind | Action |
+|---------|--------|
+| `$mod + 1-9, 0` | Switch to workspace 1-10 |
+| `$mod + Shift + 1-0` | Move window to workspace |
+| `$mod + Ctrl + Right` | Next workspace |
+| `$mod + Ctrl + Left` | Previous workspace |
+| `$mod + M` | Toggle special: Discord |
+| `$mod + N` | Toggle special: Notes |
+| `$mod + S` | Toggle special: Spotify |
+| `$mod + O` | Toggle special: Obs |
+
+### Focus Movement (vim-style)
+
+| Keybind | Action |
+|---------|--------|
+| `$mod + H` | Focus left |
+| `$mod + L` | Focus right |
+| `$mod + K` | Focus up |
+| `$mod + J` | Focus down |
+
+### Move Windows
+
+| Keybind | Action |
+|---------|--------|
+| `$mod + Ctrl + H` | Move window left |
+| `$mod + Ctrl + L` | Move window right |
+| `$mod + Ctrl + K` | Move window up |
+| `$mod + Ctrl + J` | Move window down |
+
+### Resize Windows
+
+| Keybind | Action |
+|---------|--------|
+| `$mod + Shift + H` | Shrink width 100px |
+| `$mod + Shift + L` | Grow width 100px |
+| `$mod + Shift + K` | Shrink height 100px |
+| `$mod + Shift + J` | Grow height 100px |
+
+### Mouse Bindings
+
+| Keybind | Action |
+|---------|--------|
+| `$mod + Left Click` | Move window |
+| `$mod + Right Click` | Resize window |
+
+### Screenshots
+
+| Keybind | Action |
+|---------|--------|
+| `Print` | Screenshot selection → clipboard |
+| `Shift + Print` | Screenshot fullscreen → clipboard |
+| `$mod + Print` | Screenshot selection → edit in swappy |
+| `$mod + Shift + Print` | Screenshot fullscreen → edit in swappy |
+
+### Multimedia
+
+| Keybind | Action |
+|---------|--------|
+| `XF86AudioRaiseVolume` | Volume up 5% |
+| `XF86AudioLowerVolume` | Volume down 5% |
+| `XF86AudioMute` | Toggle mute |
+| `XF86AudioMicMute` | Toggle mic mute |
+| `XF86MonBrightnessUp` | Brightness up 10% |
+| `XF86MonBrightnessDown` | Brightness down 10% |
+| `XF86AudioNext` | Next track |
+| `XF86AudioPrev` | Previous track |
+| `XF86AudioPlay/Pause` | Play/Pause |
+
+# Configuration
+
+## Sway/Scroll
+
+### Screen
 
 ```swayconfig
 # display definitions
@@ -130,4 +287,26 @@ for_window [app_id="com.stremio.stremio"] move to workspace $ws
 
 # force fullscreen
 for_window [app_id="com.stremio.stremio"] fullscreen enable
+```
+
+## Hyprland
+
+### Screen
+
+```hyprlang
+$primarymonitor = ,preferred,auto,1
+monitor = ,preferred,auto,1
+```
+
+the monitors id goes before the first comma, 
+if left blank like in the example it applys to all monitors.
+
+$primarymonitor is used by minimashell to set xwayland scaing 
+and follows the same syntax of hyprlands monitors.
+
+### Special workspaces
+
+```hyprlang
+exec-once = /usr/bin/discord
+exec-once = /usr/bin/spotify-launcher
 ```
