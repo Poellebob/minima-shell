@@ -9,7 +9,8 @@ include ~/.config/minima/sway/config.d/*
 exec swww-daemon
 exec dunst
 exec env QT_QPA_PLATFORMTHEME=qt6ct GTK_THEME=Breeze-Dark qs -d
-exec sh ~/.config/hypr/getkeys.sh
+exec sh -c "~/.config/hypr/getkeys.sh"
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 exec systemctl --user start polkit-gnome
 exec wl-paste --watch cliphist store
+exec sh -c "~/.config/sway/set-xft-dpi"

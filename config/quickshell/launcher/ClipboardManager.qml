@@ -10,11 +10,14 @@ import qs
 
 MenuPanel {
   id: clipboardManagerRoot
-  menuWidth: 600
   property var clipboardEntries: []
   property string searchText: ""
 
   WlrLayershell.layer: WlrLayer.Overlay
+
+  anchors {
+    bottom: true  
+  }
   
   onVisibleChanged: {
     if (visible) {
