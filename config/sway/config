@@ -1,6 +1,5 @@
-# Sway Configuration (No Scroll)
-
-include ~/.config/minima/sway/config.d/*
+include ~/.config/minima/sway.conf
+include ~/.config/sway/config.d/*
 
 # For SwayFX, uncomment the following line:
 # include ~/.config/minima/sway/fx
@@ -13,4 +12,5 @@ exec sh -c "~/.config/hypr/getkeys.sh"
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 exec systemctl --user start polkit-gnome
 exec wl-paste --watch cliphist store
+exec_always --no-startup-id sh -c 'swaymsg input type:keyboard xkb_layout "$(localectl status | sed -n "s/^\s*X11 Layout:\s*//p")"'
 exec sh -c "~/.config/sway/set-xft-dpi"

@@ -41,7 +41,15 @@ bindsym $mod+Shift+l resize grow width 100px
 bindsym $mod+Shift+k resize shrink height 100px
 bindsym $mod+Shift+j resize grow height 100px
 
-# Screenlock
+# Scratchpad
+bindsym $mod+minus move scratchpad
+bindsym $mod+Shift+minus scratchpad show
+
+# Direction
+bindsym $mod+t set_mode v
+bindsym $mod+y set_mode h
+
+# Logout
 bindsym XF86PowerOff exec qs ipc call minimaLogout open
 
 # Multimedia keys
