@@ -27,7 +27,7 @@ ModuleBase {
 
     StyledText {
       id: percentageText
-      text: "NaN%"
+      text: "-%"
       horizontalAlignment: Text.AlignHCenter
     }
   }
@@ -39,10 +39,26 @@ ModuleBase {
     onTriggered: displayInfo() 
   }
 
+  property bool p10: false
+  property bool p5: false
+
   function displayInfo() {
-    // Force property refresh
-    percentageText.text = UPower.displayDevice.ready
-    ? Math.round(UPower.displayDevice.percentage * 100) + "%" : "—"
+    if(!UPower.displayDevice.ready) return
+
+    percentageText.text = Math.round(UPower.displayDevice.percentage * 100) + "%"
+
+    if (UPower.displayDevice.percentage * 100 < 10 && !p10) {
+      p10 = true
+      Quickshell.execDetached(["sh", "-c", "notify-send -u critical batary low"])
+    }
+    if (UPower.displayDevice.percentage * 100 < 5 && !p5) {
+      p5 = true
+      Quickshell.execDetached(["sh", "-c", "notify-send -u critical batary low"])
+    }
+    if (UPower.displayDevice.percentage * 100 > 10) {
+      p5 = false
+      p10 = false
+    }
 
     batteryIcon.text = batteryRoot.getBatteryIcon(UPower.displayDevice.iconName)
   }
@@ -59,6 +75,8 @@ ModuleBase {
       return "󱊢";
     case "battery-full-symbolic":
       return "󱊣";
+    case "battery-full-charging-symbolic":
+      return "󰂄";
     case "battery-charging-symbolic":
       return "󰂄";
     case "battery-low-charging-symbolic":

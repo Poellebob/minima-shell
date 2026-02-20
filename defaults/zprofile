@@ -17,9 +17,8 @@ export QT_SCALE_FACTOR_ROUNDING_POLICY=RoundPreferFloor
 
 
 # XDG desktop variables to set scroll as the desktop
-export XDG_CURRENT_DESKTOP=scroll
+export XDG_CURRENT_DESKTOP=minima
 export XDG_SESSION_TYPE=wayland
-export XDG_SESSION_DESKTOP=scroll
 
 # Nvidia
 #export LIBVA_DRIVER_NAME=nvidia
