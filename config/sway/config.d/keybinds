@@ -17,13 +17,13 @@ bindsym Shift+Print exec grim - | wl-copy
 bindsym $mod+Print exec grim -g "$(slurp)" - | convert - -shave 1x1 PNG:- | swappy -f -
 bindsym $mod+Shift+Print exec grim - | swappy -f -
 
-# Focus movement (vim-style)
+# Focus movement
 bindsym $mod+h focus left
 bindsym $mod+l focus right
 bindsym $mod+k focus up
 bindsym $mod+j focus down
 
-# Move windows (vim-style)
+# Move windows
 bindsym $mod+Control+h move left
 bindsym $mod+Control+l move right
 bindsym $mod+Control+k move up
@@ -36,6 +36,7 @@ bindsym $mod+Shift+k resize shrink height 100px
 bindsym $mod+Shift+j resize grow height 100px
 
 # Layout & Splitting
+bindsym $mod+a split toggle
 bindsym $mod+Mod1+j split v
 bindsym $mod+Mod1+k split h
 
@@ -43,8 +44,8 @@ bindsym $mod+Mod1+h layout stacking
 bindsym $mod+Mod1+l layout tabbed
 bindsym $mod+Escape layout default
 
-bindsym $mod+a focus parent
-bindsym $mod+Shift+a focus child
+bindsym $mod+Control+a focus parent
+bindsym $mod+Shift+a focus parent
 
 # Scratchpad
 bindsym $mod+minus move scratchpad
