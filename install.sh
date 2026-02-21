@@ -435,6 +435,8 @@ install_configs() {
     chmod +x ~/.config/hypr/genkeys.sh 2>/dev/null || true
     chmod +x ~/.config/hypr/set-xft-dpi.sh 2>/dev/null || true
     chmod +x ~/.config/hypr/suspend.sh 2>/dev/null || true
+    chmod +x ~/.config/sway/set-xft-dpi.sh 2>/dev/null || true
+    chmod +x ~/.config/scroll/set-xft-dpi.sh 2>/dev/null || true
 
     touch ~/.config/wallpaper.conf
     [ ! -s ~/.config/wallpaper.conf ] && echo "$HOME/Wallpapers/botw.png" > ~/.config/wallpaper.conf
