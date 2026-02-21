@@ -377,7 +377,6 @@ install_deps_arch() {
     build_aur_pkg rose-pine-hyprcursor
     build_aur_pkg rose-pine-cursor
     build_aur_pkg google-breakpad
-    build_aur_pkg 
     build_aur_pkg quickshell-git
     build_aur_pkg matugen-bin
     build_aur_pkg afetch
