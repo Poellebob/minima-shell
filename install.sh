@@ -367,7 +367,7 @@ run_dry_run() {
 build_aur_pkg() {
     local pkg="$1"
     echo "Installing $pkg from AUR..."
-    $AUR_HELPER -S --needed --noconfirm "$pkg"
+    sh -c "$AUR_HELPER -S --needed --noconfirm $pkg"
 }
 
 install_deps_arch() {
