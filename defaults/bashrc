@@ -1,7 +1,11 @@
 # ---------------------------
+# Components
+# ---------------------------
+
+# ---------------------------
 # Aliases
 # ---------------------------
-alias newtexdoc = git clone https://github.com/Poellebob/latex-template.git 
+alias newtexdoc='git clone https://github.com/Poellebob/latex-template.git'
 
 # ---------------------------
 # Environment
@@ -13,8 +17,8 @@ else
   export EDITOR='nvim'
 fi
 
-eval "$(fzf --zsh)"
-eval "$(zoxide init zsh)"
+eval "$(fzf --bash)"
+eval "$(zoxide init bash)"
 
 zv() {
   local prev="$PWD"
@@ -50,15 +54,35 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # ---------------------------
-# Oh My Zsh
+# Bash-specific configuration
 # ---------------------------
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="powerlevel10k/powerlevel10k"
-plugins=(git themes)
 
-source $ZSH/oh-my-zsh.sh
+# Enable tab completion
+if ! shopt -oq posix; then
+  if [[ -f /usr/share/bash-completion/bash_completion ]]; then
+    source /usr/share/bash-completion/bash_completion
+  elif [[ -f /etc/bash_completion ]]; then
+    source /etc/bash_completion
+  fi
+fi
 
-# ---------------------------
-# Powerlevel10k Config
-# ---------------------------
-[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+# History settings
+HISTCONTROL=ignoreboth
+HISTSIZE=10000
+HISTFILESIZE=20000
+shopt -s histappend
+
+# Enable color support
+if [[ -x dircolors ]]; then
+  if [[ -r ~/.dircolors ]]; then
+    eval "$(dircolors -b ~/.dircolors)"
+  else
+    eval "$(dircolors -b)"
+  fi
+fi
+
+# Color support for ls, grep, etc.
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
