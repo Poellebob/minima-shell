@@ -23,12 +23,18 @@ detect_aur_helper() {
         AUR_HELPER="paru"
     else
         echo "Installing yay..."
-        git clone https://aur.archlinux.org/yay.git /tmp/yay 2>/dev/null || {
+        local prev
+        prev=$PWD
+        local dir
+        dir=$(mktemp)
+        mkdir $dir
+        git clone https://aur.archlinux.org/yay.git $dir 2>/dev/null || {
             echo "Failed to clone yay"
             return 1
         }
-        (cd /tmp/yay && makepkg -sri --noconfirm)
-        rm -rf /tmp/yay
+        (cd $dir && makepkg -sri --noconfirm)
+        cd $prev
+        rm -rf $dir
         AUR_HELPER="yay"
     fi
 }
