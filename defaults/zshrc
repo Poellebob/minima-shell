@@ -1,9 +1,4 @@
 # ---------------------------
-# Components
-# ---------------------------
-source ~/.zsh-defer/zsh-defer.plugin.zsh
-
-# ---------------------------
 # Aliases
 # ---------------------------
 alias newtexdoc = git clone https://github.com/Poellebob/latex-template.git 

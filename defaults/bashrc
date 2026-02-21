@@ -1,0 +1,88 @@
+# ---------------------------
+# Components
+# ---------------------------
+
+# ---------------------------
+# Aliases
+# ---------------------------
+alias newtexdoc='git clone https://github.com/Poellebob/latex-template.git'
+
+# ---------------------------
+# Environment
+# ---------------------------
+
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='nvim'
+fi
+
+eval "$(fzf --bash)"
+eval "$(zoxide init bash)"
+
+zv() {
+  local prev="$PWD"
+  z "$1" || return
+  nvim .
+  cd "$prev"
+}
+
+ziv() {
+  local prev="$PWD"
+  zi || return
+  nvim .
+  cd "$prev"
+}
+
+alias lock='hyprlock'
+alias hibernate='systemctl hibernate'
+alias suspend='systemctl suspend'
+alias reboot='systemctl reboot'
+alias poweroff='systemctl poweroff'
+alias logout='loginctl terminate-session "$XDG_SESSION_ID"'
+
+# ---------------------------
+# Start Fetch
+# ---------------------------
+afetch
+
+# ---------------------------
+# Powerlevel10k Instant Prompt
+# ---------------------------
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# ---------------------------
+# Bash-specific configuration
+# ---------------------------
+
+# Enable tab completion
+if ! shopt -oq posix; then
+  if [[ -f /usr/share/bash-completion/bash_completion ]]; then
+    source /usr/share/bash-completion/bash_completion
+  elif [[ -f /etc/bash_completion ]]; then
+    source /etc/bash_completion
+  fi
+fi
+
+# History settings
+HISTCONTROL=ignoreboth
+HISTSIZE=10000
+HISTFILESIZE=20000
+shopt -s histappend
+
+# Enable color support
+if [[ -x dircolors ]]; then
+  if [[ -r ~/.dircolors ]]; then
+    eval "$(dircolors -b ~/.dircolors)"
+  else
+    eval "$(dircolors -b)"
+  fi
+fi
+
+# Color support for ls, grep, etc.
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'

@@ -16,7 +16,7 @@ sudo pacman -Sy wireplumber libgtop bluez bluez-utils btop networkmanager \
   hyprlock hypridle kitty ttf-jetbrains-mono-nerd qt6-wayland qt5-wayland qt5ct \
   grim slurp swappy wiremix bluetui \
   archlinux-xdg-menu xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal \
-  jq bc git zsh breeze breeze-gtk breeze5 papirus-icon-theme fzf zoxide
+  jq bc git breeze breeze-gtk breeze5 papirus-icon-theme fzf zoxide
 ```
 
 ```sh
@@ -28,19 +28,20 @@ sudo update-desktop-database
 sudo mv /etc/xdg/menus/arch-applications.menu /etc/xdg/menus/applications.menu 
 ```
 
-### hyprland
+### Window Manager
+#### hyprland
 
 ```sh
 yay -Sy hyprland xdg-desktop-portal-hyprland hyprpolkitagent hypremoji
 ```
 
-### sway
+#### sway
 
 ```sh
 sudo pacman -Sy sway
 ```
 
-### scroll
+#### scroll
 
 ```sh
 yay -Sy scroll
@@ -56,11 +57,7 @@ rm -rf .git
 rm -rf ./**.git*
 
 cp -r ./config/*      ~/.config/
-cp -r ./zsh-defer/*   ~/.zsh-defer/
 cp -r ./Wallpapers/   ~/
-# cp ./defaults/zprofile ~/.zprofile # this is nessesary for sway or scroll to work
-# if you dont want to destroy your zprofile consider appending it to the end
-# cat ./defaults/zprofile >> ~/.zprofile
 
 mkdir -p "$HOME/.config/minima" "$HOME/.config/quickshell"
 [ ! -f "$HOME/.config/minima/hypr.conf" ] && cp ./defaults/hypr.conf "$HOME/.config/minima/"
@@ -75,27 +72,40 @@ chmod +x ~/.config/hypr/suspend.sh
 
 touch ~/.config/wallpaper.conf
 echo $HOME/Wallpapers/botw.png > ~/.config/wallpaper.conf
-mv defaults/hypr.conf ~/.config/hypr/config.conf
 
 sh -c ~/.config/quickshell/scripts/generate-colors.sh
 ```
 
-### zsh theme
+### Shell
+Minima contains bash and zsh profiles aswell as configs to make it easy to setup sway
+as it needs enviroment variables from the shell.
+
+> Other shells will work but need to be setup manually
+
+#### zsh
 ```sh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+sudo pacman -Sy zsh
+
+chsh zsh
 ```
 
-### virt-machine
+##### Copy the profile and rc
 ```sh
-sudo pacman -S qemu libvirt virt-manager dnsmasq bridge-utils #ebtables
-sudo systemctl start libvirtd
-sudo systemctl enable libvirtd
+cp ./config/zprofile ~/.zprofile
+cp ./config/zshrc ~/.zshrc
+```
 
-sudo usermod -aG libvirt,video,render,kvm $(whoami)
+#### bash
+```sh
+sudo pacman -Sy bash
 
-sudo virsh net-start default
-sudo virsh net-autostart default
+chsh bash
+```
+
+##### Copy the profile and rc
+```sh
+cp ./config/profile ~/.profile
+cp ./config/bashrc ~/.bashrc
 ```
 
 # Keybinds

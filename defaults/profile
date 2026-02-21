@@ -1,0 +1,26 @@
+# Theming
+set -x QT_QPA_PLATFORMTHEME qt6ct
+set -x GTK_THEME Breeze-Dark
+
+set -x XCURSOR_THEME BreezeX-RosePine-Linux
+set -x XCURSOR_SIZE 24
+
+set -x QT_WAYLAND_DISABLE_WINDOWDECORATION 1
+
+# Backend
+set -x GDK_BACKEND wayland,x11
+set -x SDL_VIDEODRIVER wayland
+set -x CLUTTER_BACKEND wayland
+set -x ELECTRON_OZONE_PLATFORM_HINT wayland
+
+set -x QT_SCALE_FACTOR_ROUNDING_POLICY RoundPreferFloor
+
+# XDG desktop variables to set scroll as the desktop
+set -x XDG_CURRENT_DESKTOP scroll
+set -x XDG_SESSION_TYPE wayland
+set -x XDG_SESSION_DESKTOP scroll
+
+# Nvidia
+# set -x LIBVA_DRIVER_NAME nvidia
+# set -x GBM_BACKEND nvidia-drm
+# set -x __GLX_VENDOR_LIBRARY_NAME nvidia
