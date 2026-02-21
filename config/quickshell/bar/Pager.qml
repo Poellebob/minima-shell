@@ -19,12 +19,11 @@ ModuleBase {
   property bool i3: false
 
   Component.onCompleted: {
-    switch (Quickshell.env("XDG_CURRENT_DESKTOP")) {
+    switch (Quickshell.env("XDG_SESSION_DESKTOP")) {
       case "Hyprland":
         pagerRoot.hyprland = true
         break
       case "sway":
-      case "i3":
       case "scroll":
         pagerRoot.i3 = true
         break
