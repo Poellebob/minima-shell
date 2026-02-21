@@ -304,7 +304,6 @@ run_dry_run() {
     echo "  WM= $WM"
     echo "  SHELL= $SHELL"
     echo "  INSTALL_DEPS= $INSTALL_DEPS"
-    echo "  AUR_HELPER= $AUR_HELPER"
     echo
 
     echo "Would run:"
@@ -315,6 +314,7 @@ run_dry_run() {
             arch)
                 echo "- pacman: wireplumber libgtop bluez bluez-utils btop networkmanager ..."
                 echo "- pacman: base-devel (fakeroot, debugedit, etc.)"
+                echo "- git clone + makepkg: $AUR_HELPER (AUR helper)"
                 echo "- $AUR_HELPER: qt6ct-kde rose-pine-hyprcursor rose-pine-cursor google-breakpad quickshell matugen-bin afetch"
                 echo "- sudo: update-desktop-database, mv arch-applications.menu"
                 ;;
@@ -382,6 +382,8 @@ install_deps_arch() {
 
     echo "Installing AUR build dependencies..."
     sudo pacman -Sy --needed base-devel
+
+    detect_aur_helper
 
     echo "Installing AUR packages..."
     build_aur_pkg qt6ct-kde
@@ -464,12 +466,10 @@ case "$1" in
     --test)
         TEST_MODE="yes"
         detect_distro
-        detect_aur_helper
         main_menu
         ;;
     *)
         detect_distro
-        detect_aur_helper
         main_menu
         ;;
 esac
