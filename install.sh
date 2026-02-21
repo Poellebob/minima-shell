@@ -361,7 +361,7 @@ build_aur_pkg() {
 
 install_deps_arch() {
     echo "Installing base dependencies (pacman)..."
-    sudo pacman -Sy --needed wireplumber libgtop bluez bluez-utils btop networkmanager \
+    sudo pacman -Sy --needed wireplumber libgtop bluez bluez-utils btop networkmanager jemalloc\
       dart-sass wl-clipboard brightnessctl swww python upower \
       pacman-contrib power-profiles-daemon gvfs cliphist \
       hyprlock hypridle kitty ttf-jetbrains-mono-nerd qt6-wayland qt5-wayland qt5ct \
@@ -376,6 +376,8 @@ install_deps_arch() {
     build_aur_pkg qt6ct-kde
     build_aur_pkg rose-pine-hyprcursor
     build_aur_pkg rose-pine-cursor
+    build_aur_pkg google-breakpad
+    build_aur_pkg 
     build_aur_pkg quickshell-git
     build_aur_pkg matugen-bin
     build_aur_pkg afetch
