@@ -16,11 +16,29 @@ detect_distro() {
     fi
 }
 
+detect_aur_helper() {
+    if command -v yay &>/dev/null; then
+        AUR_HELPER="yay"
+    elif command -v paru &>/dev/null; then
+        AUR_HELPER="paru"
+    else
+        echo "Installing yay..."
+        git clone https://aur.archlinux.org/yay.git /tmp/yay 2>/dev/null || {
+            echo "Failed to clone yay"
+            return 1
+        }
+        (cd /tmp/yay && makepkg -sri --noconfirm)
+        rm -rf /tmp/yay
+        AUR_HELPER="yay"
+    fi
+}
+
 DISTRO=""
 WM=""
 SHELL=""
 INSTALL_DEPS=""
 TEST_MODE="no"
+AUR_HELPER=""
 
 RESET=$'\033[0m'
 BOLD=$'\033[1m'
@@ -286,6 +304,7 @@ run_dry_run() {
     echo "  WM= $WM"
     echo "  SHELL= $SHELL"
     echo "  INSTALL_DEPS= $INSTALL_DEPS"
+    echo "  AUR_HELPER= $AUR_HELPER"
     echo
 
     echo "Would run:"
@@ -296,7 +315,7 @@ run_dry_run() {
             arch)
                 echo "- pacman: wireplumber libgtop bluez bluez-utils btop networkmanager ..."
                 echo "- pacman: base-devel (fakeroot, debugedit, etc.)"
-                echo "- AUR: qt6ct-kde, rose-pine-hyprcursor, quickshell-git, matugen-bin, afetch"
+                echo "- $AUR_HELPER: qt6ct-kde rose-pine-hyprcursor rose-pine-cursor google-breakpad quickshell matugen-bin afetch"
                 echo "- sudo: update-desktop-database, mv arch-applications.menu"
                 ;;
             debian)
@@ -318,9 +337,9 @@ run_dry_run() {
 
     case "$WM" in
         sway)     echo "- pacman: sway" ;;
-        swayfx)   echo "- AUR: swayfx (git clone + makepkg)" ;;
-        hyprland) echo "- AUR: hyprland, xdg-desktop-portal-hyprland ..." ;;
-        scroll)   echo "- AUR: scroll" ;;
+        swayfx)   echo "- $AUR_HELPER: swayfx" ;;
+        hyprland) echo "- $AUR_HELPER: hyprland xdg-desktop-portal-hyprland hyprpolkitagent hypremoji" ;;
+        scroll)   echo "- $AUR_HELPER: scroll" ;;
     esac
 
     case "$SHELL" in
@@ -347,16 +366,8 @@ run_dry_run() {
 
 build_aur_pkg() {
     local pkg="$1"
-    local dir
-    dir=$(mktemp -d)
-    echo "Building $pkg from AUR..."
-    git clone "https://aur.archlinux.org/${pkg}.git" "$dir" 2>/dev/null || {
-        echo "Failed to clone $pkg"
-        rm -rf "$dir"
-        return 1
-    }
-    (cd "$dir" && makepkg -sri --noconfirm)
-    rm -rf "$dir"
+    echo "Installing $pkg from AUR..."
+    $AUR_HELPER -S --needed --noconfirm "$pkg"
 }
 
 install_deps_arch() {
@@ -453,10 +464,12 @@ case "$1" in
     --test)
         TEST_MODE="yes"
         detect_distro
+        detect_aur_helper
         main_menu
         ;;
     *)
         detect_distro
+        detect_aur_helper
         main_menu
         ;;
 esac
