@@ -17,26 +17,47 @@ detect_distro() {
 }
 
 detect_aur_helper() {
-    if command -v yay &>/dev/null; then
-        AUR_HELPER="yay"
-    elif command -v paru &>/dev/null; then
-        AUR_HELPER="paru"
-    else
-        echo "Installing yay..."
-        local prev
-        prev=$PWD
-        local dir
-        dir=$(mktemp)
-        mkdir $dir
-        git clone https://aur.archlinux.org/yay.git "$dir"/yay 2>/dev/null || {
-            echo "Failed to clone yay"
-            return 1
-        }
-        (cd $dir && makepkg -sri --noconfirm)
-        cd $prev
-        rm -rf $dir
-        AUR_HELPER="yay"
-    fi
+  if command -v yay >/dev/null 2>&1; then
+    AUR_HELPER="yay"
+    return
+  fi
+
+  if command -v paru >/dev/null 2>&1; then
+    AUR_HELPER="paru"
+    return
+  fi
+
+  echo "Installing yay..."
+
+  local prev="$PWD"
+  local dir
+
+  dir=$(mktemp -d) || {
+    echo "Failed to create temp dir"
+    return 1
+  }
+
+  git clone https://aur.archlinux.org/yay.git "$dir/yay" 2>/dev/null || {
+    echo "Failed to clone yay"
+    rm -rf "$dir"
+    return 1
+  }
+
+  cd "$dir/yay" || {
+    rm -rf "$dir"
+    return 1
+  }
+
+  makepkg -sri --noconfirm || {
+    cd "$prev"
+    rm -rf "$dir"
+    return 1
+  }
+
+  cd "$prev"
+  rm -rf "$dir"
+
+  AUR_HELPER="yay"
 }
 
 DISTRO=""
