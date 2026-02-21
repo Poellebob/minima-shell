@@ -27,7 +27,6 @@ detect_aur_helper() {
         prev=$PWD
         local dir
         dir=$(mktemp)
-        mkdir $dir
         git clone https://aur.archlinux.org/yay.git $dir 2>/dev/null || {
             echo "Failed to clone yay"
             return 1
