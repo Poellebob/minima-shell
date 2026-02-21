@@ -30,25 +30,24 @@ detect_aur_helper() {
   echo "Installing yay..."
 
   local prev="$PWD"
-  local dir
 
-  dir=$(mktemp -d) || {
+  cd $(mktemp -d) || {
     echo "Failed to create temp dir"
     return 1
   }
 
-  git clone https://aur.archlinux.org/yay.git "$dir/yay" 2>/dev/null || {
+  git clone https://aur.archlinux.org/yay.git yay/ 2>/dev/null || {
     echo "Failed to clone yay"
     rm -rf "$dir"
     return 1
   }
 
-  cd "$dir/yay" || {
+  cd ./yay || {
     rm -rf "$dir"
     return 1
   }
 
-  makepkg -sri --noconfirm || {
+  makepkg -sri || {
     cd "$prev"
     rm -rf "$dir"
     return 1
