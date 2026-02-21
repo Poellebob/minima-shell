@@ -60,7 +60,7 @@ ModuleBase {
     defaultNode.audio.volume = Math.max(0.0, Math.min(1.0, defaultNode.audio.volume + delta))
   }
 
-  AudioControll {
+  AudioControl {
     id: menu
     window: panel
     x: (panel.width - audioRoot.parent.width) / 2 + audioRoot.x + (audioRoot.width - width) / 2

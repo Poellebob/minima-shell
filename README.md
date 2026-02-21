@@ -117,8 +117,6 @@ cp ./config/bashrc ~/.bashrc
 ### General (Sway/Scroll)
 
 | Keybind | Action (Sway) | Action (Scroll) |
-
-| Keybind | Action (Sway) | Action (Scroll) |
 |---------|---------------|------------------|
 | `$mod + Return` | Open terminal | Open terminal |
 | `$mod + b` | Open browser | Open browser |
@@ -133,14 +131,11 @@ cp ./config/bashrc ~/.bashrc
 | `$mod + Shift + c` | Reload config | Reload config |
 | `$mod + Alt + l` | Tabbed layout | Set window height to 100% |
 | `$mod + Alt + h` | Stacking layout | Set window height to 50% |
-| `$mod + Alt + j` | Split vertical | Move window left |
-| `$mod + Alt + k` | Split horizontal | Move window right |
-| `$mod + Tab` | - | Toggle workspace overview |
-| `$mod + t` | - | Enter vertical mode |
-| `$mod + y` | - | Enter horizontal mode |
-| `$mod + a` | Focus parent | - |
-| `$mod + Shift + a` | Focus child | - |
+| `$mod + Alt + j` | Split vertical | Move window into collum on left |
+| `$mod + Alt + k` | Split horizontal | Move window into collum on right |
+| `$mod + a` | Split toggle | Direction mode |
 | `$mod + Escape` | Default layout | - |
+| `$mod + Tab` | - | Workspace overview |
 
 ### Focus Movement (vim-style)
 
@@ -151,7 +146,7 @@ cp ./config/bashrc ~/.bashrc
 | `$mod + k` | Focus up |
 | `$mod + j` | Focus down |
 
-### Move Windows (vim-style)
+### Move Windows
 
 | Keybind | Action |
 |---------|--------|
@@ -207,7 +202,7 @@ cp ./config/bashrc ~/.bashrc
 | `$mod + Ctrl + Right` | Next workspace |
 | `$mod + Ctrl + Left` | Previous workspace |
 
-### Focus Movement (vim-style)
+### Focus Movement
 
 | Keybind | Action |
 |---------|--------|

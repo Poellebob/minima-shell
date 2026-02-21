@@ -23,13 +23,13 @@ bindsym Shift+Print exec grim - | wl-copy
 bindsym $mod+Print exec grim -g "$(slurp)" - | convert - -shave 1x1 PNG:- | swappy -f -
 bindsym $mod+Shift+Print exec grim - | swappy -f -
 
-# Focus movement (vim-style)
+# Focus movementv
 bindsym $mod+h focus left
 bindsym $mod+l focus right
 bindsym $mod+k focus up
 bindsym $mod+j focus down
 
-# Move windows (vim-style)
+# Move windows
 bindsym $mod+Control+h move left
 bindsym $mod+Control+l move right
 bindsym $mod+Control+k move up
@@ -46,8 +46,7 @@ bindsym $mod+minus move scratchpad
 bindsym $mod+Shift+minus scratchpad show
 
 # Direction
-bindsym $mod+t set_mode v
-bindsym $mod+y set_mode h
+bindsym $mod+a set_mode toggle
 
 # Logout
 bindsym XF86PowerOff exec qs ipc call minimaLogout open
