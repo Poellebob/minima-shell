@@ -36,10 +36,14 @@ yay -Sy hyprland xdg-desktop-portal-hyprland hyprpolkitagent hypremoji
 ```
 
 #### sway
-
 ```sh
 sudo pacman -Sy sway
+# or
+yay -Sy swayfx
 ```
+
+> if you want to use sway add `--unsupported-gpu` to the launch command `Exec` in 
+`/usr/share/wayland-sessions/sway.desktop` if you use the proprietary nvidia drivers.
 
 #### scroll
 
