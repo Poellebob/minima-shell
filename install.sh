@@ -295,6 +295,7 @@ run_dry_run() {
         case "$DISTRO" in
             arch)
                 echo "- pacman: wireplumber libgtop bluez bluez-utils btop networkmanager ..."
+                echo "- pacman: base-devel (fakeroot, debugedit, etc.)"
                 echo "- AUR: qt6ct-kde, rose-pine-hyprcursor, quickshell-git, matugen-bin, afetch"
                 echo "- sudo: update-desktop-database, mv arch-applications.menu"
                 ;;
@@ -367,6 +368,9 @@ install_deps_arch() {
       grim slurp swappy wiremix bluetui \
       archlinux-xdg-menu xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal \
       jq bc git breeze breeze-gtk breeze5 papirus-icon-theme fzf zoxide
+
+    echo "Installing AUR build dependencies..."
+    sudo pacman -Sy --needed base-devel
 
     echo "Installing AUR packages..."
     build_aur_pkg qt6ct-kde
