@@ -353,14 +353,16 @@ run_installation() {
     echo -e "${GREEN}Installation complete!${RESET}"
     echo
 
-    if [ "rc" =  ]
+    if {
+        [ "$SHELL_CONFIG" = "rc" ] || [ "$SHELL_CONFIG" = "none" ]
+    } && {
+        [ "$WM" = "sway" ] || [ "$WM" = "swayfx" ] || [ "$WM" = "scroll" ]
+    }; then
+        echo "${YELLOW}Sway needs some environment variables to be set in the shell profile to show icons and theme system apps.${RESET}"
+        echo "${YELLOW}Read https://github.com/Poellebob/minima-shell#sway to know which variables to set"
+    fi
 
     if [ "$WM" = "sway" ] || [ "$WM" = "swayfx" ]; then
-        if [ "$SHELL_CONFIG" = "rc" ] || [ "$SHELL_CONFIG" = "none" ]; then
-            echo "${YELLOW}Sway needs some enviroment variables to be set in the shell profile to show icons and theme system apps.${RESET}"
-            echo "${YELLOW}Read https://github.com/Poellebob/minima-shell#sway to know witch variables to set"
-        fi
-
         show_nvidia_warning
     fi
 
