@@ -465,6 +465,11 @@ install_shell_bash() {
 }
 
 install_configs() {
+    local prev=$PWD
+    local dir=$(mktemp -d)
+    git clone https://github.com/Poellebob/minima-shell.git "$dir" --recurse-submodules
+    cd $dir
+
     echo "Copying configs to home..."
     cp -r ./config/* ~/.config/ 2>/dev/null || true
     cp -r ./Wallpapers/ ~/ 2>/dev/null || true
@@ -486,6 +491,9 @@ install_configs() {
     [ ! -s ~/.config/wallpaper.conf ] && echo "$HOME/Wallpapers/botw.png" > ~/.config/wallpaper.conf
 
     sh -c "$HOME/.config/quickshell/scripts/generate-colors.sh" 2>/dev/null || true
+    
+    cd $prev
+    rm -r $dir
 }
 
 case "$1" in
