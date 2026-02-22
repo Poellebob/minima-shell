@@ -30,19 +30,23 @@ detect_aur_helper() {
   echo "Installing yay..."
 
   local prev="$PWD"
+  local dir
+  dir=$(mktemp -d)
 
-  cd $(mktemp -d) || {
+  cd "$dir" || {
     echo "Failed to create temp dir"
     return 1
   }
 
   git clone https://aur.archlinux.org/yay.git yay/ 2>/dev/null || {
     echo "Failed to clone yay"
+    cd "$prev"
     rm -rf "$dir"
     return 1
   }
 
   cd ./yay || {
+    cd "$prev"
     rm -rf "$dir"
     return 1
   }
@@ -455,7 +459,7 @@ install_shell_zsh() {
     echo "To change shell, run: chsh zsh"
     cp ./config/zprofile ~/.zprofile 2>/dev/null || true
     cp ./config/zshrc ~/.zshrc 2>/dev/null || true
-    chsh -s /usr/bin/zsh
+    chsh -s /usr/bin/zsh || true
 }
 
 install_shell_bash() {
@@ -464,7 +468,7 @@ install_shell_bash() {
     echo "To change shell, run: chsh bash"
     cp ./config/profile ~/.profile 2>/dev/null || true
     cp ./config/bashrc ~/.bashrc 2>/dev/null || true
-    chsh -s /usr/bin/bash
+    chsh -s /usr/bin/bash || true
 }
 
 install_configs() {
