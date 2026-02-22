@@ -61,8 +61,9 @@ detect_aur_helper() {
 
 DISTRO=""
 WM=""
-SHELL=""
+SHELL_TYPE=""
 INSTALL_DEPS=""
+SHELL_CONFIG=""
 TEST_MODE="no"
 AUR_HELPER=""
 
@@ -83,7 +84,7 @@ ${CYAN}
 ██    ██    ██  ██ ██     ██  ██ ██    ██    ██        ██  
 ██    ██    ██  ██ ██     ██  ██ ██    ██    ██   ███████                           __     __       
 ██    ██    ██  ██ ██     ██  ██ ██    ██    ██  ██    ██      ___  _______   ___ _/ /__  / /  ___ _
-██    ██    ██  ██ ██     ██  ██ ██    ██    ██   █████ ██    / _ \/ __/ -_) / _ `/ / _ \/ _ \/ _ `/
+██    ██    ██  ██ ██     ██  ██ ██    ██    ██   █████ ██    / _ \/ __/ -_) / _ '/ / _ \/ _ \/ _ '/
                                                              / .__/_/  \__/  \_,_/_/ .__/_//_/\_,_/ 
                                                             /_/                   /_/                
 ${RESET}
@@ -139,12 +140,39 @@ shell_submenu() {
         echo "  0. Back"
         echo
 
-        echo -n "Select option [2]: "
+        echo -n "Select option [1]: "
         read shell_choice
 
         case "$shell_choice" in
-            1) SHELL="zsh" ; break ;;
-            2|"") SHELL="bash" ; break ;;
+            1|"") SHELL_TYPE="zsh" ; break ;;
+            2) SHELL_TYPE="bash" ; break ;;
+            0) return ;;
+            *) echo -e "${RED}Invalid option${RESET}" ;;
+        esac
+    done
+}
+
+shell_config_submenu() {
+    while true; do
+        show_logo
+        echo "Shell Config"
+        echo "============"
+        echo
+        echo "  1. Both (rc + profile)"
+        echo "  2. rc only"
+        echo "  3. profile only"
+        echo "  4. None"
+        echo "  0. Back"
+        echo
+
+        echo -n "Select option [1]: "
+        read config_choice
+
+        case "$config_choice" in
+            1|"") SHELL_CONFIG="both" ; break ;;
+            2) SHELL_CONFIG="rc" ; break ;;
+            3) SHELL_CONFIG="profile" ; break ;;
+            4) SHELL_CONFIG="none" ; break ;;
             0) return ;;
             *) echo -e "${RED}Invalid option${RESET}" ;;
         esac
@@ -162,12 +190,12 @@ deps_submenu() {
         echo "  0. Back"
         echo
 
-        echo -n "Select option [2]: "
+        echo -n "Select option [1]: "
         read deps_choice
 
         case "$deps_choice" in
-            1) INSTALL_DEPS="yes" ; break ;;
-            2|"") INSTALL_DEPS="no" ; break ;;
+            1| "") INSTALL_DEPS="yes" ; break ;;
+            2) INSTALL_DEPS="no" ; break ;;
             0) return ;;
             *) echo -e "${RED}Invalid option${RESET}" ;;
         esac
@@ -177,12 +205,14 @@ deps_submenu() {
 get_main_default() {
     if [ -z "$WM" ]; then
         echo "1"
-    elif [ -z "$SHELL" ]; then
+    elif [ -z "$SHELL_TYPE" ]; then
         echo "2"
     elif [ -z "$INSTALL_DEPS" ]; then
         echo "3"
-    else
+    elif [ -z "$SHELL_CONFIG" ]; then
         echo "4"
+    else
+        echo "5"
     fi
 }
 
@@ -203,11 +233,12 @@ main_menu() {
         echo "============"
         echo
         echo "  1. Window Manager:  ${WM:-<not set>}"
-        echo "  2. Shell:          ${SHELL:-<not set>}"
+        echo "  2. Shell:          ${SHELL_TYPE:-<not set>}"
         echo "  3. Dependencies:   ${INSTALL_DEPS:-<not set>}"
+        echo "  4. Shell Config:    ${SHELL_CONFIG:-<not set>}"
         echo
-        echo "  4. Confirm & Install"
-        echo "  5. Exit"
+        echo "  5. Confirm & Install"
+        echo "  6. Exit"
         echo
 
         local default
@@ -222,13 +253,14 @@ main_menu() {
             1) wm_submenu ;;
             2) shell_submenu ;;
             3) deps_submenu ;;
-            4)
+            4) shell_config_submenu ;;
+            5)
                 if validate_config; then
                     run_installation
                     return
                 fi
                 ;;
-            5) exit 0 ;;
+            6) exit 0 ;;
             *) echo -e "${RED}Invalid option${RESET}" ;;
         esac
     done
@@ -241,7 +273,7 @@ validate_config() {
         read
         return 1
     fi
-    if [ -z "$SHELL" ]; then
+    if [ -z "$SHELL_TYPE" ]; then
         echo -e "${RED}Please select a Shell first${RESET}"
         echo -n "Press Enter to continue..."
         read
@@ -253,10 +285,17 @@ validate_config() {
         read
         return 1
     fi
+    if [ -z "$SHELL_CONFIG" ]; then
+        echo -e "${RED}Please select shell config option${RESET}"
+        echo -n "Press Enter to continue..."
+        read
+        return 1
+    fi
     return 0
 }
 
 show_nvidia_warning() {
+    if [ "" = $(lsmod | grep nvidia) ] return
     echo
     cat <<EOF
 ${YELLOW}
@@ -301,7 +340,7 @@ run_installation() {
         scroll)  install_wm_scroll ;;
     esac
 
-    case "$SHELL" in
+    case "$SHELL_TYPE" in
         zsh) install_shell_zsh ;;
         bash) install_shell_bash ;;
     esac
@@ -309,6 +348,8 @@ run_installation() {
     show_logo
     echo -e "${GREEN}Installation complete!${RESET}"
     echo
+
+    if [ "rc" =  ]
 
     if [ "$WM" = "sway" ] || [ "$WM" = "swayfx" ]; then
         show_nvidia_warning
@@ -329,7 +370,7 @@ run_dry_run() {
     echo "Variables set:"
     echo "  DISTRO= $DISTRO"
     echo "  WM= $WM"
-    echo "  SHELL= $SHELL"
+    echo "  SHELL= $SHELL_TYPE"
     echo "  INSTALL_DEPS= $INSTALL_DEPS"
     echo
 
@@ -369,7 +410,7 @@ run_dry_run() {
         scroll)   echo "- $AUR_HELPER: scroll" ;;
     esac
 
-    case "$SHELL" in
+    case "$SHELL_TYPE" in
         zsh)  echo "- pacman: zsh" ;;
         bash) echo "- pacman: bash" ;;
     esac
@@ -400,7 +441,7 @@ build_aur_pkg() {
 install_deps_arch() {
     echo "Installing base dependencies (pacman)..."
     sudo pacman -Sy --needed wireplumber libgtop bluez bluez-utils btop networkmanager jemalloc\
-      dart-sass wl-clipboard brightnessctl swww python upower \
+      dart-sass wl-clipboard brightnessctl swww python upower neovim\
       pacman-contrib power-profiles-daemon gvfs cliphist \
       hyprlock hypridle kitty ttf-jetbrains-mono-nerd qt6-wayland qt5-wayland qt5ct \
       grim slurp swappy wiremix bluetui \
@@ -453,18 +494,14 @@ install_shell_zsh() {
     echo "Installing zsh..."
     sudo pacman -Sy --needed zsh
     echo "To change shell, run: chsh zsh"
-    cp ./config/zprofile ~/.zprofile 2>/dev/null || true
-    cp ./config/zshrc ~/.zshrc 2>/dev/null || true
-    chsh -s /usr/bin/zsh
+    chsh -s /usr/bin/zsh || true
 }
 
 install_shell_bash() {
     echo "Installing bash..."
     sudo pacman -Sy --needed bash
     echo "To change shell, run: chsh bash"
-    cp ./config/profile ~/.profile 2>/dev/null || true
-    cp ./config/bashrc ~/.bashrc 2>/dev/null || true
-    chsh -s /usr/bin/bash
+    chsh -s /usr/bin/bash || true
 }
 
 install_configs() {
@@ -472,6 +509,8 @@ install_configs() {
     local dir=$(mktemp -d)
     git clone https://github.com/Poellebob/minima-shell.git "$dir" --recurse-submodules
     cd $dir
+
+    : ${SHELL_CONFIG:=both}
 
     echo "Copying configs to home..."
     cp -r ./config/* ~/.config/ 2>/dev/null || true
@@ -481,6 +520,25 @@ install_configs() {
     [ ! -f "$HOME/.config/minima/hypr.conf" ] && cp ./defaults/hypr.conf "$HOME/.config/minima/" 2>/dev/null || true
     [ ! -f "$HOME/.config/minima/sway.conf" ] && cp ./defaults/sway.conf "$HOME/.config/minima/" 2>/dev/null || true
     [ ! -f "$HOME/.config/quickshell/config.ini" ] && cp ./defaults/config.ini "$HOME/.config/quickshell/" 2>/dev/null || true
+
+    case "$SHELL_CONFIG" in
+        both)
+            cp ./config/zprofile ~/.zprofile 2>/dev/null || true
+            cp ./config/zshrc ~/.zshrc 2>/dev/null || true
+            cp ./config/profile ~/.profile 2>/dev/null || true
+            cp ./config/bashrc ~/.bashrc 2>/dev/null || true
+            ;;
+        rc)
+            cp ./config/zshrc ~/.zshrc 2>/dev/null || true
+            cp ./config/bashrc ~/.bashrc 2>/dev/null || true
+            ;;
+        profile)
+            cp ./config/zprofile ~/.zprofile 2>/dev/null || true
+            cp ./config/profile ~/.profile 2>/dev/null || true
+            ;;
+        none)
+            ;;
+    esac
 
     chmod +x ~/.config/quickshell/scripts/generate-colors.sh 2>/dev/null || true
     chmod +x ~/.config/quickshell/scripts/sysfetch.sh 2>/dev/null || true
