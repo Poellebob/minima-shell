@@ -536,20 +536,20 @@ install_configs() {
     case "$SHELL_CONFIG" in
         both)
             echo "$(GREEN)Installing rc and profile"
-            cp ./config/zprofile ~/.zprofile 2>/dev/null || true
-            cp ./config/zshrc ~/.zshrc 2>/dev/null || true
-            cp ./config/profile ~/.profile 2>/dev/null || true
-            cp ./config/bashrc ~/.bashrc 2>/dev/null || true
+            cp ./defaults/zprofile ~/.zprofile 2>/dev/null || true
+            cp ./defaults/zshrc ~/.zshrc 2>/dev/null || true
+            cp ./defaults/profile ~/.profile 2>/dev/null || true
+            cp ./defaults/bashrc ~/.bashrc 2>/dev/null || true
             ;;
         rc)
             echo "$(GREEN)Installing rc"
-            cp ./config/zshrc ~/.zshrc 2>/dev/null || true
-            cp ./config/bashrc ~/.bashrc 2>/dev/null || true
+            cp ./defaults/zshrc ~/.zshrc 2>/dev/null || true
+            cp ./defaults/bashrc ~/.bashrc 2>/dev/null || true
             ;;
         profile)
             echo "$(GREEN)Installing profile"
-            cp ./config/zprofile ~/.zprofile 2>/dev/null || true
-            cp ./config/profile ~/.profile 2>/dev/null || true
+            cp ./defaults/zprofile ~/.zprofile 2>/dev/null || true
+            cp ./defaults/profile ~/.profile 2>/dev/null || true
             ;;
         none)
             echo "$(GREEN)Not installing shellconfig"
