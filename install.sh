@@ -299,9 +299,12 @@ validate_config() {
 }
 
 show_nvidia_warning() {
-    if [ "" = $(lsmod | grep nvidia) ] return
-    echo
-    cat <<EOF
+  if ! lsmod | grep -q '^nvidia'; then
+    return
+  fi
+
+  echo
+  cat <<EOF
 ${YELLOW}
 ╔═══════════════════════════════════════════════════════════╗
 ║                     NVIDIA USERS                          ║
