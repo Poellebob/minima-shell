@@ -33,27 +33,27 @@ sudo mv /etc/xdg/menus/arch-applications.menu /etc/xdg/menus/applications.menu
 ```
 
 ### Window Manager
-#### hyprland
+#### Hyprland
 
 ```sh
 yay -Sy hyprland xdg-desktop-portal-hyprland hyprpolkitagent hypremoji
 ```
 
-#### sway
+#### Sway
 ```sh
 sudo pacman -Sy sway
 # or
 yay -Sy swayfx
-```
-
-> if you want to use sway add `--unsupported-gpu` to the launch command `Exec` in 
-`/usr/share/wayland-sessions/sway.desktop` if you use the proprietary nvidia drivers.
-
-#### scroll
-
-```sh
+# or
 yay -Sy scroll
 ```
+
+> if you want to use Sway or Swayfx (not Scroll) add `--unsupported-gpu` to the launch command `Exec` in 
+`/usr/share/wayland-sessions/sway.desktop` if you use the proprietary nvidia drivers.
+
+**Improtent:** Sway needs enviroment variables to be set in the shell's profile to run in the correct graphics mode, theme apps and use icons.
+Look at the [zprofile](https://github.com/Poellebob/minima-shell/blob/master/defaults/zprofile) or
+[profile](https://github.com/Poellebob/minima-shell/blob/master/defaults/profile) used by bash, to know witch are reccomeded to set.
 
 ### Copy to home
 ```sh

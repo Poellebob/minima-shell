@@ -47,11 +47,11 @@ ModuleBase {
 
     percentageText.text = Math.round(UPower.displayDevice.percentage * 100) + "%"
 
-    if (UPower.displayDevice.percentage * 100 < 10 && !p10) {
+    if (UPower.displayDevice.percentage * 100 < 10 && !p10 && !(UPower.displayDevice.percentage == 0)) {
       p10 = true
       Quickshell.execDetached(["sh", "-c", "notify-send -u critical batary low"])
     }
-    if (UPower.displayDevice.percentage * 100 < 5 && !p5) {
+    if (UPower.displayDevice.percentage * 100 < 5 && !p5 && !(UPower.displayDevice.percentage == 0)) {
       p5 = true
       Quickshell.execDetached(["sh", "-c", "notify-send -u critical batary low"])
     }
