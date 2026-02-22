@@ -454,6 +454,7 @@ install_shell_zsh() {
     echo "To change shell, run: chsh zsh"
     cp ./config/zprofile ~/.zprofile 2>/dev/null || true
     cp ./config/zshrc ~/.zshrc 2>/dev/null || true
+    chsh zsh
 }
 
 install_shell_bash() {
@@ -462,6 +463,7 @@ install_shell_bash() {
     echo "To change shell, run: chsh bash"
     cp ./config/profile ~/.profile 2>/dev/null || true
     cp ./config/bashrc ~/.bashrc 2>/dev/null || true
+    chsh bash
 }
 
 install_configs() {
