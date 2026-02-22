@@ -7,6 +7,10 @@ minima-shell is a userspace shell and a [scroll](https://github.com/dawsers/scro
 # Install
 **Warning backup your configs**
 
+```sh
+sh <(curl -fsSL https://raw.githubusercontent.com/Poellebob/minima-shell/refs/heads/master/install.sh)
+```
+
 ## Arch
 
 ```sh
