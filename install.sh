@@ -495,7 +495,7 @@ install_configs() {
     sh -c "$HOME/.config/quickshell/scripts/generate-colors.sh" 2>/dev/null || true
     
     cd $prev
-    rm -r $dir
+    rm -rf $dir
 }
 
 case "$1" in
