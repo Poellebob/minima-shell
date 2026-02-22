@@ -356,6 +356,11 @@ run_installation() {
     if [ "rc" =  ]
 
     if [ "$WM" = "sway" ] || [ "$WM" = "swayfx" ]; then
+        if [ "$SHELL_CONFIG" = "rc" ] || [ "$SHELL_CONFIG" = "none" ]; then
+            echo "${YELLOW}Sway needs some enviroment variables to be set in the shell profile to show icons and theme system apps.${RESET}"
+            echo "${YELLOW}Read https://github.com/Poellebob/minima-shell#sway to know witch variables to set"
+        fi
+
         show_nvidia_warning
     fi
 
@@ -498,8 +503,6 @@ install_shell_zsh() {
     echo "Installing zsh..."
     sudo pacman -Sy --needed zsh
     echo "To change shell, run: chsh zsh"
-    cp ./config/zprofile ~/.zprofile 2>/dev/null || true
-    cp ./config/zshrc ~/.zshrc 2>/dev/null || true
     chsh -s /usr/bin/zsh || true
 }
 
@@ -507,8 +510,6 @@ install_shell_bash() {
     echo "Installing bash..."
     sudo pacman -Sy --needed bash
     echo "To change shell, run: chsh bash"
-    cp ./config/profile ~/.profile 2>/dev/null || true
-    cp ./config/bashrc ~/.bashrc 2>/dev/null || true
     chsh -s /usr/bin/bash || true
 }
 
