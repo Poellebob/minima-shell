@@ -524,8 +524,6 @@ install_configs() {
     git clone https://github.com/Poellebob/minima-shell.git "$dir" --recurse-submodules
     cd $dir
 
-    : ${SHELL_CONFIG:=both}
-
     echo "Copying configs to home..."
     cp -r ./config/* ~/.config/ 2>/dev/null || true
     cp -r ./Wallpapers/ ~/ 2>/dev/null || true
@@ -534,23 +532,27 @@ install_configs() {
     [ ! -f "$HOME/.config/minima/hypr.conf" ] && cp ./defaults/hypr.conf "$HOME/.config/minima/" 2>/dev/null || true
     [ ! -f "$HOME/.config/minima/sway.conf" ] && cp ./defaults/sway.conf "$HOME/.config/minima/" 2>/dev/null || true
     [ ! -f "$HOME/.config/quickshell/config.ini" ] && cp ./defaults/config.ini "$HOME/.config/quickshell/" 2>/dev/null || true
-
+    
     case "$SHELL_CONFIG" in
         both)
+            echo "$(GREEN)Installing rc and profile"
             cp ./config/zprofile ~/.zprofile 2>/dev/null || true
             cp ./config/zshrc ~/.zshrc 2>/dev/null || true
             cp ./config/profile ~/.profile 2>/dev/null || true
             cp ./config/bashrc ~/.bashrc 2>/dev/null || true
             ;;
         rc)
+            echo "$(GREEN)Installing rc"
             cp ./config/zshrc ~/.zshrc 2>/dev/null || true
             cp ./config/bashrc ~/.bashrc 2>/dev/null || true
             ;;
         profile)
+            echo "$(GREEN)Installing profile"
             cp ./config/zprofile ~/.zprofile 2>/dev/null || true
             cp ./config/profile ~/.profile 2>/dev/null || true
             ;;
         none)
+            echo "$(GREEN)Not installing shellconfig"
             ;;
     esac
 
