@@ -5,21 +5,6 @@
 # ---------------------------
 # Aliases
 # ---------------------------
-alias newtexdoc='git clone https://github.com/Poellebob/latex-template.git'
-
-# ---------------------------
-# Environment
-# ---------------------------
-
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='nvim'
-fi
-
-eval "$(fzf --bash)"
-eval "$(zoxide init bash)"
-
 zv() {
   local prev="$PWD"
   z "$1" || return
@@ -42,20 +27,28 @@ alias poweroff='systemctl poweroff'
 alias logout='loginctl terminate-session "$XDG_SESSION_ID"'
 
 # ---------------------------
+# Environment
+# ---------------------------
+
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='nvim'
+fi
+
+eval "$(fzf --bash)"
+eval "$(zoxide init bash)"
+
+# ---------------------------
 # Start Fetch
 # ---------------------------
 afetch
 
 # ---------------------------
-# Powerlevel10k Instant Prompt
+# Bash config
 # ---------------------------
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
 
-# ---------------------------
-# Bash-specific configuration
-# ---------------------------
+PS1='[\u@\h \W]\$ '
 
 # Enable tab completion
 if ! shopt -oq posix; then
