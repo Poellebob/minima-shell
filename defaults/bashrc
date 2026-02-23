@@ -47,14 +47,17 @@ afetch
 # ---------------------------
 # Bash config
 # ---------------------------
+git_prompt() {
+  git rev-parse --is-inside-work-tree &>/dev/null || return
 
-PS1='\[$([ $? -ne 0 ] && printf "\e[31m%d\e[0m " $? )\]\[\e[36m\]\w\[\e[0m\]$(
-  if git rev-parse --is-inside-work-tree &>/dev/null; then
-    b=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
-    s=$(git status --porcelain 2>/dev/null)
-    printf " \[\e[35m\]%s%s\[\e[0m\]" "$b" "$( [ -n "$s" ] && printf "*" )"
-  fi
-) \[\e[90m\]›\[\e[0m\] '
+  local b s
+  b=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+  s=$(git status --porcelain 2>/dev/null)
+
+  printf " \[\e[35m\]%s%s\[\e[0m\]" "$b" "$( [ -n "$s" ] && printf "*" )"
+}
+
+PS1='\[$([ $? -ne 0 ] && printf "\e[31m%d\e[0m " $? )\]\[\e[36m\]\w\[\e[0m\]$(git_prompt) \[\e[90m\]›\[\e[0m\] '
 
 # Enable tab completion
 if ! shopt -oq posix; then
