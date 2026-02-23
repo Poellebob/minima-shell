@@ -18,7 +18,7 @@ sudo pacman -Sy wireplumber libgtop bluez bluez-utils btop networkmanager \
   dart-sass wl-clipboard brightnessctl swww python upower \
   pacman-contrib power-profiles-daemon gvfs cliphist \
   hyprlock hypridle kitty ttf-jetbrains-mono-nerd qt6-wayland qt5-wayland qt5ct \
-  grim slurp swappy wiremix bluetui \
+  grim slurp swappy wiremix bluetui polkit-kde-agent\
   archlinux-xdg-menu xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal \
   jq bc git breeze breeze-gtk breeze5 papirus-icon-theme fzf zoxide
 ```
@@ -36,7 +36,7 @@ sudo mv /etc/xdg/menus/arch-applications.menu /etc/xdg/menus/applications.menu
 #### Hyprland
 
 ```sh
-yay -Sy hyprland xdg-desktop-portal-hyprland hyprpolkitagent hypremoji
+yay -Sy hyprland xdg-desktop-portal-hyprland hypremoji
 ```
 
 #### Sway
