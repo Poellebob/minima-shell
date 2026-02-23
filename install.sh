@@ -458,7 +458,7 @@ install_deps_arch() {
       dart-sass wl-clipboard brightnessctl swww python upower neovim\
       pacman-contrib power-profiles-daemon gvfs cliphist \
       hyprlock hypridle kitty ttf-jetbrains-mono-nerd qt6-wayland qt5-wayland qt5ct \
-      grim slurp swappy wiremix bluetui \
+      grim slurp swappy wiremix bluetui polkit-kde-agent\
       archlinux-xdg-menu xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal \
       jq bc git breeze breeze-gtk breeze5 papirus-icon-theme fzf zoxide
 
@@ -495,7 +495,6 @@ install_wm_hyprland() {
     echo "Installing Hyprland..."
     build_aur_pkg hyprland
     build_aur_pkg xdg-desktop-portal-hyprland
-    build_aur_pkg hyprpolkitagent
     build_aur_pkg hypremoji
 }
 
