@@ -5,6 +5,17 @@ return {
     config = function() require("lsp_signature").setup() end,
   },
   {
+    "neovim/nvim-lspconfig",
+    config = function()
+      local lspconfig = require "lspconfig"
+
+      lspconfig.qmlls.setup {
+        cmd = { "/usr/bin/qmlls6" },
+        filetypes = { "qml", "qmljs" },
+      }
+    end,
+  },
+  {
     "folke/snacks.nvim",
     opts = {
       dashboard = {
