@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import qs.widgets.bluetooth
 import qs.components.bar
 import qs.components.text
 import qs
@@ -27,6 +28,8 @@ ModuleBase {
       visible: bluetoothRoot.displayText !== ""
     }
   }
+
+  onClicked: menu.visible = !menu.visible
 
   property bool bluetoothEnabled: false
   property var connectedDevices: []
@@ -111,5 +114,11 @@ ModuleBase {
     running: true
     repeat: true
     onTriggered: bluetoothRoot.updateDisplayText()
+  }
+
+  BlueControl {
+    id: menu
+    window: panel
+    x: (panel.width - bluetoothRoot.parent.width) / 2 + bluetoothRoot.x + (bluetoothRoot.width - width) / 2
   }
 }

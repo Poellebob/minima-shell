@@ -237,7 +237,6 @@ DropdownWindow {
                 }
               }
               MouseArea {
-                id: mouseArea
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: Pipewire.preferredDefaultAudioSink = modelData

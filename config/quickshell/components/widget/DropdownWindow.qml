@@ -14,6 +14,7 @@ PopupWindow {
   required property real x
   anchor.rect.x: x 
   anchor.rect.y: window.height + Global.format.spacing_large
+  color: "transparent"
 
   Timer {
     id: hideTimer

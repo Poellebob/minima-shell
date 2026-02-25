@@ -227,8 +227,12 @@ MenuPanel {
             id: mouseArea
             anchors.fill: parent
             hoverEnabled: true
+
+            onClicked: (mouse) => {
+              clipList.currentIndex = clipItem.index
+            }
             
-            onClicked: {
+            onDoubleClicked: {
               clipboardManagerRoot.selectEntry(clipItem.modelData)
               clipboardManagerRoot.visible = false
               grab.active = false

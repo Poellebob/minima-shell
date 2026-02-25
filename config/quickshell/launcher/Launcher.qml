@@ -19,7 +19,42 @@ MenuPanel {
     bottom: true  
   }
 
+  PanelWindow {
+    anchors.bottom: true
+    implicitWidth: launcherMenuRoot.implicitWidth
+    implicitHeight: 15
+    color: "transparent"
+    exclusiveZone: 0
+
+    MouseArea {
+      id: mouseActive
+      anchors.fill: parent
+      hoverEnabled: true
+
+      onClicked: handeler.open()
+    }
+
+    Rectangle {
+      color: Global.colors.surface
+      implicitHeight: mouseActive.containsMouse ? parent.height : 3
+      visible: mouseActive.containsMouse
+      topRightRadius: height
+      topLeftRadius: height
+
+      anchors{
+        bottom: parent.bottom
+        left: parent.left
+        right: parent.right
+      }
+
+      Behavior on implicitHeight {
+        NumberAnimation{duration: 100}
+      }
+    }
+  }
+
   IpcHandler {
+    id: handeler
     target: "minimaLauncher"
 
     function open(): void { 
@@ -144,6 +179,7 @@ MenuPanel {
       delegate: Rectangle {
         id: appItem
         required property var modelData
+        required property int index
         property bool selected: modelData == appList.currentItem
         focus: false
         width: appList.width - scrollBar.width
@@ -200,12 +236,16 @@ MenuPanel {
           anchors.fill: parent
           hoverEnabled: true
           propagateComposedEvents: true
+
+          onClicked: (mouse) => {
+            appList.currentIndex = appItem.index
+          }
           
-          onClicked: {
+          onDoubleClicked: {
             if (appItem.modelData) {
+              appItem.modelData?.execute()
               launcherMenuRoot.visible = false
               grab.active = false
-              appItem.modelData?.execute()
               searchBox.clear()
             }
           }

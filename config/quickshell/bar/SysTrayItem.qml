@@ -3,8 +3,6 @@ import Quickshell
 import QtQuick.Layouts
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
-import Quickshell.DBusMenu
-import Qt5Compat.GraphicalEffects
 import qs.components.widget
 import qs
 

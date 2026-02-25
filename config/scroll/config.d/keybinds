@@ -42,8 +42,8 @@ bindsym $mod+Shift+k resize shrink height 100px
 bindsym $mod+Shift+j resize grow height 100px
 
 # Scratchpad
-bindsym $mod+minus move scratchpad
-bindsym $mod+Shift+minus scratchpad show
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
 
 # Direction
 bindsym $mod+a set_mode toggle
