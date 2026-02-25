@@ -18,7 +18,7 @@ Singleton {
 
   FileView {
     id: confFile
-    path: Quickshell.env("HOME") + "/.config/quickshell/config.ini"
+    path: Quickshell.env("HOME") + "/.config/minima/config.ini"
     blockLoading: true
     watchChanges: true
     

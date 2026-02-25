@@ -44,12 +44,12 @@ bindsym $mod+Mod1+h layout stacking
 bindsym $mod+Mod1+l layout tabbed
 bindsym $mod+Escape layout default
 
-bindsym $mod+Control+a focus parent
+bindsym $mod+Control+a focus child
 bindsym $mod+Shift+a focus parent
 
 # Scratchpad
-bindsym $mod+minus move scratchpad
-bindsym $mod+Shift+minus scratchpad show
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
 
 # Logout
 bindsym XF86PowerOff exec qs ipc call minimaLogout open

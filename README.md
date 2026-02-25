@@ -18,7 +18,7 @@ sudo pacman -Sy wireplumber libgtop bluez bluez-utils btop networkmanager \
   dart-sass wl-clipboard brightnessctl swww python upower \
   pacman-contrib power-profiles-daemon gvfs cliphist \
   hyprlock hypridle kitty ttf-jetbrains-mono-nerd qt6-wayland qt5-wayland qt5ct \
-  grim slurp swappy wiremix bluetui polkit-kde-agent\
+  grim slurp swappy wiremix bluetui polkit-kde-agent \
   archlinux-xdg-menu xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal \
   jq bc git breeze breeze-gtk breeze5 papirus-icon-theme fzf zoxide
 ```
@@ -142,8 +142,22 @@ cp ./config/bashrc ~/.bashrc
 | `$mod + Alt + j` | Split vertical | Move window into collum on left |
 | `$mod + Alt + k` | Split horizontal | Move window into collum on right |
 | `$mod + a` | Split toggle | Direction mode |
+| `$mod + Shift + a` | Focus parent | - |
+| `$mod + Control + a` | Focus child | - |
 | `$mod + Escape` | Default layout | - |
 | `$mod + Tab` | - | Workspace overview |
+| `$mod + Shift + -` | Move to scratchpad | Move to scratchpad |
+| `$mod + -` | Show scratchpad | Show scratchpad |
+| `XF86PowerOff` | Open logout menu | Open logout menu |
+
+### Screenshot
+
+| Keybind | Action |
+|---------|--------|
+| `Print` | Screenshot selection → clipboard |
+| `Shift + Print` | Screenshot fullscreen → clipboard |
+| `$mod + Print` | Screenshot selection → edit in swappy |
+| `$mod + Shift + Print` | Screenshot fullscreen → edit in swappy |
 
 ### Focus Movement (vim-style)
 

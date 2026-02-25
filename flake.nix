@@ -27,15 +27,12 @@ outputs = { self, nixpkgs, flake-utils }:
           wl-clipboard
           brightnessctl
           swww
-          python310
           upower
           pacman-contrib
           power-profiles-daemon
           gvfs
           cliphist
-          hyprland
           hyprlock
-          hypridle
           kitty
           qt5.qtwayland
           qt6.qtwayland
