@@ -1,5 +1,5 @@
 {
-  description = "minima-shell - userspace shell + Hyprland config";
+  description = "minima-shell - userspace shell and config";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -13,6 +13,10 @@
 outputs = { self, nixpkgs, flake-utils, home-manager }:
   let
     lib = nixpkgs.lib;
+
+    users = [
+      { name = "minima"; system = "x86_64-linux"; }
+    ];
   in
   {
     packages = flake-utils.lib.eachDefaultSystem (system:
@@ -90,13 +94,6 @@ outputs = { self, nixpkgs, flake-utils, home-manager }:
       '';
     };
 
-    homeConfigurations = {
-      "minima" = home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs { system = "x86_64-linux"; };
-        modules = [
-          ./home-manager.nix
-        ];
-      };
-    };
+    homeManagerModules.minima = ./home-manager.nix;
   };
 }
