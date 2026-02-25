@@ -1,9 +1,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  home.username = "minima";
-  home.homeDirectory = "/home/minima";
-
   home.sessionVariables = {
     XDG_CURRENT_DESKTOP = "Hyprland";
     XDG_SESSION_TYPE = "wayland";
