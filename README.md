@@ -2,7 +2,7 @@
 
 minima-shell is a userspace shell and a [scroll](https://github.com/dawsers/scroll/)/[sway](https://swaywm.org/) and [hyprland](https://hypr.land/) config in one.
 
-**Warning:** this project is not done and is still pre-alpha, it will contain bugs
+**Warning:** this project is not done and is still **pre-alpha**, it will contain bugs
 
 # Install
 **Warning backup your configs**
