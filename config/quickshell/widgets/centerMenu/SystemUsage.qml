@@ -23,7 +23,7 @@ Item {
     // CPU Usage Process
     Process {
       id: cpuUsage
-      command: ["/bin/bash", "-c", "LC_ALL=C top -bn1 | grep 'Cpu(s)' | awk '{print 100 - $8}'"]
+      command: ["/bin/sh", "-c", "LC_ALL=C top -bn1 | grep 'Cpu(s)' | awk '{print 100 - $8}'"]
       stdout: StdioCollector {
         onStreamFinished: {
           sysUsageRoot.cpuPercent = parseFloat(this.text)
@@ -34,7 +34,7 @@ Item {
     // RAM Usage Process
     Process {
       id: ramUsage
-      command: ["/bin/bash", "-c", "free | grep Mem | awk '{printf \"%.1f\", $3/$2 * 100.0}'"]
+      command: ["/bin/sh", "-c", "free | grep Mem | awk '{printf \"%.1f\", $3/$2 * 100.0}'"]
       stdout: StdioCollector {
         onStreamFinished: {
           sysUsageRoot.ramPercent = parseFloat(this.text)
@@ -45,7 +45,7 @@ Item {
     // Disk Usage Process
     Process {
       id: diskUsage
-      command: ["/bin/bash", "-c", "df / | tail -1 | awk '{print $5}' | sed 's/%//'"]
+      command: ["/bin/sh", "-c", "df / | tail -1 | awk '{print $5}' | sed 's/%//'"]
       stdout: StdioCollector {
         onStreamFinished: {
           sysUsageRoot.diskPercent = parseFloat(this.text)

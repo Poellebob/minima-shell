@@ -7,7 +7,7 @@ Item {
 
   FileView {
     id: colorFile
-    path: Quickshell.env("HOME") + "/.config/quickshell/colors/colors.json"
+    path: Quickshell.env("HOME") + "/.config/matugen/quickshell.json"
     watchChanges: true
     blockLoading: true
 
@@ -106,7 +106,6 @@ Item {
           property string secondary_fixed: ""
           property string secondary_fixed_dim: ""
           property string shadow: ""
-          property string source_color: ""
           property string surface: ""
           property string surface_bright: ""
           property string surface_container: ""
@@ -229,6 +228,5 @@ Item {
     tertiary_container: json.colors.light.tertiary_container
     tertiary_fixed: json.colors.light.tertiary_fixed
     tertiary_fixed_dim: json.colors.light.tertiary_fixed_dim
-    source_color: json.colors.light.source_color
   }
 }

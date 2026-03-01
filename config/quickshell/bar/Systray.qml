@@ -7,9 +7,9 @@ import qs
 ModuleBase {
   id: systray
   implicitWidth: rowLayout.implicitWidth + Global.format.spacing_medium
-
-  // TODO: This component is dependent on the panel because of the bar property
-  // passed to SysTrayItem. This needs to be refactored to be able to use it without a panel.
+  
+  visible: true // SystemTray.items.values.length > 0
+  
   property var bar: panel
 
   RowLayout {
