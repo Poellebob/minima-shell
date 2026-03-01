@@ -55,7 +55,7 @@ PanelWindow {
       anchors.fill: parent
       bottomRightRadius: Global.format.radius_medium
       color: Global.colors.surface
-      visible: parent.containsMouse || Global.panelAlwaysVisible
+      visible: systray.visible && ( parent.containsMouse || Global.panelAlwaysVisible )
 
       RowLayout {
         id: itemsLeft
@@ -66,7 +66,10 @@ PanelWindow {
         }
         spacing: Global.format.spacing_medium
         
-        Systray { Layout.alignment: Qt.AlignVCenter }
+        Systray { 
+          id: systray
+          Layout.alignment: Qt.AlignVCenter 
+        }
       }
     }
   }

@@ -1,0 +1,10 @@
+[config]
+mode = "color"
+
+[templates.quickshell]
+input_path = "./quickshell.template.json"
+output_path = "./quickshell.json"
+
+[colors]
+source = "#6750A4"
+scheme = "content"

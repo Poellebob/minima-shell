@@ -211,7 +211,7 @@ DropdownWindow {
               width: outputList.width - scrollBar.width
               height: Global.format.module_height + Global.format.spacing_medium
               radius: Global.format.radius_medium
-              color: mouseArea.containsMouse || Pipewire.defaultAudioSink.id == modelData.id ? Global.colors.surface_container_high : "transparent"
+              color: (mouseArea.containsMouse || Pipewire.defaultAudioSink.id == modelData.id) ? Global.colors.surface_container_high : "transparent"
               Behavior on color {
                 ColorAnimation {
                   duration: 150
@@ -237,6 +237,7 @@ DropdownWindow {
                 }
               }
               MouseArea {
+                id: mouseArea
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: Pipewire.preferredDefaultAudioSink = modelData
