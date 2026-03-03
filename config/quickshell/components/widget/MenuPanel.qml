@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import qs
+import "./Menu.qml"
 
 PanelWindow {
   id: windowRoot

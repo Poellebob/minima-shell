@@ -14,7 +14,7 @@ DropdownWindow {
   implicitWidth: 800
   color: "transparent"
 
-  property int visibleHeight: 600
+  property int visibleHeight: 620
   property string fetchString
   property string fetchPath: Quickshell.shellDir + "/scripts/sysfetch.sh"
   
@@ -99,7 +99,8 @@ DropdownWindow {
               anchors.fill: parent
               anchors.margins: Global.format.spacing_medium
               text: menuRoot.fetchString
-              font.family: "monospace"
+              font.family: "JetBrainsMono Nerd Font"
+              font.pixelSize: 13
               font.bold: true
               wrapMode: Text.WrapAnywhere
               textFormat: Text.RichText

@@ -32,4 +32,9 @@ ShellRoot {
   }
 
   Logout { id: logout }
+
+  Component.onCompleted: {
+    console.log(Quickshell.iconPath("media-playlist-shuffle"))
+    console.log(Global.colors.surface_container_high)
+  }
 }
