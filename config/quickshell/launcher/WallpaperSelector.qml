@@ -237,7 +237,7 @@ MenuPanel {
     id: scanImagesProc
     property var buffer: []
     
-    command: ["bash", "-c", "find -L " + wallpaperSelectorRoot.wallpapersDir + " -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\)"]
+    command: ["/bin/sh", "-c", "find -L " + wallpaperSelectorRoot.wallpapersDir + " -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\)"]
     
     stdout: SplitParser {
       onRead: (line) => {
@@ -280,7 +280,7 @@ MenuPanel {
   Process {
     id: scanEngineProc
     property var buffer: []
-    command: ["bash", "-c",
+    command: ["/bin/sh", "-c",
       "find -L " + wallpaperSelectorRoot.workshopPath + " -name 'project.json'"
     ]
     stdout: SplitParser {
@@ -415,7 +415,7 @@ MenuPanel {
     property string wallpaperPath: ""
     property string previewPath: ""
     command: [
-      "bash", "-c", 
+      "/bin/sh", "-c", 
       "echo \"" + wallpaperPath + "\" > " + 
       Quickshell.env("HOME") + "/.config/wallpaper.conf"
     ]
@@ -425,9 +425,8 @@ MenuPanel {
         return
       }
       Quickshell.execDetached([
-        "bash", "-c", 
-        "matugen -j hex image \"" + previewPath + "\" 2>/dev/null | grep { | jq . > " + 
-        Quickshell.env("HOME") + "/.config/quickshell/colors/colors.json" 
+        "/bin/sh", "-c", 
+        "matugen -j hex image \"" + previewPath + "\" 2>/dev/null"
       ])
     }
   }

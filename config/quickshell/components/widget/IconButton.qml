@@ -5,18 +5,18 @@ import Quickshell.Widgets
 import qs
 
 Rectangle {
-  property string icon
+  required property string icon
   property bool enabled: true
   signal clicked()
   
   radius: Global.format.radius_small
   color: enabled ? (mouseArea.containsMouse ? Global.colors.surface : "transparent") : "transparent"
   opacity: enabled ? 1.0 : 0.5
+  visible: enabled
   
   IconImage {
     anchors.centerIn: parent
-    width: parent.width * 0.9
-    height: parent.height * 0.9
+    implicitSize: parent.width * 0.9
     source: icon
   }
   

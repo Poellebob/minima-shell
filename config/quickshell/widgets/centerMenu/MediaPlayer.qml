@@ -193,7 +193,7 @@ Item {
             IconButton {
               width: Global.format.icon_size
               height: Global.format.icon_size
-              icon: mediaPlayerRoot.player?.shuffle ? Quickshell.iconPath("media-playlist-shuffle") : Quickshell.iconPath("media-playlist-no-shuffle")
+              icon: mediaPlayerRoot.player?.shuffle ? Quickshell.iconPath("media-playlist-shuffle-symbolic") : Quickshell.iconPath("media-playlist-no-shuffle-symbolic")
               enabled: mediaPlayerRoot.player?.shuffleSupported
               onClicked: {
                 mediaPlayerRoot.player.shuffle = !mediaPlayerRoot.player.shuffle
@@ -203,7 +203,7 @@ Item {
             IconButton {
               width: Global.format.icon_size
               height: Global.format.icon_size
-              icon: Quickshell.iconPath("media-skip-backward")
+              icon: Quickshell.iconPath("media-skip-backward-symbolic")
               enabled: mediaPlayerRoot.player?.canGoPrevious ?? false
               onClicked: mediaPlayerRoot.player?.previous()
             }
@@ -213,9 +213,9 @@ Item {
               height: Global.format.big_icon_size
               icon: {
                 if (mediaPlayerRoot.player?.playbackState === MprisPlaybackState.Playing) {
-                  return Quickshell.iconPath("media-playback-pause")
+                  return Quickshell.iconPath("media-playback-pause-symbolic")
                 } else {
-                  return Quickshell.iconPath("media-playback-start")
+                  return Quickshell.iconPath("media-playback-start-symbolic")
                 }
               }
               enabled: mediaPlayerRoot.player?.canPause || mediaPlayerRoot.player?.canPlay
@@ -225,7 +225,7 @@ Item {
             IconButton {
               width: Global.format.icon_size
               height: Global.format.icon_size
-              icon: Quickshell.iconPath("media-skip-forward")
+              icon: Quickshell.iconPath("media-skip-forward-symbolic")
               enabled: mediaPlayerRoot.player?.canGoNext ?? false
               onClicked: mediaPlayerRoot.player?.next()
             }
@@ -235,13 +235,13 @@ Item {
               height: Global.format.icon_size
               icon: {
                 if(mediaPlayerRoot.player?.loopState === MprisLoopState.Playlist) {
-                  return Quickshell.iconPath("media-playlist-repeat")
+                  return Quickshell.iconPath("media-playlist-repeat-symbolic")
                 }
                 else if (mediaPlayerRoot.player?.loopState === MprisLoopState.Track) {
-                  return Quickshell.iconPath("media-repeat-single")
+                  return Quickshell.iconPath("media-repeat-single-symbolic")
                 }
                 else if(mediaPlayerRoot.player?.loopState === MprisLoopState.None) {
-                  return Quickshell.iconPath("media-repeat-none")
+                  return Quickshell.iconPath("media-repeat-none-symbolic")
                 }
               }
               enabled: mediaPlayerRoot.player?.loopSupported
