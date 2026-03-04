@@ -1,3 +1,4 @@
+local term = require("nvchad.term")
 local map = vim.keymap.set
 
 map("n", "<C-h>", "<C-w>h", { desc = "switch window left" })
@@ -75,78 +76,49 @@ map("n", "<leader>dh", "<cmd>DiffviewFileHistory %<CR>", { desc = "File History"
 
 -- terminal
 map("n", "<leader>t", "<Nop>", { desc = "Terminal" })
-map("t", "<C-x>", "<C-\\><C-n>", { desc = "terminal escape mode" })
+-- Terminal mode escape
+map("t", "<C-'>", function() term.toggle { id = "term" } end, { desc = "Close terminal" })
 
-map("n", "<leader>tf", function()
-  term.new { pos = "float" }
-end, { desc = "terminal open floating" })
+-- New terminals
+map("n", "<leader>tf", function() term.toggle { pos = "float", id = "term" } end, { desc = "terminal open floating" })
+map("n", "<leader>th", function() term.toggle { pos = "sp", id = "term" } end, { desc = "terminal open horizontal" })
+map("n", "<leader>tv", function() term.toggle { pos = "vsp", id = "term" } end, { desc = "terminal open vertical" })
 
-map("n", "<leader>th", function()
-  term.new { pos = "sp" }
-end, { desc = "terminal open horizontal" })
-
-map("n", "<leader>tv", function()
-  term.new { pos = "vsp" }
-end, { desc = "terminal open vertical" })
-
-map({ "n", "t" }, "<leader>tl", function()
-  term.toggle {
-    pos = "float",
-    id = "lazygit",
-    cmd = "lazygit",
-  }
+-- Toggle specific terminals
+map({ "n" }, "<leader>tg", function()
+  term.toggle { pos = "float", id = "lazygit", cmd = "lazygit" }
 end, { desc = "terminal toggle lazygit" })
 
-map({ "n", "t" }, "<leader>tn", function()
-  term.toggle {
-    pos = "float",
-    id = "node",
-    cmd = "node",
-  }
+map({ "n" }, "<leader>tn", function()
+  term.toggle { pos = "float", id = "node", cmd = "node" }
 end, { desc = "terminal toggle node" })
 
-map({ "n", "t" }, "<leader>tp", function()
-  term.toggle {
-    pos = "float",
-    id = "python",
-    cmd = "python",
-  }
+map({ "n" }, "<leader>tp", function()
+  term.toggle { pos = "float", id = "python", cmd = "python" }
 end, { desc = "terminal toggle python" })
 
-map({ "n", "t" }, "<leader>tt", function()
-  term.toggle {
-    pos = "float",
-    id = "btm",
-    cmd = "btm",
-  }
+map({ "n" }, "<leader>tt", function()
+  term.toggle { pos = "vsp", id = "btm", cmd = "btm" }
 end, { desc = "terminal toggle btm" })
-
-map({ "n", "t" }, "<F7>", function()
-  term.toggle { id = "term" }
-end, { desc = "terminal toggle current" })
-
-map({ "n", "t" }, "<C-'>", function()
-  term.toggle { id = "term" }
-end, { desc = "terminal toggle current alt" })
 
 -- Neotree
 map("n", "<leader>e", "<cmd>Neotree toggle<CR>", { desc = "Neo-tree toggle" })
 map("n", "<leader>o", "<cmd>Neotree focus<CR>", { desc = "Neo-tree focus" })
 
 -- PlatformIO
-map("n", "-p", "", { desc = "PlatformIO" })
-map("n", "-pd", "<cmd>!pio run -t compiledb<CR>", { desc = "Make pio compiledb" })
-map("n", "-pu", "<cmd>!pio run -t upload<CR>", { desc = "Upload pio project" })
-map("n", "-pm", "<cmd>!pio run<CR>", { desc = "Make pio project" })
-map("n", "-pc", "<cmd>!pio run -t clean<CR>", { desc = "Clean pio project" })
+map("n", "<leader>p", "", { desc = "PlatformIO" })
+map("n", "<leader>pd", "<cmd>!pio run -t compiledb<CR>", { desc = "Make pio compiledb" })
+map("n", "<leader>pu", "<cmd>!pio run -t upload<CR>", { desc = "Upload pio project" })
+map("n", "<leader>pm", "<cmd>!pio run<CR>", { desc = "Make pio project" })
+map("n", "<leader>pc", "<cmd>!pio run -t clean<CR>", { desc = "Clean pio project" })
 
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "tex",
-  callback = function()
-    vim.opt_local.spell = true
-    vim.opt_local.spelllang = "da,en"
-  end,
-})
+-- Vimtex
+map("n", "<leader>l", "", { desc = "VimTeX" })
+map("n", "<leader>ll", "<cmd>VimtexCompile<CR>", { desc = "Compile LaTeX (VimTeX)" })
+map("n", "<leader>lc", "<cmd>VimtexClean<CR>", { desc = "Clean LaTeX build (VimTeX)" })
+map("n", "<leader>lv", "<cmd>VimtexView<CR>", { desc = "View PDF (VimTeX)" })
+map("n", "<leader>lw", "<cmd>VimtexLog<CR>", { desc = "Open LaTeX log (VimTeX)" })
+map("n", "<leader>ls", "<cmd>VimtexStop<CR>", { desc = "Stop compilation (VimTeX)" })
 
 map("n", ";", ":", { desc = "CMD enter command mode" })
 map("i", "jk", "<ESC>")

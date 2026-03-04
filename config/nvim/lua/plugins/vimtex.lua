@@ -21,11 +21,12 @@ return {
       },
     }
 
-    vim.keymap.set("n", "-t", "", { desc = "+VimTeX" })
-    vim.keymap.set("n", "-tl", "<cmd>VimtexCompile<cr>", { desc = "Compile LaTeX (VimTeX)" })
-    vim.keymap.set("n", "-tc", "<cmd>VimtexClean<cr>", { desc = "Clean LaTeX build (VimTeX)" })
-    vim.keymap.set("n", "-tv", "<cmd>VimtexView<cr>", { desc = "View PDF (VimTeX)" })
-    vim.keymap.set("n", "-tw", "<cmd>VimtexLog<cr>", { desc = "Open LaTeX log (VimTeX)" })
-    vim.keymap.set("n", "-ts", "<cmd>VimtexStop<cr>", { desc = "Stop compilation (VimTeX)" })
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "tex",
+      callback = function()
+        vim.opt_local.spell = true
+        vim.opt_local.spelllang = "da,en"
+      end,
+    })
   end,
 }
