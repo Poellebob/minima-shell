@@ -1,13 +1,29 @@
 { config, lib, pkgs, ... }:
 
 with lib;
-
 let
   cfg = config.minima;
-in
-{
+in {
+  imports = [
+    ./nixvim.nix
+  ];
+
   options.minima = {
     enable = mkEnableOption "Minima shell";
+
+    wm = mkOption {
+      type = types.str;
+      default = "sway";
+      description = ''
+        Window mamager to use with minima shell.
+
+        Can be: 
+          "sway"
+          "swayfx"
+          "scroll"
+          "hyprland"
+      '';
+    };
 
     enableBranding = mkOption {
       type = types.bool;
@@ -26,7 +42,7 @@ in
       default = "Papirus-Dark";
       description = "Icon theme name (used by both Qt and GTK)";
     };
-    
+
     qt = {
       enable = mkOption {
         type = types.bool;
@@ -34,24 +50,45 @@ in
         description = "Enable QT theming";
       };
 
-      colorScheme = mkOption {
-        type = types.str;
-        default = "BreezeDark";
-      };
-
-      colorSchemePath = mkOption {
-        type = types.str;
-        default = "${pkgs.kdePackages.breeze}/share/color-schemes/BreezeDark.colors";
-      };
-
-      style = mkOption {
+      widgetStyle = mkOption {
         type = types.str;
         default = "Breeze";
+        description = "Actual widget style used inside qt5ct/qt6ct (e.g. Breeze, Fusion)";
       };
 
       lookAndFeel = mkOption {
         type = types.str;
         default = "org.kde.breezedark.desktop";
+      };
+
+      accentColor = mkOption {
+        type = types.str;
+        default = "232,203,45";
+        description = "KDE accent color as R,G,B string";
+      };
+
+      qt5 = {
+        colorSchemePath = mkOption {
+          type = types.str;
+          default = "/usr/share/qt5ct/colors/darker.conf";
+          description = "qt5ct color scheme path";
+        };
+        customPalette = mkOption {
+          type = types.bool;
+          default = true;
+        };
+      };
+
+      qt6 = {
+        colorSchemePath = mkOption {
+          type = types.str;
+          default = "${pkgs.kdePackages.breeze}/share/color-schemes/BreezeDark.colors";
+          description = "qt6ct color scheme path";
+        };
+        customPalette = mkOption {
+          type = types.bool;
+          default = false;
+        };
       };
 
       fonts = {
@@ -120,31 +157,31 @@ in
           default = true;
         };
 
-        enableCompletion = mkOption { 
-          type = types.bool; 
-          default = true; 
+        enableCompletion = mkOption {
+          type = types.bool;
+          default = true;
         };
 
-        autosuggestion.enable = mkOption { 
-          type = types.bool; 
-          default = true; 
+        autosuggestion.enable = mkOption {
+          type = types.bool;
+          default = true;
         };
 
-        syntaxHighlighting.enable = mkOption { 
-          type = types.bool; 
-          default = true; 
+        syntaxHighlighting.enable = mkOption {
+          type = types.bool;
+          default = true;
         };
 
-        initExtra = mkOption { 
-          type = types.lines; 
-          default = ""; 
+        initContent = mkOption {
+          type = types.lines;
+          default = "";
         };
       };
 
       bash = {
-        enable = mkOption { 
-          type = types.bool; 
-          default = false; 
+        enable = mkOption {
+          type = types.bool;
+          default = false;
         };
 
         shellAliases = mkOption {
@@ -164,12 +201,48 @@ in
           type = types.attrs;
           default = {
             add_newline = true;
+
             directory.style = "cyan";
-            character.success_symbol = "›";
-            character.error_symbol = "[›](red)";
-            git_branch.style = "purple";
+
+            character = {
+              success_symbol = "[](green)";
+              error_symbol = "[](red)";
+            };
+
+            git_branch = {
+              style = "purple";
+              symbol = "󰘬 ";
+            };
+
             git_status.style = "purple";
             cmd_duration.disabled = false;
+
+            aws.symbol            = "󰸏 ";
+            bun.symbol            = "󰟓 ";
+            c.symbol              = "󰙱 ";
+            conda.symbol          = "󱔎 ";
+            dart.symbol           = "󰔶 ";
+            docker_context.symbol = "󰡨 ";
+            elixir.symbol         = "󰘉 ";
+            elm.symbol            = "󰏚 ";
+            golang.symbol         = "󰟓 ";
+            haskell.symbol        = "󰲒 ";
+            java.symbol           = "󰬷 ";
+            julia.symbol          = "󱌞 ";
+            kotlin.symbol         = "󱈙 ";
+            lua.symbol            = "󰢱 ";
+            memory_usage.symbol   = "󰍛 ";
+            nim.symbol            = "󰆥 ";
+            nix_shell.symbol      = "󱄅 ";
+            nodejs.symbol         = "󰎙 ";
+            package.symbol        = "󰏗 ";
+            php.symbol            = "󰌟 ";
+            python.symbol         = "󰌠 ";
+            ruby.symbol           = "󰴭 ";
+            rust.symbol           = "󱘗 ";
+            scala.symbol          = " ";
+            swift.symbol          = "󰛥 ";
+            zig.symbol            = "󱐋 ";
           };
         };
       };
@@ -177,13 +250,17 @@ in
 
     gtk = {
       enable = mkOption { type = types.bool; default = true; };
-      themeName = mkOption { type = types.str; default = "Breeze-dark"; };
+      themeName = mkOption {
+        type = types.str;
+        default = "Breeze";
+        description = "GTK theme name. Dark mode is controlled by colorScheme, not the theme name.";
+      };
       colorScheme = mkOption {
         type = types.enum [ "default" "prefer-dark" "prefer-light" ];
         default = "prefer-dark";
       };
       cursorTheme = {
-        name = mkOption { type = types.str; default = "breeze_cursors"; };
+        name = mkOption { type = types.str; default = "BreezeX-RosePine-Linux"; };
         size = mkOption { type = types.int; default = 24; };
       };
     };
@@ -200,23 +277,23 @@ in
       kdePackages.qt6ct
       kdePackages.breeze
       papirus-icon-theme
+      rose-pine-cursor
       cfg.terminal.package
     ]
-    ++ optionals cfg.shell.enable [ fzf zoxide neovim git afetch ]
+    ++ optionals cfg.shell.enable [ fzf zoxide git afetch ]
     ++ cfg.extraPackages;
 
-    # --- SHELL CONFIGURATION (This generates .zshrc and .bashrc) ---
     programs.zsh = mkIf (cfg.shell.enable && cfg.shell.zsh.enable) {
       enable = true;
       enableCompletion = cfg.shell.zsh.enableCompletion;
       autosuggestion.enable = cfg.shell.zsh.autosuggestion.enable;
       syntaxHighlighting.enable = cfg.shell.zsh.syntaxHighlighting.enable;
-      initExtra = ''
+      initContent = ''
         eval "$(fzf --zsh)"
         eval "$(zoxide init zsh)"
         eval "$(starship init zsh)"
         ${cfg.shell.sharedShell}
-        ${cfg.shell.zsh.initExtra}
+        ${cfg.shell.zsh.initContent}
       '';
     };
 
@@ -236,7 +313,18 @@ in
       settings = cfg.shell.starship.settings;
     };
 
-    # --- ENVIRONMENT VARIABLES ---
+    dconf.settings = mkIf cfg.gtk.enable {
+      "org/gnome/desktop/interface" = {
+        color-scheme = if cfg.gtk.colorScheme == "prefer-dark"
+          then "prefer-dark"
+          else "prefer-light";
+        gtk-theme = cfg.gtk.themeName;
+        icon-theme = cfg.iconTheme;
+        cursor-theme = cfg.gtk.cursorTheme.name;
+        cursor-size = cfg.gtk.cursorTheme.size;
+      };
+    };
+
     home.sessionVariables = mkMerge [
       {
         QT_SCALE_FACTOR_ROUNDING_POLICY = "RoundPreferFloor";
@@ -246,7 +334,6 @@ in
         CLUTTER_BACKEND = "wayland";
         ELECTRON_OZONE_PLATFORM_HINT = "wayland";
         XDG_SESSION_TYPE = "wayland";
-        GTK_THEME = cfg.gtk.themeName;
         XCURSOR_THEME = cfg.gtk.cursorTheme.name;
         XCURSOR_SIZE = toString cfg.gtk.cursorTheme.size;
       }
@@ -273,54 +360,122 @@ in
     qt = mkIf cfg.qt.enable {
       enable = true;
       platformTheme.name = "qtct";
-      style.name = toLower cfg.qt.style;
     };
 
-    # qtct settings (Requires home.file or direct qtct config)
-    xdg.configFile."qt5ct/qt5ct.conf".text = mkIf cfg.qt.enable (generators.toINI {} {
-      Appearance = {
-        style = cfg.qt.style;
-        color_scheme_path = cfg.qt.colorSchemePath;
-        custom_palette = true;
-        icon_theme = cfg.iconTheme;
-        standard_dialogs = "xdgdesktopportal";
-      };
-      Fonts = {
-        fixed = cfg.qt.fonts.fixed;
-        general = cfg.qt.fonts.general;
-      };
-    });
-
-    xdg.configFile."qt6ct/qt6ct.conf".text = mkIf cfg.qt.enable (generators.toINI {} {
-      Appearance = {
-        style = cfg.qt.style;
-        color_scheme_path = cfg.qt.colorSchemePath;
-        custom_palette = true;
-        icon_theme = cfg.iconTheme;
-        standard_dialogs = "xdgdesktopportal";
-      };
-      Fonts = {
-        fixed = cfg.qt.fonts.fixed;
-        general = cfg.qt.fonts.general;
-      };
-    });
-
     home.file.".config/kdeglobals".text = ''
-      [ColorScheme]
-      ColorScheme=${cfg.qt.colorScheme}
-
       [General]
-      ColorScheme=${cfg.qt.colorScheme}
-      Name=${cfg.qt.colorScheme}
+      AccentColor=${cfg.qt.accentColor}
+      BrowserApplication=google-chrome.desktop
       TerminalApplication=${cfg.terminal.application}
       TerminalService=${cfg.terminal.service}
+      UseSystemBell=true
 
       [Icons]
       Theme=${cfg.iconTheme}
 
       [KDE]
       LookAndFeelPackage=${cfg.qt.lookAndFeel}
-      widgetStyle=${toLower cfg.qt.style}
+      widgetStyle=qt6ct-style
+
+      [Sounds]
+      Enable=false
+    '';
+
+    home.file."Wallpapers/d.svg".source = ./defaults/d.svg;
+
+    home.file.".config/sway/set-xft-dpi.sh" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/set-xft-dpi.sh; };
+    home.file.".config/sway/config" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config; };
+    home.file.".config/sway/config.d/keybinds" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/keybinds; };
+    home.file.".config/sway/config.d/workspace" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/workspace; };
+    home.file.".config/sway/config.d/application-behavior" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/application-behavior; };
+    home.file.".config/sway/config.d/env" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/env; };
+    home.file.".config/sway/config.d/input" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/input; };
+    home.file.".config/sway/config.d/application-style" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/application-style; };
+    home.file.".config/sway/config.d/terminal" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
+      text = ''
+        set $terminal ${cfg.terminal.application}
+      '';
+    };
+    home.file.".config/sway/config.d/fx" = mkIf (cfg.wm == "swayfx") {
+      text = ''
+        # corner rounding
+        corner_radius 8
+        # window shadows
+        shadows enable
+        shadow_blur_radius 4
+        shadow_color #1a1a1aee
+        shadow_offset 0 2
+        # blur
+        blur enable
+        blur_radius 4
+        blur_passes 2
+        for_window [app_id=".*"] blur enable
+        for_window [class=".*"] blur enable
+      '';
+    };
+    home.file.".config/scroll/set-xft-dpi.sh" = mkIf (cfg.wm == "scroll") { source = ./config/sway/set-xft-dpi.sh; };
+    home.file.".config/scroll/config" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config; };
+    home.file.".config/scroll/config.d/keybinds" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/keybinds; };
+    home.file.".config/scroll/config.d/workspace" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/workspace; };
+    home.file.".config/scroll/config.d/application-behavior" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/application-behavior; };
+    home.file.".config/scroll/config.d/env" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/env; };
+    home.file.".config/scroll/config.d/input" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/input; };
+    home.file.".config/scroll/config.d/application-style" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/application-style; };
+    home.file.".config/scroll/config.d/terminal" = mkIf (cfg.wm == "scroll") {
+      text = ''
+        set $terminal ${cfg.terminal.application}
+      '';
+    };
+
+    home.file.".config/hypr/suspend.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/suspend.sh; };
+    home.file.".config/hypr/hyprland.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/hyprland.conf; };
+    home.file.".config/hypr/hypridle.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/hypridle.conf; };
+    home.file.".config/hypr/hyprlock.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/hyprlock.conf; };
+    home.file.".config/hypr/set-xft-dpi.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/set-xft-dpi.sh; };
+    home.file.".config/hypr/getkeys.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/getkeys.sh; };
+    home.file.".config/hypr/components/input.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/input.conf; };
+    home.file.".config/hypr/components/env.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/env.conf; };
+    home.file.".config/hypr/components/workspace.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/workspace.conf; };
+    home.file.".config/hypr/components/application-behavior.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/application-behavior.conf; };
+    home.file.".config/hypr/components/application-style.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/application-style.conf; };
+    home.file.".config/hypr/components/keybinds.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/keybinds.conf; };
+    home.file.".config/hypr/terminal.conf" = mkIf (cfg.wm == "hyprland") {
+      text = ''
+        $terminal = ${cfg.terminal.application}
+      '';
+    };
+
+    home.file.".config/matugen/config.toml".source = ./config/matugen/config.toml;
+    home.file.".config/matugen/quickshell.template.json".source = ./config/matugen/quickshell.template.json;
+    home.file.".config/kitty/kitty.conf".source = ./config/kitty/kitty.conf;
+    home.file.".config/quickshell/".source = ./config/quickshell;
+
+    home.activation.minimaBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      dir="$HOME/.config/minima"
+      mkdir -p "$dir"
+
+      chmod +x $HOME/.config/quickshell/scripts/sysfetch.sh
+      chmod +x $HOME/.config/kitty/kitty.conf
+
+      if [ "${cfg.wm}" = "sway" ] || [ "${cfg.wm}" = "swayfx" ]; then
+        chmod +x $HOME/.config/sway/set-xft-dpi.sh
+      fi
+
+      if [ "${cfg.wm}" = "scroll" ]; then
+        chmod +x $HOME/.config/scroll/set-xft-dpi.sh
+      fi
+
+      if [ "${cfg.wm}" = "hyprland" ]; then
+        chmod +x $HOME/.config/hypr/set-xft-dpi.sh
+        chmod +x $HOME/.config/hypr/getkeys.sh
+        chmod +x $HOME/.config/hypr/suspend.sh
+      fi
+
+      for f in config.ini hypr.conf sway.conf; do
+        if [ ! -f "$dir/$f" ]; then
+          cp ${./defaults}/$f "$dir/$f"
+        fi
+      done
     '';
   };
 }
