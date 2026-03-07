@@ -9,11 +9,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    scroll-flake = {
-      url = "github:AsahiRocks/scroll-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     nixvim.url = "github:nix-community/nixvim";
   };
 

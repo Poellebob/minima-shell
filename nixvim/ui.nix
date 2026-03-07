@@ -74,7 +74,7 @@
         enable = true;
         settings.options = {
           numbers = "none";
-          close_command = "bdelete! %d";
+          close_command = "lua if vim.fn.winnr('$') == 1 then vim.cmd('enew') else vim.cmd('bdelete! ' .. vim.fn.bufnr('%')) end";
           diagnostics = "nvim_lsp";
           diagnostics_indicator.__raw = ''
             function(count, level)
@@ -166,55 +166,89 @@
         };
       };
 
-      snacks = {
+      alpha = {
         enable = true;
-        settings = {
-          dashboard = {
-            preset = {
-              header = ''
-                                                                         
-                              ██            ██                           
-                                                                         
-              █████████████   ██ ████████   ██ █████████████    ██████   
-              ██    ██    ██  ██ ██     ██  ██ ██    ██    ██        ██  
-              ██    ██    ██  ██ ██     ██  ██ ██    ██    ██   ███████  
-              ██    ██    ██  ██ ██     ██  ██ ██    ██    ██  ██    ██  
-              ██    ██    ██  ██ ██     ██  ██ ██    ██    ██   █████ ██ 
-              '';
-              keys = [
-                {
-                  icon = "  ";
-                  key = "f";
-                  desc = "Find file";
-                  action = ":lua require('telescope.builtin').find_files()";
-                }
-                {
-                  icon = "  ";
-                  key = "n";
-                  desc = "New file";
-                  action = ":ene | startinsert";
-                }
-                {
-                  icon = "  ";
-                  key = "r";
-                  desc = "Recent files";
-                  action = ":lua require('telescope.builtin').oldfiles()";
-                }
-                {
-                  icon = "  ";
-                  key = "q";
-                  desc = "Quit";
-                  action = ":qa";
-                }
-              ];
+        settings.layout = [
+          {
+            type = "text";
+            val = [
+              ""
+              "                  ██            ██                          "
+              ""
+              "  █████████████   ██ ████████   ██ █████████████    ██████  "
+              "  ██    ██    ██  ██ ██     ██  ██ ██    ██    ██        ██ "
+              "  ██    ██    ██  ██ ██     ██  ██ ██    ██    ██   ███████ "
+              "  ██    ██    ██  ██ ██     ██  ██ ██    ██    ██  ██    ██ "
+              "  ██    ██    ██  ██ ██     ██  ██ ██    ██    ██   █████ ██"
+              ""
+            ];
+            opts = {
+              position = "center";
+              hl = "Type";
             };
-          };
-          terminal = {
-            enabled = true;
-            win.style = "terminal";
-          };
-          notifier.enabled = true;
-        };
+          }
+          {
+            type = "group";
+            val = [
+              {
+                type = "button";
+                val = "f  find file";
+                on_press.__raw = "function() require('telescope.builtin').find_files() end";
+                opts = {
+                  shortcut = "f";
+                  cursor = 3;
+                  width = 50;
+                  align_shortcut = "right";
+                  hl_shortcut = "Keyword";
+                  position = "center";
+                };
+              }
+              {
+                type = "button";
+                val = "n  new file";
+                on_press.__raw = "function() vim.cmd('ene | startinsert') end";
+                opts = {
+                  shortcut = "n";
+                  cursor = 3;
+                  width = 50;
+                  align_shortcut = "right";
+                  hl_shortcut = "Keyword";
+                  position = "center";
+                };
+              }
+              {
+                type = "button";
+                val = "r  recent files";
+                on_press.__raw = "function() require('telescope.builtin').oldfiles() end";
+                opts = {
+                  shortcut = "r";
+                  cursor = 3;
+                  width = 50;
+                  align_shortcut = "right";
+                  hl_shortcut = "Keyword";
+                  position = "center";
+                };
+              }
+              {
+                type = "button";
+                val = "q  quit";
+                on_press.__raw = "function() vim.cmd('qa') end";
+                opts = {
+                  shortcut = "q";
+                  cursor = 3;
+                  width = 50;
+                  align_shortcut = "right";
+                  hl_shortcut = "Keyword";
+                  position = "center";
+                };
+              }
+            ];
+            opts = {
+              spacing = 1;
+              position = "center";
+            };
+          }
+        ];
       };
 
       dressing = {
