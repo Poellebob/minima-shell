@@ -26,8 +26,14 @@
         splitbelow = true;
         scrolloff = 8;
         updatetime = 250;
+        title = true;
+        titlestring = "%{expand('%:t')} [%{getcwd()}] – nvim";
       };
       keymaps = [
+        # ── Indentation ───────────────────────────────────────────────────────
+        { mode = "v"; key = "<Tab>";   action = ">gv"; options.desc = "Indent right"; }
+        { mode = "v"; key = "<S-Tab>"; action = "<gv"; options.desc = "Indent left"; }
+
         # ── Neo-tree ──────────────────────────────────────────────────────────
         { mode = "n"; key = "<leader>e"; action = "<cmd>Neotree toggle<CR>";        options.desc = "Neo-tree toggle"; }
         { mode = "n"; key = "<leader>o"; action = "<cmd>Neotree focus<CR>";         options.desc = "Neo-tree focus"; }
@@ -50,7 +56,7 @@
         { mode = "n"; key = "<C-s>";      action = "<cmd>w!<CR>";                        options.desc = "Force write"; }
         { mode = "n"; key = "<C-q>";      action = "<cmd>q!<CR>";                        options.desc = "Force quit"; }
         { mode = "n"; key = "<leader>n";  action = "<cmd>enew<CR>";                      options.desc = "New file"; }
-        { mode = "n"; key = "<leader>c";  action = "<cmd>bdelete<CR>";                   options.desc = "Close buffer"; }
+        { mode = "n"; key = "<leader>c";  action = "<cmd>lua if vim.fn.winnr('$') == 1 then vim.cmd('enew') else vim.cmd('bdelete') end<CR>";                   options.desc = "Close buffer"; }
         { mode = "n"; key = "]b";         action = "<cmd>bnext<CR>";                     options.desc = "Next buffer"; }
         { mode = "n"; key = "[b";         action = "<cmd>bprevious<CR>";                 options.desc = "Prev buffer"; }
         { mode = "n"; key = ">b";         action = "<cmd>BufferLineMoveNext<CR>";        options.desc = "Move buffer right"; }
@@ -99,7 +105,7 @@
         { mode = "n"; key = "[h";         action = "<cmd>Gitsigns prev_hunk<CR>";    options.desc = "Prev hunk"; }
 
         # ── Terminal (snacks) ─────────────────────────────────────────────────
-        { mode = [ "n" "t" ]; key = "<F7>";        action = "<cmd>lua Snacks.terminal.toggle()<CR>";                                        options.desc = "Toggle terminal"; }
+        { mode = [ "n" "t" ];  key = "<C-'>";      action = "<cmd>lua Snacks.terminal.toggle()<CR>"; options.desc = "Toggle terminal"; }
         { mode = "n";          key = "<leader>tf"; action = "<cmd>lua Snacks.terminal.toggle(nil, { win = { style = 'float' } })<CR>";      options.desc = "Floating terminal"; }
         { mode = "n";          key = "<leader>th"; action = "<cmd>lua Snacks.terminal.toggle(nil, { win = { position = 'bottom' } })<CR>";  options.desc = "Horizontal terminal"; }
         { mode = "n";          key = "<leader>tv"; action = "<cmd>lua Snacks.terminal.toggle(nil, { win = { position = 'right' } })<CR>";   options.desc = "Vertical terminal"; }
@@ -129,8 +135,8 @@
         { mode = "n"; key = "<leader>uD"; action = "<cmd>lua Snacks.notifier.hide()<CR>";                                          options.desc = "Dismiss notifications"; }
 
         # ── Commenting ────────────────────────────────────────────────────────
-        { mode = "n"; key = "<leader>/"; action = "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>";               options.desc = "Toggle comment"; }
-        { mode = "v"; key = "<leader>/"; action = "<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>"; options.desc = "Toggle comment"; }
+        { mode = "n"; key = "<leader>/";  action = "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>";               options.desc = "Toggle comment"; }
+        { mode = "v"; key = "<leader>/";  action = "<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>"; options.desc = "Toggle comment"; }
       ] ++ map (k: {
         mode = k.mode;
         key = k.key;
@@ -150,6 +156,17 @@
             highlight.enable = true;
             indent.enable = true;
             auto_install = true;
+          };
+        };
+        treesitter-textobjects = {
+          enable = true;
+          settings = {
+            enable = true;
+            lookahead = true;
+            keymaps = {
+              vai = "@function.outer";
+              vii = "@function.inner";
+            };
           };
         };
         gitsigns.enable = true;
