@@ -68,7 +68,7 @@ in {
       wireplumber jq bc power-profiles-daemon brightnessctl
       nerd-fonts.jetbrains-mono lazygit papirus-icon-theme
       rose-pine-cursor qt5.qtwayland qt6.qtwayland kdePackages.qt6ct 
-      #libsForQt5.breeze-qt5
+      linux-wallpaperengine
       cfg.terminal.package
     ]
     ++ optionals cfg.shell.enable [ fzf zoxide git afetch ]
@@ -123,16 +123,49 @@ in {
       # };
     };
 
+    programs.bat = mkIf (cfg.shell.enable) {
+      enable = true;
+      config = {
+        pager = "never";
+      };
+    };
+
+    programs.fzf = mkIf (cfg.shell.enable) {
+      enable = true;
+      enableZshIntegration = true;
+      defaultCommand = "fd --type f --hidden --exclude .git";
+      fileWidgetCommand = "fd --type f --hidden --exclude .git";
+      changeDirWidgetCommand = "fd --type d --hidden --exclude .git";
+      defaultOptions = [ "--preview 'bat --color=always {}'" ];
+    };
+
+    programs.zoxide = mkIf (cfg.shell.enable) {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
+    programs.ripgrep = mkIf (cfg.shell.enable) {
+      enable = true;
+    };
+
+    programs.eza = mkIf (cfg.shell.enable) {
+      enable = true;
+      enableZshIntegration = true;
+      git = true;
+      icons = "auto";
+    };
+
+    #programs.zellij = mkIf (cfg.shell.enable) {
+    #  enable = true;
+    #  enableZshIntegration = true;
+    #};
+
     programs.zsh = mkIf (cfg.shell.enable) {
       enable = true;
       enableCompletion = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       initContent = ''
-        eval "$(fzf --zsh)"
-        eval "$(zoxide init zsh)"
-        eval "$(starship init zsh)"
-        
         zv() { local prev="$PWD"; z "$1" || return; nvim .; cd "$prev"; }
         ziv() { local prev="$PWD"; zi || return; nvim .; cd "$prev"; }
         alias lock='hyprlock'
@@ -143,11 +176,22 @@ in {
         alias logout='loginctl terminate-session "$XDG_SESSION_ID"'
 
         alias cd=z
+        alias grep='rg'
+        alias find='fd'
+        alias ls='eza'
+        alias ll='eza -lh --git'
+        alias la='eza -lah --git'
+        alias tree='eza --tree'
+        alias cat='bat'
+        alias du='dust'
+        alias df='duf'
+        alias top='btop'
       '';
     };
 
     programs.starship = mkIf cfg.shell.enable {
       enable = true;
+      enableZshIntegration = true;
       settings = {
         add_newline = true;
         directory.style = "cyan";
@@ -187,10 +231,15 @@ in {
     programs.kitty = mkIf (cfg.terminal.name == "kitty") {
       enable = true;
       settings = {
+        clear_all_shortcuts = true;
         shell_integration = "enabled";
         background_opacity = "0.8";
         font_family = "JetBrainsMono Nerd Font";
         font_size = "13.0";
+      };
+      keybindings = {
+        "ctrl+shift+c" = "copy_to_clipboard";
+        "ctrl+shift+v" = "paste_from_clipboard";
       };
     };
 
@@ -215,6 +264,7 @@ in {
         GBM_BACKEND = "nvidia-drm";
         __GLX_VENDOR_LIBRARY_NAME = "nvidia";
       })
+      ( mkIf cfg.vim.enable { EDITOR = "nvim"; })
     ];
 
     xdg.configFile."kdeglobals" = mkIf cfg.theming.enable {
