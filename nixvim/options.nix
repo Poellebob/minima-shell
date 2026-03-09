@@ -30,6 +30,9 @@
         titlestring = "%{expand('%:t')} [%{getcwd()}] – nvim";
       };
       keymaps = [
+        # ── Nice To Have ──────────────────────────────────────────────────────
+        { mode = "v"; key = "aa"; action = "gg_G$"; options.desc = "Select all"; }
+
         # ── Indentation ───────────────────────────────────────────────────────
         { mode = "v"; key = "<Tab>";   action = ">gv"; options.desc = "Indent right"; }
         { mode = "v"; key = "<S-Tab>"; action = "<gv"; options.desc = "Indent left"; }
