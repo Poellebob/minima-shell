@@ -20,6 +20,8 @@
         number = true;
         relativenumber = true;
         undofile = true;
+        swapfile = true;
+        autoread = true;
         ignorecase = true;
         smartcase = true;
         splitright = true;
@@ -48,8 +50,8 @@
         { mode = "n"; key = "<C-l>";     action = "<C-w>l";                         options.desc = "Right window"; }
         { mode = "n"; key = "<C-Up>";    action = "<cmd>resize +2<CR>";             options.desc = "Resize up"; }
         { mode = "n"; key = "<C-Down>";  action = "<cmd>resize -2<CR>";             options.desc = "Resize down"; }
-        { mode = "n"; key = "<C-Left>";  action = "<cmd>vertical resize -2<CR>";   options.desc = "Resize left"; }
-        { mode = "n"; key = "<C-Right>"; action = "<cmd>vertical resize +2<CR>";   options.desc = "Resize right"; }
+        { mode = "n"; key = "<C-Left>";  action = "<cmd>vertical resize -2<CR>";    options.desc = "Resize left"; }
+        { mode = "n"; key = "<C-Right>"; action = "<cmd>vertical resize +2<CR>";    options.desc = "Resize right"; }
 
         # ── Splits ────────────────────────────────────────────────────────────
         { mode = "n"; key = "\\";        action = "<cmd>split<CR>";                 options.desc = "Horizontal split"; }
@@ -59,7 +61,7 @@
         { mode = "n"; key = "<C-s>";      action = "<cmd>w!<CR>";                        options.desc = "Force write"; }
         { mode = "n"; key = "<C-q>";      action = "<cmd>q!<CR>";                        options.desc = "Force quit"; }
         { mode = "n"; key = "<leader>n";  action = "<cmd>enew<CR>";                      options.desc = "New file"; }
-        { mode = "n"; key = "<leader>c";  action = "<cmd>lua if vim.fn.winnr('$') == 1 then vim.cmd('enew') else vim.cmd('bdelete') end<CR>";                   options.desc = "Close buffer"; }
+        { mode = "n"; key = "<leader>c";  action = "<cmd>Bdelete<CR>";                   options.desc = "Close buffer"; }
         { mode = "n"; key = "]b";         action = "<cmd>bnext<CR>";                     options.desc = "Next buffer"; }
         { mode = "n"; key = "[b";         action = "<cmd>bprevious<CR>";                 options.desc = "Prev buffer"; }
         { mode = "n"; key = ">b";         action = "<cmd>BufferLineMoveNext<CR>";        options.desc = "Move buffer right"; }
@@ -146,7 +148,14 @@
         action = k.action;
         options.desc = k.desc;
       }) config.minima.vim.keybinds;
-      autoCmd = map (a: {
+      autoCmd = [
+        {
+          event = "SwapExists";
+          pattern = "*";
+          command = "let v:swapchoice = 'e'";
+          desc = "Edit file anyway when swap exists";
+        }
+      ] ++ map (a: {
         event = a.event;
         pattern = a.pattern;
         command = a.command;

@@ -40,6 +40,11 @@ with lib;
         default = {};
         description = "Extra conform formatters by filetype";
       };
+      formatterOpts = mkOption {
+        type = types.attrsOf types.anything;
+        default = {};
+        description = "Formatter options (e.g. args for formatters)";
+      };
     };
 
     keybinds = mkOption {
