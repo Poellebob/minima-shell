@@ -8,12 +8,11 @@ import qs
 DropdownWindow {
   id: menu
   color: "transparent"
-
   implicitWidth: 200
-  implicitHeight: items.height + Global.format.spacing_large + Global.format.spacing_small
+  implicitHeight: items.implicitHeight + Global.format.radius_medium * 2
 
   required property var model
-  signal itemTriggered()
+  signal itemTriggered
 
   Timer {
     id: hideTimer
@@ -22,9 +21,14 @@ DropdownWindow {
     repeat: false
     onTriggered: menu.visible = false
   }
-
+  
   Menu {
-    anchors.fill: parent
+    id: items
+    anchors.margins: Global.format.radius_medium
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    width: parent.width
+    height: parent.height - Global.format.radius_medium * 2
     model: menu.model
   }
 }

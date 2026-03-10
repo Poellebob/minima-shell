@@ -32,9 +32,15 @@
         enable = true;
         settings = {
           close_if_last_window = true;
-          filesystem.follow_current_file = {
-            enabled = true;
-            leave_dirs_open = true;
+          use_libuv_file_watcher = true;
+          filesystem = {
+            follow_current_file = {
+              enabled = true;
+              leave_dirs_open = true;
+            };
+            filtered_items = {
+              hide_hidden = true;
+            };
           };
           window.mappings = {
             "l".__raw = ''
@@ -74,7 +80,7 @@
         enable = true;
         settings.options = {
           numbers = "none";
-          close_command = "lua if vim.fn.winnr('$') == 1 then vim.cmd('enew') else vim.cmd('bdelete! ' .. vim.fn.bufnr('%')) end";
+          close_command = "Bdelete";
           diagnostics = "nvim_lsp";
           diagnostics_indicator.__raw = ''
             function(count, level)
@@ -164,6 +170,11 @@
           stages = "fade";
           timeout = 3000;
         };
+      };
+
+      snacks = {
+        enable = true;
+        autoLoad = true;
       };
 
       alpha = {
@@ -264,6 +275,10 @@
             backend = [ "telescope" "builtin" ];
           };
         };
+      };
+
+      bufdelete = {
+        enable = true;
       };
     };
   };

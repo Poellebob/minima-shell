@@ -32,6 +32,7 @@
             nix = [ "nixfmt" ];
             lua = [ "stylua" ];
           } // config.minima.vim.lsp.conform;
+          formatters = config.minima.vim.lsp.formatterOpts;
         };
       };
     };
