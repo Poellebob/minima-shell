@@ -9,7 +9,7 @@ import qs
 PanelWindow {
   id: panel
   aboveWindows: true
-  focusable: WlrKeyboardFocus.OnDemand
+  focusable: true
   color: "transparent"
   property bool inside:
     leftMouseArea.containsMouse ||
@@ -65,10 +65,10 @@ PanelWindow {
           verticalCenter: parent.verticalCenter
         }
         spacing: Global.format.spacing_medium
-        
-        Systray { 
+
+        Systray {
           id: systray
-          Layout.alignment: Qt.AlignVCenter 
+          Layout.alignment: Qt.AlignVCenter
         }
       }
     }
@@ -101,7 +101,7 @@ PanelWindow {
       bottomLeftRadius: Global.format.radius_medium
       color: Global.colors.surface
       visible: parent.containsMouse || Global.panelAlwaysVisible
-      
+
       Item {
         id: itemsCenterWrapper
         anchors.centerIn: parent
@@ -145,7 +145,7 @@ PanelWindow {
       bottomLeftRadius: Global.format.radius_medium
       color: Global.colors.surface
       visible: parent.containsMouse || Global.panelAlwaysVisible
-      
+
       RowLayout {
         id: itemsRight
         anchors {
@@ -154,8 +154,8 @@ PanelWindow {
           verticalCenter: parent.verticalCenter
         }
         spacing: Global.format.spacing_medium
-        
-        Pager { 
+
+        Pager {
           Layout.alignment: Qt.AlignVCenter
           screen: panel.screen
         }

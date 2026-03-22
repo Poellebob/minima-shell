@@ -12,9 +12,16 @@ PopupWindow {
   anchor.window: window
   anchor.edges: Edges.Top
   required property real x
-  anchor.rect.x: x 
+  anchor.rect.x: x
   anchor.rect.y: window.height + Global.format.spacing_large
   color: "transparent"
+
+  onVisibleChanged: {
+    if (visible) {
+      menuRoot.raise()
+      menuRoot.requestActivate()
+    }
+  }
 
   Timer {
     id: hideTimer
@@ -22,7 +29,7 @@ PopupWindow {
     running: false
     repeat: false
     onTriggered: {
-      menuRoot.visible = false
+      menuRoot.visible = false;
     }
   }
 
@@ -36,7 +43,7 @@ PopupWindow {
 
     onEntered: hideTimer.stop()
     onExited: hideTimer.restart()
-    
+
     Rectangle {
       anchors.fill: parent
       color: Global.colors.surface

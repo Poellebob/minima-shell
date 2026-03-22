@@ -2,7 +2,11 @@
 with lib;
 {
   options.minima.vim = {
-    enable = lib.mkEnableOption "Nixvim editor";
+    enable = lib.mkOption{
+      description = "Nixvim editor";
+      type = types.bool;
+      default = true;
+    };
 
     theme = {
       name = mkOption {
@@ -36,14 +40,14 @@ with lib;
         '';
       };
       conform = mkOption {
-        type = types.attrsOf (types.listOf types.str);
+        type = types.attrsOf types.anything;
         default = {};
         description = "Extra conform formatters by filetype";
       };
       formatterOpts = mkOption {
         type = types.attrsOf types.anything;
         default = {};
-        description = "Formatter options (e.g. args for formatters)";
+        description = "Formatter definitions (e.g. custom args for formatters)";
       };
     };
 

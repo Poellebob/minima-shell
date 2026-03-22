@@ -17,7 +17,7 @@ DropdownWindow {
   property int visibleHeight: 620
   property string fetchString
   property string fetchPath: Quickshell.shellDir + "/scripts/sysfetch.sh"
-  
+
   /*Behavior on implicitHeight {
     NumberAnimation {
       duration: 100
@@ -35,7 +35,7 @@ DropdownWindow {
       }
     }
   }
-  
+
   Timer {
     id: fetchTimer
     interval: Global.format.interval_xlong
@@ -45,7 +45,7 @@ DropdownWindow {
       fetchRunner.running = true
     }
   }
-  
+
   Rectangle {
     id: menuIURoot
     anchors.fill: parent
@@ -58,25 +58,24 @@ DropdownWindow {
     anchors.margins: Global.format.spacing_large
 
     //visible: menuRoot.height == menuRoot.visibleHeight ? true : false
-    
+
     RowLayout {
       spacing: Global.format.spacing_large
       anchors.fill: parent
-      
+
       // Left column
       ColumnLayout {
         spacing: Global.format.spacing_large
         Layout.fillHeight: true
         Layout.preferredWidth: parent.width * 0.8
-        
+
         // Top row with small square and wide rectangle
         RowLayout {
           spacing: Global.format.spacing_large
           Layout.fillWidth: true
           Layout.preferredHeight: parent.height * 0.235
-          
+
           Rectangle {
-            id: profileIcon
             Layout.preferredWidth: parent.height
             Layout.preferredHeight: parent.height
             color: Global.colors.inverse_on_surface
@@ -86,14 +85,14 @@ DropdownWindow {
               anchors.fill: parent
             }
           }
-          
+
           Rectangle {
             id: fetchOutput
             Layout.fillWidth: true
             Layout.preferredHeight: parent.height
             color: Global.colors.inverse_on_surface
             radius: Global.format.radius_large
-            
+
             Text {
               id: fetchText
               anchors.fill: parent
@@ -108,7 +107,7 @@ DropdownWindow {
             }
           }
         }
-        
+
         // Large middle rectangle
         Rectangle {
           id: mediaControls
@@ -116,12 +115,12 @@ DropdownWindow {
           Layout.fillHeight: true
           color: Global.colors.inverse_on_surface
           radius: Global.format.radius_large
-          
+
           MediaPlayer {
             anchors.fill: parent
           }
         }
-        
+
         // Bottom rectangle
         Rectangle {
           id: systemUsage
@@ -135,7 +134,7 @@ DropdownWindow {
           }
         }
       }
-      
+
       // Right tall rectangle with audio and brightness controls
       Rectangle {
         id: audioAndBrightness
@@ -143,7 +142,7 @@ DropdownWindow {
         Layout.preferredWidth: parent.height * 0.235
         color: Global.colors.inverse_on_surface
         radius: Global.format.radius_large
-        
+
         SystemUsage {
           anchors.fill: parent
         }

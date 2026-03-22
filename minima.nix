@@ -139,6 +139,15 @@ in {
       defaultOptions = [ "--preview 'bat --color=always {}'" ];
     };
 
+    programs.fd = {
+      enable = true;
+      hidden = true;
+      ignores = [
+        ".git"
+        "*.bak"
+      ];
+    };
+
     programs.zoxide = mkIf (cfg.shell.enable) {
       enable = true;
       enableZshIntegration = true;
@@ -166,6 +175,7 @@ in {
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       initContent = ''
+        eval "$(starship init zsh)"
         zv() { local prev="$PWD"; z "$1" || return; nvim .; cd "$prev"; }
         ziv() { local prev="$PWD"; zi || return; nvim .; cd "$prev"; }
         alias lock='hyprlock'
@@ -191,11 +201,10 @@ in {
 
     programs.starship = mkIf cfg.shell.enable {
       enable = true;
-      enableZshIntegration = true;
       settings = {
         add_newline = true;
         directory.style = "cyan";
-        character = { success_symbol = "[](green)"; error_symbol = "[](red)"; };
+        character = { success_symbol = "[❯](green)"; error_symbol = "[❯](red)"; };
         git_branch = { style = "purple"; symbol = "󰘬 "; };
         git_status.style = "purple";
         cmd_duration.disabled = false;
@@ -253,6 +262,8 @@ in {
         CLUTTER_BACKEND = "wayland";
         ELECTRON_OZONE_PLATFORM_HINT = "wayland";
         XDG_SESSION_TYPE = "wayland";
+        WM = cfg.wm;
+        PYTHONPATH = "${pkgs.sagetex}/lib/python/site-packages:$PYTHONPATH";
       }
       (mkIf cfg.theming.enable {
         XCURSOR_THEME = "BreezeX-RosePine-Linux";
@@ -272,7 +283,7 @@ in {
     };
 
     # --- Symlinks ---
-    home.file.".config/sway/set-xft-dpi.sh" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/set-xft-dpi.sh; };
+    home.file.".config/sway/set-xft-dpi.sh" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/set-xft-dpi.sh; executable = true; };
     home.file.".config/sway/config" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config; };
     home.file.".config/sway/config.d/keybinds" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/keybinds; };
     home.file.".config/sway/config.d/workspace" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/workspace; };
@@ -290,7 +301,7 @@ in {
       '';
     };
 
-    home.file.".config/scroll/set-xft-dpi.sh" = mkIf (cfg.wm == "scroll") { source = ./config/sway/set-xft-dpi.sh; };
+    home.file.".config/scroll/set-xft-dpi.sh" = mkIf (cfg.wm == "scroll") { source = ./config/sway/set-xft-dpi.sh; executable = true; };
     home.file.".config/scroll/config" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config; };
     home.file.".config/scroll/config.d/keybinds" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/keybinds; };
     home.file.".config/scroll/config.d/workspace" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/workspace; };
@@ -300,12 +311,12 @@ in {
     home.file.".config/scroll/config.d/application-style" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/application-style; };
     home.file.".config/scroll/config.d/terminal" = mkIf (cfg.wm == "scroll") { text = "set $terminal ${cfg.terminal.name}"; };
 
-    home.file.".config/hypr/suspend.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/suspend.sh; };
+    home.file.".config/hypr/suspend.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/suspend.sh; executable = true; };
     home.file.".config/hypr/hyprland.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/hyprland.conf; };
     home.file.".config/hypr/hypridle.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/hypridle.conf; };
     home.file.".config/hypr/hyprlock.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/hyprlock.conf; };
-    home.file.".config/hypr/set-xft-dpi.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/set-xft-dpi.sh; };
-    home.file.".config/hypr/getkeys.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/getkeys.sh; };
+    home.file.".config/hypr/set-xft-dpi.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/set-xft-dpi.sh; executable = true; };
+    home.file.".config/hypr/getkeys.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/getkeys.sh; executable = true; };
     home.file.".config/hypr/components/input.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/input.conf; };
     home.file.".config/hypr/components/env.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/env.conf; };
     home.file.".config/hypr/components/workspace.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/workspace.conf; };
@@ -315,6 +326,7 @@ in {
     home.file.".config/hypr/terminal.conf" = mkIf (cfg.wm == "hyprland") { text = "$terminal = ${cfg.terminal.name}"; };
 
     home.file.".config/quickshell/".source = ./config/quickshell;
+    home.file.".config/quickshell/scripts/sysfetch.sh" = { source = ./config/quickshell/scripts/sysfetch.sh; executable = true; };
 
     home.activation.minimaBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       dir="$HOME/.config/minima"
@@ -325,14 +337,6 @@ in {
       cp -n ${./defaults/config.ini} $dir/config.ini
       cp -n ${./defaults/hypr.conf} $dir/hypr.conf
       cp -n ${./defaults/sway.conf} $dir/sway.conf
-      chmod +x $HOME/.config/quickshell/scripts/sysfetch.sh
-      [ -f "$HOME/.config/sway/set-xft-dpi.sh" ] && chmod +x $HOME/.config/sway/set-xft-dpi.sh
-      [ -f "$HOME/.config/scroll/set-xft-dpi.sh" ] && chmod +x $HOME/.config/scroll/set-xft-dpi.sh
-      if [ "${cfg.wm}" = "hyprland" ]; then
-        chmod +x $HOME/.config/hypr/set-xft-dpi.sh
-        chmod +x $HOME/.config/hypr/getkeys.sh
-        chmod +x $HOME/.config/hypr/suspend.sh
-      fi
     '';
   };
 }
