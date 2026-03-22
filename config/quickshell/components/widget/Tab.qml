@@ -12,12 +12,12 @@ Rectangle {
   property string iconSource: ""
   property string text: ""
 
-  signal clicked() 
+  signal clicked()
 
   implicitHeight: Global.format.big_icon_size + Global.format.radius_small
   Layout.fillWidth: true
   radius: Global.format.radius_large
-  color: isSelected ? Global.colors.surface : (mouseArea.containsMouse ? Qt.lighter(Global.colors.surface_variant, 0.8) : Global.colors.surface_variant)
+  color: isSelected ? Qt.lighter(Global.colors.inverse_on_surface, 0.7) : (mouseArea.containsMouse ? Qt.lighter(Global.colors.surface_variant, 0.8) : Global.colors.surface_variant)
 
   Behavior on color {
     ColorAnimation {

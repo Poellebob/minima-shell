@@ -26,17 +26,17 @@ MenuPanel {
   property string savedWallpaper: ""
   property var favorites: []
   property string favoritesPath: Quickshell.env("HOME") + "/.config/wallpaper-favorites.conf"
-    
+
   Component.onCompleted: {
     // Load favorites first
     readFavoritesProc.running = true
-    
+
     // Always load wallpapers on startup
     scanWallpapers()
-    
+
     // Try to read the saved wallpaper from config
     readWallpaperConf.running = true
-    
+
     if (visible) {
       searchBox.clear()
       searchBox.focus = true
@@ -46,7 +46,7 @@ MenuPanel {
 
   property var filterWallpapers: {
     let filtered = wallpapers
-    
+
     if (searchText.trim() !== "") {
       const search = searchText.toLowerCase()
       filtered = wallpapers.filter(item => {
@@ -58,7 +58,7 @@ MenuPanel {
 
     return filtered.slice((4*10)*tab, (4*10)*(tab+1))
   }
-  
+
   function scanWallpapers() {
     scanImagesProc.running = true
     if (engineEnabled) {
@@ -94,7 +94,7 @@ MenuPanel {
       w.type === "engine" && w.id === folderId
     )
   }
-  
+
   function getWallpaperId(wallpaperData) {
     if (wallpaperData.type === "engine") {
       return "engine:" + wallpaperData.id
@@ -102,31 +102,31 @@ MenuPanel {
       return "image:" + wallpaperData.path
     }
   }
-  
+
   function isFavorite(wallpaperData) {
     const id = getWallpaperId(wallpaperData)
     return favorites.indexOf(id) !== -1
   }
-  
+
   function toggleFavorite(wallpaperData) {
     const id = getWallpaperId(wallpaperData)
     let newFavorites = favorites.slice()
     const index = newFavorites.indexOf(id)
-    
+
     if (index !== -1) {
       newFavorites.splice(index, 1)
     } else {
       newFavorites.push(id)
     }
-    
+
     favorites = newFavorites
     saveFavoritesProc.running = true
   }
-  
+
   function checkAndApplyInitialWallpaper() {
     if (initialLoadComplete) return
     initialLoadComplete = true
-    
+
     if (savedWallpaper && savedWallpaper.trim() !== "") {
       // Try to apply the saved wallpaper
       if (savedWallpaper.startsWith("engine:")) {
@@ -146,14 +146,14 @@ MenuPanel {
         }
       }
     }
-    
+
     // If no saved wallpaper or it wasn't found, apply the first wallpaper
     if (wallpapers.length > 0) {
       console.log("No saved wallpaper foAutumnund, applying first wallpaper")
       setWallpaper(wallpapers[0])
     }
   }
-  
+
   function setWallpaper(wallpaperData) {
     if (wallpaperData.type === "engine") {
       setEngineWallpaper(wallpaperData.id, wallpaperData.previewPath)
@@ -161,7 +161,7 @@ MenuPanel {
       setImageWallpaper(wallpaperData.path)
     }
   }
-  
+
   function setImageWallpaper(path) {
     Quickshell.execDetached(["killall", "-9", "linux-wallpaperengine"])
     setWallpaperProc.wallpaperPath = path
@@ -169,7 +169,7 @@ MenuPanel {
     setWallpaperProc.wallpaperType = "image"
     setWallpaperProc.running = true
   }
-  
+
   function setEngineWallpaper(folderId, previewPath) {
     engineProc.folderId = folderId
     engineProc.previewPath = previewPath
@@ -180,7 +180,7 @@ MenuPanel {
   Process {
     id: readFavoritesProc
     command: ["cat", favoritesPath]
-    
+
     stdout: StdioCollector {
       onStreamFinished: {
         const lines = this.text.trim().split('\n').filter(line => line.trim() !== "")
@@ -188,7 +188,7 @@ MenuPanel {
         console.log("Loaded", lines.length, "favorites")
       }
     }
-    
+
     onExited: (exitCode, exitStatus) => {
       if (exitCode !== 0) {
         console.log("No favorites file found")
@@ -196,7 +196,7 @@ MenuPanel {
       }
     }
   }
-  
+
   // Save favorites to config
   Process {
     id: saveFavoritesProc
@@ -204,26 +204,26 @@ MenuPanel {
       "bash", "-c",
       "echo \"" + favorites.join('\n') + "\" > " + favoritesPath
     ]
-    
+
     onExited: (exitCode, exitStatus) => {
       if (exitCode === 0) {
         console.log("Favorites saved")
       }
     }
   }
-  
+
   // Read the saved wallpaper from config
   Process {
     id: readWallpaperConf
     command: ["cat", Quickshell.env("HOME") + "/.config/wallpaper.conf"]
-    
+
     stdout: StdioCollector {
       onStreamFinished: {
         wallpaperSelectorRoot.savedWallpaper = this.text.trim()
         console.log("Read saved wallpaper:", wallpaperSelectorRoot.savedWallpaper)
       }
     }
-    
+
     onExited: (exitCode, exitStatus) => {
       if (exitCode !== 0) {
         console.log("No wallpaper.conf found or error reading it")
@@ -231,21 +231,21 @@ MenuPanel {
       }
     }
   }
-  
+
   // Scan regular image files
   Process {
     id: scanImagesProc
     property var buffer: []
-    
+
     command: ["/bin/sh", "-c", "find -L " + wallpaperSelectorRoot.wallpapersDir + " -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\)"]
-    
+
     stdout: SplitParser {
       onRead: (line) => {
         scanImagesProc.buffer.push(line)
         console.log(line)
       }
     }
-    
+
     onExited: (exitCode, exitStatus) => {
       if (exitCode === 0) {
         let images = []
@@ -263,7 +263,7 @@ MenuPanel {
         }
         wallpaperSelectorRoot.wallpapers = images
         scanImagesProc.buffer = []
-        
+
         // If engine is not enabled, check for initial wallpaper now
         if (!engineEnabled) {
           checkAndApplyInitialWallpaper()
@@ -275,7 +275,7 @@ MenuPanel {
 
   property var engineQueue: []
   property int engineQueueIndex: 0
-  
+
   // Scan wallpaper engine projects
   Process {
     id: scanEngineProc
@@ -302,7 +302,7 @@ MenuPanel {
       }
     }
   }
- 
+
   // Parse individual project.json files
   Process {
     id: parseProjectProc
@@ -352,14 +352,14 @@ MenuPanel {
       }
     }
   }
-  
+
   // Kill existing wallpaper engine processes and start new one
   Process {
     id: engineProc
     property string folderId: ""
     property string previewPath: ""
     command: ["killall", "-9", "linux-wallpaperengine"]
-    
+
     onExited: (exitCode, exitStatus) => {
       for (let i in Quickshell.screens) {
         let args = [
@@ -387,7 +387,7 @@ MenuPanel {
       updateConfProc.running = true
     }
   }
-    
+
   // Set regular image wallpaper with swww
   Process {
     id: setWallpaperProc
@@ -395,11 +395,11 @@ MenuPanel {
     property string previewPath: ""
     property string wallpaperType: ""
     command: [
-      "swww", "img", wallpaperPath, 
-      "--transition-type", "fade", 
+      "swww", "img", wallpaperPath,
+      "--transition-type", "fade",
       "--transition-duration", "1"
     ]
-    
+
     onExited: (exitCode, exitStatus) => {
       if (exitCode === 0) {
         updateConfProc.wallpaperPath = wallpaperPath
@@ -408,57 +408,57 @@ MenuPanel {
       }
     }
   }
-  
+
   // Update wallpaper.conf
   Process {
     id: updateConfProc
     property string wallpaperPath: ""
     property string previewPath: ""
     command: [
-      "/bin/sh", "-c", 
-      "echo \"" + wallpaperPath + "\" > " + 
+      "/bin/sh", "-c",
+      "echo \"" + wallpaperPath + "\" > " +
       Quickshell.env("HOME") + "/.config/wallpaper.conf"
     ]
-    
+
     onExited: (exitCode, exitStatus) => {
       if (exitCode !== 0) {
         return
       }
       Quickshell.execDetached([
-        "/bin/sh", "-c", 
+        "/bin/sh", "-c",
         "matugen -j hex image \"" + previewPath + "\" 2>/dev/null"
       ])
     }
   }
-    
+
   IpcHandler {
     target: "minimaWallpaperSelector"
-    
+
     function open(): void {
       wallpaperSelectorRoot.visible = !wallpaperSelectorRoot.visible
       wallpaperSelectorRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
       searchBox.focus = true
     }
   }
-  
+
   ColumnLayout {
     anchors.fill: parent
     anchors.margins: Global.format.spacing_large
     spacing: Global.format.spacing_large
-    
+
     // Title bar
     RowLayout {
       Layout.fillWidth: true
       Layout.preferredHeight: 24
       spacing: Global.format.spacing_medium
-      
+
       Text {
         text: "󰸉"
         font.family: "JetBrainsMono Nerd Font"
         font.pixelSize: Global.format.font_size_large
         color: Global.colors.primary
       }
-      
+
       Text {
         text: "Wallpaper Selector"
         font.family: "JetBrainsMono Nerd Font"
@@ -466,8 +466,8 @@ MenuPanel {
         font.bold: true
         color: Global.colors.on_surface_variant
       }
-      
-      RowLayout { 
+
+      RowLayout {
         Layout.fillWidth: true
         spacing: Global.format.spacing_large
         StyledButton {
@@ -495,7 +495,7 @@ MenuPanel {
           }
         }
       }
-      
+
       Text {
         visible: wallpaperSelectorRoot.favorites.length > 0
         text: " " + wallpaperSelectorRoot.favorites.length + " favorites"
@@ -503,21 +503,21 @@ MenuPanel {
         color: Global.colors.primary
         font.family: "JetBrainsMono Nerd Font"
       }
-      
+
       Text {
         text: wallpaperSelectorRoot.wallpapers.length + " wallpapers"
         font.pixelSize: Global.format.text_size
         color: Global.colors.outline
       }
     }
-    
+
     // Wallpaper grid
     Rectangle {
       Layout.fillWidth: true
       Layout.fillHeight: true
       radius: Global.format.radius_large
       color: Global.colors.surface
-      
+
       GridView {
         id: wallpaperGrid
         anchors.fill: parent
@@ -527,22 +527,22 @@ MenuPanel {
         cellHeight: 160
         focus: false
         cacheBuffer: visible ? (4*10)*cellHeight : cellHeight*3
-        
+
         populate: Transition {
           NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 200 }
         }
-        
+
         model: wallpaperSelectorRoot.filterWallpapers
-        
+
         delegate: Rectangle {
           id: wallpaperItem
           required property var modelData
           required property int index
-          
+
           width: wallpaperGrid.cellWidth - Global.format.spacing_small
           height: wallpaperGrid.cellHeight - Global.format.spacing_small
           radius: Global.format.radius_medium
-          color: mouseArea.containsMouse || wallpaperGrid.currentIndex === index ? 
+          color: mouseArea.containsMouse || wallpaperGrid.currentIndex === index ?
                 Global.colors.surface_container_high : Global.colors.surface_container
           visible: wallpaperSelectorRoot.visible
 
@@ -552,12 +552,12 @@ MenuPanel {
               easing.type: Easing.OutCubic
             }
           }
-          
+
           ColumnLayout {
             anchors.fill: parent
             anchors.margins: Global.format.spacing_small
             spacing: Global.format.spacing_tiny
-            
+
             // Image preview
             Rectangle {
               id: previewContainer
@@ -589,7 +589,7 @@ MenuPanel {
                   }
                 }
               }
-              
+
               // Wallpaper Engine badge
               Rectangle {
                 visible: wallpaperItem.modelData.type === "engine"
@@ -600,7 +600,7 @@ MenuPanel {
                 height: 24
                 radius: 12
                 color: Global.colors.tertiary
-                
+
                 Text {
                   anchors.centerIn: parent
                   text: "󰇻"
@@ -609,7 +609,7 @@ MenuPanel {
                   color: Global.colors.on_tertiary
                 }
               }
-              
+
               // Favorite star - as a separate clickable item
               Rectangle {
                 id: favStar
@@ -619,27 +619,27 @@ MenuPanel {
                 width: 24
                 height: 24
                 radius: 12
-                color: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 
+                color: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ?
                       Global.colors.primary : Global.colors.surface_dim
                 opacity: favMouseArea.containsMouse || wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 1.0 : 0.6
-                
+
                 Behavior on color {
                   ColorAnimation { duration: 150 }
                 }
-                
+
                 Behavior on opacity {
                   NumberAnimation { duration: 150 }
                 }
-                
+
                 Text {
                   anchors.centerIn: parent
                   text: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? "" : ""
                   font.family: "JetBrainsMono Nerd Font"
                   font.pixelSize: 14
-                  color: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ? 
+                  color: wallpaperSelectorRoot.isFavorite(wallpaperItem.modelData) ?
                         Global.colors.on_primary : Global.colors.on_surface
                 }
-                
+
                 // Separate MouseArea for the star only
                 MouseArea {
                   id: favMouseArea
@@ -653,13 +653,13 @@ MenuPanel {
                 }
               }
             }
-            
+
             // File info
             ColumnLayout {
               Layout.fillWidth: true
               Layout.preferredHeight: Global.format.font_size_small * 3
               spacing: 0
-              
+
               Text {
                 Layout.fillWidth: true
                 text: wallpaperItem.modelData.name
@@ -668,7 +668,7 @@ MenuPanel {
                 elide: Text.ElideMiddle
                 font.bold: true
               }
-              
+
               Text {
                 Layout.fillWidth: true
                 text: wallpaperItem.modelData.folder
@@ -684,45 +684,45 @@ MenuPanel {
             id: mouseArea
             anchors.fill: parent
             hoverEnabled: true
-            
+
             anchors.topMargin: favStar.height + Global.format.spacing_tiny
             propagateComposedEvents: false
-            
+
             onClicked: (mouse) => {
               wallpaperGrid.currentIndex = wallpaperItem.index
             }
-            
+
             onDoubleClicked: {
               wallpaperSelectorRoot.setWallpaper(wallpaperItem.modelData)
             }
-            
+
             onPressAndHold: {
               wallpaperGrid.currentIndex = wallpaperItem.index
             }
           }
         }
-        
+
         ScrollBar.vertical: ScrollBar {
           policy: ScrollBar.AsNeeded
         }
       }
-      
+
       Text {
         anchors.centerIn: parent
         visible: wallpaperGrid.count === 0
-        text: wallpaperSelectorRoot.searchText ? 
-              "No wallpapers match your search" : 
+        text: wallpaperSelectorRoot.searchText ?
+              "No wallpapers match your search" :
               "No wallpapers found"
         color: Global.colors.outline
         font.pixelSize: Global.format.text_size
       }
     }
-    
+
     // Search bar
     RowLayout {
       Layout.fillWidth: true
       spacing: Global.format.spacing_medium
-      
+
       TextField {
         id: searchBox
         Layout.fillWidth: true
@@ -731,18 +731,18 @@ MenuPanel {
         font.pixelSize: Global.format.text_size
         placeholderText: "Search by name or folder..."
         focus: wallpaperSelectorRoot.visible
-        
+
         onTextChanged: {
           wallpaperSelectorRoot.searchText = text
           wallpaperGrid.currentIndex = 0
         }
-        
+
         onAccepted: {
           if (wallpaperGrid.count > 0) {
             wallpaperSelectorRoot.setWallpaper(wallpaperGrid.model[wallpaperGrid.currentIndex])
           }
         }
-        
+
         Keys.onPressed: (event) => {
           if (event.key === Qt.Key_Up) {
             const cols = Math.floor(wallpaperGrid.width / wallpaperGrid.cellWidth)
@@ -773,30 +773,30 @@ MenuPanel {
             event.accepted = true
           }
         }
-        
+
         background: Rectangle {
           anchors.fill: parent
           color: Global.colors.surface
           radius: Global.format.radius_large
         }
       }
-      
+
       Button {
         implicitHeight: 39
         implicitWidth: contentItem.implicitWidth + Global.format.spacing_large
         text: "󰑐 Refresh"
-        
+
         onClicked: {
           wallpaperSelectorRoot.scanWallpapers()
           searchBox.focus = true
         }
-        
+
         background: Rectangle {
-          color: parent.pressed ? Global.colors.primary : 
+          color: parent.pressed ? Global.colors.primary :
                   (parent.hovered ? Global.colors.primary_container : Global.colors.surface)
           radius: Global.format.radius_large
         }
-        
+
         contentItem: Text {
           text: parent.text
           color: parent.pressed ? Global.colors.on_primary : Global.colors.on_surface_variant

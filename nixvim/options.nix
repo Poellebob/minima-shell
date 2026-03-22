@@ -33,7 +33,7 @@
       };
       keymaps = [
         # ── Nice To Have ──────────────────────────────────────────────────────
-        { mode = "v"; key = "aa"; action = "gg_G$"; options.desc = "Select all"; }
+        { mode = "v"; key = "aa"; action = "<Esc>gg_vG$"; options.desc = "Select all"; }
 
         # ── Indentation ───────────────────────────────────────────────────────
         { mode = "v"; key = "<Tab>";   action = ">gv"; options.desc = "Indent right"; }
@@ -193,6 +193,7 @@
               { name = "nvim_lsp"; }
               { name = "buffer"; }
               { name = "path"; }
+              { name = "luasnip"; }
             ];
             mapping = {
               "<C-Space>" = "cmp.mapping.complete()";
@@ -201,6 +202,14 @@
               "<Tab>" = "cmp.mapping.select_next_item()";
               "<S-Tab>" = "cmp.mapping.select_prev_item()";
             };
+          };
+        };
+
+        luasnip = {
+          enable = true;
+          settings = {
+            region_check_events = "InsertEnter";
+            delete_check_events = "TextChanged,InsertLeave";
           };
         };
       } // config.minima.vim.plugins;

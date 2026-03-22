@@ -14,7 +14,9 @@
             vim.api.nvim_create_autocmd("BufWritePre", {
               buffer = bufnr,
               callback = function()
-                vim.lsp.buf.format({ bufnr = bufnr, id = client.id })
+                if vim.bo.filetype ~= "qml" then
+                  require("conform").format({ bufnr = bufnr })
+                end
               end,
             })
           end
@@ -33,6 +35,29 @@
             lua = [ "stylua" ];
           } // config.minima.vim.lsp.conform;
           formatters = config.minima.vim.lsp.formatterOpts;
+        };
+      };
+
+      vimtex = {
+        enable = true;
+        settings = {
+          view_method = "zathura";
+          view_automatic = 1;
+          compiler_method = "latexmk";
+          quickfix_mode = 0;
+          compiler_latexmk = {
+            continuous = 1;
+            callback = 1;
+            build_dir = "";
+            options = [
+              "-pdf"
+              "-verbose"
+              "-file-line-error"
+              "-synctex=1"
+              "-interaction=nonstopmode"
+              "-shell-escape"
+            ];
+          };
         };
       };
     };
