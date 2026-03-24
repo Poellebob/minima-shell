@@ -5,61 +5,10 @@ let
   cfg = config.minima;
 in {
   imports = [
+    ./lib.nix
     ./nixvim.nix
     ./kdeglobals.nix
   ];
-
-  options.minima = {
-    enable = mkEnableOption "Minima shell";
-    theming.enable = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Enable hardcoded Minima styling (Breeze/Papirus/Rose-Pine)";
-    };
-
-    wm = mkOption {
-      type = types.str;
-      default = "sway";
-      description = ''
-        Window manager to use with minima shell.
-        Can be: "sway", "swayfx", "scroll", "hyprland"
-      '';
-    };
-
-    enableBranding = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Enable Minima name in fetch";
-    };
-
-    enableNvidia = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable Nvidia graphics";
-    };
-
-    terminal = {
-      name = mkOption {
-        type = types.str;
-        default = "kitty";
-      };
-
-      package = mkOption {
-        type = types.package;
-        default = pkgs.${cfg.terminal.name};
-      };
-    };
-
-    shell.enable = mkOption {
-      type = types.bool;
-      default = true;
-    };
-
-    extraPackages = mkOption {
-      type = types.listOf types.package;
-      default = [];
-    };
-  };
 
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
@@ -74,53 +23,11 @@ in {
     ++ optionals cfg.shell.enable [ fzf zoxide git afetch ]
     ++ cfg.extraPackages;
 
-    # stylix = {
-    #   enable = true;
-    #   autoEnable = true;
-    #   polarity = "dark";
-    #   base16Scheme = {
-    #     variant = "dark";
-    #     base00 = "1b1e20"; base01 = "232629"; base02 = "31363b"; base03 = "6a737d";
-    #     base04 = "bdc3c7"; base05 = "eff0f1"; base06 = "f5f6f7"; base07 = "ffffff";
-    #     base08 = "da4453"; base09 = "f67400"; base0A = "fdbc4b"; base0B = "27ae60";
-    #     base0C = "16a085"; base0D = "3daee9"; base0E = "8e44ad"; base0F = "c0392b";
-    #   };
-    #   targets = {
-    #     kitty.enable = false;
-    #     nixvim.enable = false;
-    #     qt = {
-    #       platform = "qtct";
-    #       standardDialogs = "xdgdesktopportal";
-    #     };
-    #     kde = {
-    #       applicationStyle = "BreezeDark";
-    #     };
-    #   };
-    # };
-    
     qt = {
       enable = true;
       platformTheme.name = "kde";
       style.name = "breeze";
       style.package = pkgs.kdePackages.breeze;
-      # qt6ctSettings = {
-      #   Appearance = {
-      #     style = "BreezeDark";
-      #     icon_theme = "Papirus-Dark";
-      #     standard_dialogs = "xdgdesktopportal";
-      #     color_scheme_path = "${pkgs.kdePackages.breeze}/share/color-schemes/BreezeDark.colors";
-      #     custom_palette = "true";
-      #   };
-      # };
-      # qt5ctSettings = {
-      #   Appearance = {
-      #     style = "BreezeDark";
-      #     icon_theme = "Papirus-Dark";
-      #     standard_dialogs = "xdgdesktopportal";
-      #     color_scheme_path = "${pkgs.kdePackages.breeze}/share/color-schemes/BreezeDark.colors";
-      #     custom_palette = "true";
-      #   };
-      # };
     };
 
     programs.bat = mkIf (cfg.shell.enable) {
@@ -163,11 +70,6 @@ in {
       git = true;
       icons = "auto";
     };
-
-    #programs.zellij = mkIf (cfg.shell.enable) {
-    #  enable = true;
-    #  enableZshIntegration = true;
-    #};
 
     programs.zsh = mkIf (cfg.shell.enable) {
       enable = true;
@@ -256,7 +158,6 @@ in {
       {
         QT_SCALE_FACTOR_ROUNDING_POLICY = "RoundPreferFloor";
         QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
-        #QT_QPA_PLATFORMTHEME = "qt6ct";
         GDK_BACKEND = "wayland,x11";
         SDL_VIDEODRIVER = "wayland";
         CLUTTER_BACKEND = "wayland";
@@ -275,14 +176,12 @@ in {
         GBM_BACKEND = "nvidia-drm";
         __GLX_VENDOR_LIBRARY_NAME = "nvidia";
       })
-      ( mkIf cfg.vim.enable { EDITOR = "nvim"; })
     ];
 
     xdg.configFile."kdeglobals" = mkIf cfg.theming.enable {
       text = cfg.kdeglobals;
     };
 
-    # --- Symlinks ---
     home.file.".config/sway/set-xft-dpi.sh" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/set-xft-dpi.sh; executable = true; };
     home.file.".config/sway/config" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config; };
     home.file.".config/sway/config.d/keybinds" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/keybinds; };
