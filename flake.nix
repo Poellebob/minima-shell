@@ -1,5 +1,5 @@
 {
-  description = "minima home-manager module";
+  description = "minima home-manager and nixos module";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -15,16 +15,28 @@
     };
 
     nixvim.url = "github:nix-community/nixvim";
+
+    scroll-flake = {
+      url = "github:AsahiRocks/scroll-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, stylix, ... }: {
+  outputs = { self, nixpkgs, home-manager, nixvim, stylix, scroll-flake, ... }: {
     homeModules.minima = { ... }: {
       imports = [
         stylix.homeModules.stylix
         nixvim.homeModules.nixvim
-        (import ./minima.nix)
+        ./home-module.nix
       ];
     };
     homeModules.default = self.homeModules.minima;
+
+    nixosModules.minima = { ... }: {
+      imports = [
+        ./nixos-module.nix
+      ];
+    };
+    nixosModules.default = self.nixosModules.minima;
   };
 }
