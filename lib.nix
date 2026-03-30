@@ -30,7 +30,8 @@ with lib;
 
       package = mkOption {
         type = types.package;
-        default = pkgs.${config.minima.terminal.name};
+        default = pkgs.kitty;
+        description = "Terminal package";
       };
     };
 
