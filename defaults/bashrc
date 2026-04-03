@@ -40,26 +40,27 @@ eval "$(fzf --bash)"
 eval "$(zoxide init bash)"
 
 # ---------------------------
-# Start Fetch
+# Prompt config
 # ---------------------------
-afetch
+if [[ $- == *i* ]]; then
+  eval "$(starship init bash)"
+else
+  git_prompt() {
+    git rev-parse --is-inside-work-tree &>/dev/null || return
+
+    local b s
+    b=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+    s=$(git status --porcelain 2>/dev/null)
+
+    printf " \[\e[35m\]%s%s\[\e[0m\]" "$b" "$( [ -n "$s" ] && printf "*" )"
+  }
+
+  PS1='\n\[$([ $? -ne 0 ] && printf "\e[31m%d\e[0m " $? )\]\[\e[36m\]\w\[\e[0m\]$(git_prompt) \[\e[90m\]\n>\[\e[0m\] '
+fi
 
 # ---------------------------
-# Bash config
+# Completion
 # ---------------------------
-git_prompt() {
-  git rev-parse --is-inside-work-tree &>/dev/null || return
-
-  local b s
-  b=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
-  s=$(git status --porcelain 2>/dev/null)
-
-  printf " \[\e[35m\]%s%s\[\e[0m\]" "$b" "$( [ -n "$s" ] && printf "*" )"
-}
-
-PS1='\[$([ $? -ne 0 ] && printf "\e[31m%d\e[0m " $? )\]\[\e[36m\]\w\[\e[0m\]$(git_prompt) \[\e[90m\]›\[\e[0m\] '
-
-# Enable tab completion
 if ! shopt -oq posix; then
   if [[ -f /usr/share/bash-completion/bash_completion ]]; then
     source /usr/share/bash-completion/bash_completion
@@ -68,14 +69,18 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# History settings
+# ---------------------------
+# History
+# ---------------------------
 HISTCONTROL=ignoreboth
 HISTSIZE=10000
 HISTFILESIZE=20000
 shopt -s histappend
 
-# Enable color support
-if [[ -x dircolors ]]; then
+# ---------------------------
+# Colors
+# ---------------------------
+if [[ -x /usr/bin/dircolors ]]; then
   if [[ -r ~/.dircolors ]]; then
     eval "$(dircolors -b ~/.dircolors)"
   else
@@ -83,7 +88,6 @@ if [[ -x dircolors ]]; then
   fi
 fi
 
-# Color support for ls, grep, etc.
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'

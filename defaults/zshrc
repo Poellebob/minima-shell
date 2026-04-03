@@ -1,4 +1,8 @@
 # ---------------------------
+# Components
+# ---------------------------
+
+# ---------------------------
 # Aliases
 # ---------------------------
 zv() {
@@ -36,11 +40,22 @@ eval "$(fzf --zsh)"
 eval "$(zoxide init zsh)"
 
 # ---------------------------
-# Start Fetch
+# Prompt config
 # ---------------------------
-afetch
+if [[ -o interactive ]]; then
+  eval "$(starship init zsh)"
+else
+  setopt PROMPT_SUBST
 
-# ---------------------------
-# Powerlevel10k Config
-# ---------------------------
-source ~/.powerlevel10k/powerlevel10k.zsh-theme
+  git_prompt() {
+    git rev-parse --is-inside-work-tree &>/dev/null || return
+
+    local b s
+    b=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+    s=$(git status --porcelain 2>/dev/null)
+
+    printf " %%{\e[35m%%}%s%s%%{\e[0m%%}" "$b" "$( [ -n "$s" ] && printf "*" )"
+  }
+
+  PS1=$'\n%{$( [ $? -ne 0 ] && printf "\e[31m%d\e[0m " $? )%}%{\e[36m%}%~%{\e[0m%}$(git_prompt) %{\e[90m%}\n›%{\e[0m%} '
+fi

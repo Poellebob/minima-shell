@@ -532,8 +532,6 @@ install_configs() {
     [ ! -f "$HOME/.config/minima/sway.conf" ] && cp ./defaults/sway.conf "$HOME/.config/minima/" 2>/dev/null || true
     [ ! -f "$HOME/.config/quickshell/config.ini" ] && cp ./defaults/config.ini "$HOME/.config/minima/" 2>/dev/null || true
 
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.powerlevel10k
-    
     case "$SHELL_CONFIG" in
         both)
             echo "$(GREEN)Installing rc and profile"
