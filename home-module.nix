@@ -77,7 +77,22 @@ in {
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       initContent = ''
-        eval "$(starship init zsh)"
+        if [[ -o interactive ]]; then
+          eval "$(starship init zsh)"
+        else
+          git_prompt() {
+            git rev-parse --is-inside-work-tree &>/dev/null || return
+
+            local b s
+            b=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+            s=$(git status --porcelain 2>/dev/null)
+
+            printf " %%{\e[35m%%}%s%s%%{\e[0m%%}" "$b" "$( [ -n "$s" ] && printf "*" )"
+          }
+
+          PS1='%{$( [ $? -ne 0 ] && printf "\e[31m%d\e[0m " $? )%}%{\e[36m%}%~%{\e[0m%}$(git_prompt) %{\e[90m%}›%{\e[0m%} '
+        fi
+
         zv() { local prev="$PWD"; z "$1" || return; nvim .; cd "$prev"; }
         ziv() { local prev="$PWD"; zi || return; nvim .; cd "$prev"; }
         alias lock='hyprlock'
