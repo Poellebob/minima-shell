@@ -109,7 +109,7 @@ in {
         alias ll='eza -lh --git'
         alias la='eza -lah --git'
         alias tree='eza --tree'
-        alias cat='bat'
+        alias cat='bat --style=numbers,changes,header --number=false'
         alias du='dust'
         alias df='duf'
         alias top='btop'
