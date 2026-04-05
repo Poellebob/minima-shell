@@ -1,40 +1,24 @@
 //@ pragma UseQApplication
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import qs.bar
-import qs.launcher
 import qs.widgets.logout
+import qs.launcher
 
 ShellRoot {
   id: root
 
   LazyLoader { active: Global.settings["Panel"]["enabled"]; component: Bar{} }
-  LazyLoader { 
-    active: Global.settings["Launcher"]["enabled"]
-    component: Launcher{
-      id: launcher
-      Component.onCompleted: Global.launcher = launcher
-    }
-  }
-  LazyLoader { 
-    active: Global.settings["Clipboard"]["enabled"]
-    component: ClipboardManager{ 
-      id: clipboardManager 
-      Component.onCompleted: Global.clipboardManager = clipboardManager
-    }
-  }
-  LazyLoader { 
-    active: Global.settings["Wallpaper"]["enabled"]
-    component: WallpaperSelector{ 
-      id: wallpaperSelector 
-      Component.onCompleted: Global.wallpaperSelector = wallpaperSelector
-    }
-  }
 
   Logout { id: logout }
 
-  Component.onCompleted: {
-    console.log(Quickshell.iconPath("media-playlist-shuffle"))
-    console.log(Global.colors.surface_container_high)
+  Instantiator {
+    model: Quickshell.screens
+
+    delegate: LauncherOpener {
+      screen: modelData
+      implicitWidth: 600
+    }
   }
 }

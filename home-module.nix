@@ -23,11 +23,34 @@ in {
     ++ optionals cfg.shell.enable [ fzf zoxide git afetch ]
     ++ cfg.extraPackages;
 
-    qt = {
+    qt = mkIf cfg.theming.enable {
       enable = true;
       platformTheme.name = "kde";
       style.name = "breeze";
       style.package = pkgs.kdePackages.breeze;
+    };
+
+    gtk = mkIf cfg.theming.enable {
+      enable = true;
+      theme = {
+        name = "Breeze-Dark";
+        package = pkgs.kdePackages.breeze-gtk;
+      };
+      iconTheme = {
+        name = "Papirus-Dark";
+        package = pkgs.papirus-icon-theme;
+      };
+      cursorTheme = {
+        name = "BreezeX-RosePine-Linux";
+        package = pkgs.rose-pine-cursor;
+        size = 24;
+      };
+      # gtk3.extraConfig = {
+      #   gtk-application-prefer-dark-theme = 1;
+      # };
+      # gtk4.extraConfig = {
+      #   gtk-application-prefer-dark-theme = 1;
+      # };
     };
 
     programs.bat = mkIf (cfg.shell.enable) {
