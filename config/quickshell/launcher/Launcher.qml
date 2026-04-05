@@ -1,3 +1,4 @@
+//@ pragma UseQApplication
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -8,68 +9,38 @@ import Quickshell.Wayland
 import qs.components.widget
 import qs
 
-MenuPanel {
-  id: launcherMenuRoot
+pragma Singleton
 
-  property string mathjsPath: Global.settings["Launcher"]["mathjsPath"]
+MenuPanel {
+  id: launcherRoot
 
   WlrLayershell.layer: WlrLayer.Overlay
 
   anchors {
-    bottom: true  
-  }
-
-  PanelWindow {
-    anchors.bottom: true
-    implicitWidth: launcherMenuRoot.implicitWidth
-    implicitHeight: 15
-    color: "transparent"
-    exclusiveZone: 0
-
-    MouseArea {
-      id: mouseActive
-      anchors.fill: parent
-      hoverEnabled: true
-
-      onClicked: handeler.open()
-    }
-
-    Rectangle {
-      color: Global.colors.surface
-      implicitHeight: mouseActive.containsMouse ? parent.height : 3
-      visible: mouseActive.containsMouse
-      topRightRadius: height
-      topLeftRadius: height
-
-      anchors{
-        bottom: parent.bottom
-        left: parent.left
-        right: parent.right
-      }
-
-      Behavior on implicitHeight {
-        NumberAnimation{duration: 100}
-      }
-    }
+    bottom: true
   }
 
   IpcHandler {
     id: handeler
     target: "minimaLauncher"
 
-    function open(): void { 
+    function open(): void {
       searchBox.clear()
-      launcherMenuRoot.visible = !launcherMenuRoot.visible
+      launcherRoot.visible = !launcherRoot.visible
       searchBox.focus = true
-      launcherMenuRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+      launcherRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
     }
+  }
+
+  function open(): void {
+    handeler.open()
   }
 
   Process {
     id: mathProc
     property string expr: "0+0"
     property string res: ""
-    command: [launcherMenuRoot.mathjsPath, expr]
+    command: [launcherRoot.mathjsPath, expr]
 
     stdout: StdioCollector {
       onStreamFinished: {
@@ -78,7 +49,7 @@ MenuPanel {
       }
     }
   }
-  
+
   property bool isCustomCommand: searchBox.text.length > 0 && searchBox.text[0] === ">"
   property bool isExpr: searchBox.text.length > 0 && searchBox.text[0] === "=" && Global.settings["Launcher"]["mathEnabled"]
 
@@ -88,7 +59,7 @@ MenuPanel {
       description: "Open clipboard manager",
       icon: "edit-paste",
       execute: function () {
-        Global.clipboardManager.visible = true
+        ClipboardManager.open()
       },
       active: Global.settings["Clipboard"]["enabled"]
     },
@@ -97,14 +68,12 @@ MenuPanel {
       description: "Open wallpaper selector",
       icon: "preferences-desktop-wallpaper-symbolic",
       execute: function () {
-        if (Global.wallpaperSelector) {
-          Global.wallpaperSelector.visible = true
-        }
+        WallpaperSelector.open()
       },
       active: Global.settings["Wallpaper"]["enabled"]
     }
   ]
-  
+
   Rectangle {
     anchors{
       top: parent.top
@@ -119,7 +88,7 @@ MenuPanel {
     }
     radius: Global.format.radius_large
     color: Global.colors.surface
-    
+
     ListView {
       id: appList
       anchors.fill: parent
@@ -130,11 +99,11 @@ MenuPanel {
       focus: false
 
       populate: Transition {
-        NumberAnimation { 
+        NumberAnimation {
           property: "opacity"
-          from: 0 
+          from: 0
           to: 1
-          duration:  100 
+          duration:  100
         }
       }
 
@@ -142,11 +111,11 @@ MenuPanel {
         let entries = []
         let allEntries = []
 
-        if (launcherMenuRoot.isCustomCommand) {
-          allEntries = launcherMenuRoot.customCommands.filter(entry =>
+        if (launcherRoot.isCustomCommand) {
+          allEntries = launcherRoot.customCommands.filter(entry =>
             !('active' in entry) || entry.active === true
           )
-        } else if (launcherMenuRoot.isExpr) {
+        } else if (launcherRoot.isExpr) {
           return [{
             name: "minimaMathProc",
             description: "Copy to Clipbord",
@@ -175,7 +144,7 @@ MenuPanel {
 
         return entries
       }
-      
+
       delegate: Rectangle {
         id: appItem
         required property var modelData
@@ -186,31 +155,31 @@ MenuPanel {
         height: 40
         radius: Global.format.radius_medium
         color: mouseArea.containsMouse || appList.currentItem.modelData == modelData ? Global.colors.surface_container_high : "transparent"
-        
+
         Behavior on color {
           ColorAnimation {
             duration: 150
             easing.type: Easing.OutCubic
           }
         }
-        
+
         RowLayout {
           anchors.fill: parent
           anchors.margins: Global.format.spacing_small
           spacing: Global.format.spacing_medium
-          
+
           IconImage {
             Layout.preferredWidth: Global.format.icon_size
             Layout.preferredHeight: Global.format.icon_size
             Layout.alignment: Qt.AlignVCenter
             source: appItem.modelData.icon ? Quickshell.iconPath(appItem.modelData.icon) : ""
           }
-          
+
           ColumnLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignVCenter
             spacing: 0
-            
+
             Text {
               Layout.fillWidth: true
               text: appItem.modelData.name === "minimaMathProc" ? mathProc.res : appItem.modelData.name
@@ -219,7 +188,7 @@ MenuPanel {
               font.bold: true
               elide: Text.ElideRight
             }
-            
+
             Text {
               Layout.fillWidth: true
               text: appItem.modelData.description || ""
@@ -230,7 +199,7 @@ MenuPanel {
             }
           }
         }
-        
+
         MouseArea {
           id: mouseArea
           anchors.fill: parent
@@ -240,28 +209,28 @@ MenuPanel {
           onClicked: (mouse) => {
             appList.currentIndex = appItem.index
           }
-          
+
           onDoubleClicked: {
             if (appItem.modelData) {
               appItem.modelData?.execute()
-              launcherMenuRoot.visible = false
+              launcherRoot.visible = false
               grab.active = false
               searchBox.clear()
             }
           }
         }
       }
-      
+
       ScrollBar.vertical: ScrollBar {
         id: scrollBar
         policy: ScrollBar.AsNeeded
       }
     }
   }
-    
+
   TextField {
     id: searchBox
-    
+
     anchors{
       bottom: parent.bottom
       left: parent.left
@@ -271,30 +240,30 @@ MenuPanel {
       leftMargin: Global.format.spacing_large
       rightMargin: Global.format.spacing_large
     }
-    
+
     implicitHeight: 39
     color: "white"
     font.pixelSize: Global.format.text_size
     placeholderText: "type > for command or = for calculator"
-    
+
     onFocusChanged: {
-      if (launcherMenuRoot.visible) {
+      if (launcherRoot.visible) {
         focus = true
       }
     }
-    
+
     onTextEdited: {
-      if (launcherMenuRoot.isExpr) {
+      if (launcherRoot.isExpr) {
         mathProc.expr = searchBox.text.slice(1)
         mathProc.running = true
       }
     }
-    
+
     onAccepted: {
       console.log(appList.currentItem?.name)
       appList.currentItem?.modelData.execute()
       clear()
-      launcherMenuRoot.visible = false
+      launcherRoot.visible = false
     }
 
     Keys.onPressed: (event) => {
@@ -306,13 +275,13 @@ MenuPanel {
         event.accepted = true
       } else if (event.key === Qt.Key_Escape) {
         clear()
-        launcherMenuRoot.visible = false
+        launcherRoot.visible = false
         event.accepted = true
       }
       if (appList.currentIndex < 0) appList.currentIndex = 0
       if (appList.currentIndex >= appList.count) appList.currentIndex = appList.count -1
     }
-    
+
     background: Rectangle {
       anchors.fill: parent
       color: Global.colors.surface

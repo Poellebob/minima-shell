@@ -1,3 +1,4 @@
+//@ pragma UseQApplication
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -7,10 +8,20 @@ import Quickshell.Io
 import qs.components.widget
 import qs
 
+pragma Singleton
+
 MenuPanel {
   id: wallpaperSelectorRoot
+
   implicitWidth: 786
   implicitHeight: 600
+
+  function open(): void {
+    wallpaperSelectorRoot.visible = !wallpaperSelectorRoot.visible
+    wallpaperSelectorRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+    searchBox.focus = true
+  }
+
   property var wallpapers: []
   property int tab: 0
   property string searchText: ""

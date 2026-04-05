@@ -1,3 +1,4 @@
+//@ pragma UseQApplication
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -8,17 +9,22 @@ import Quickshell.Wayland
 import qs.components.widget
 import qs
 
+pragma Singleton
+
 MenuPanel {
   id: clipboardManagerRoot
-  property var clipboardEntries: []
-  property string searchText: ""
 
   WlrLayershell.layer: WlrLayer.Overlay
 
-  anchors {
-    bottom: true  
+  function open(): void {
+    clipboardManagerRoot.visible = !clipboardManagerRoot.visible
+    clipboardManagerRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
   }
-  
+
+  anchors {
+    bottom: true
+  }
+
   onVisibleChanged: {
     if (visible) {
       refresh()
@@ -27,56 +33,56 @@ MenuPanel {
       clipList.currentIndex = 0
     }
   }
-  
+
   Component.onCompleted: {
     refresh()
   }
-  
+
   function refresh() {
     readProc.running = true
   }
-  
+
   function selectEntry(entry) {
     Quickshell.execDetached(["bash", "-c", `echo "${entry}" | cliphist decode | wl-copy`])
   }
-  
+
   function deleteEntry(entry) {
     deleteProc.entry = entry
     deleteProc.running = true
   }
-  
+
   function wipeAll() {
     wipeProc.running = true
   }
-  
+
   function filterEntries() {
     if (searchText.trim() === "") {
       return clipboardEntries
     }
-    
+
     const search = searchText.toLowerCase()
     return clipboardEntries.filter(entry => {
       const content = entry.replace(/^\d+\t/, "").toLowerCase()
       return content.includes(search)
     })
   }
-  
+
   function isImageEntry(entry) {
     return /^\d+\t\[\[.*binary data.*\d+x\d+.*\]\]$/.test(entry)
   }
-  
+
   Process {
     id: readProc
     property var buffer: []
-    
+
     command: ["cliphist", "list"]
-    
+
     stdout: SplitParser {
       onRead: (line) => {
         readProc.buffer.push(line)
       }
     }
-    
+
     onExited: (exitCode, exitStatus) => {
       if (exitCode === 0) {
         clipboardManagerRoot.clipboardEntries = readProc.buffer
@@ -84,26 +90,26 @@ MenuPanel {
       }
     }
   }
-  
+
   Process {
     id: deleteProc
     property string entry: ""
     command: ["bash", "-c", `echo "${entry}" | cliphist delete`]
-    
+
     onExited: (exitCode, exitStatus) => {
       clipboardManagerRoot.refresh()
     }
   }
-  
+
   Process {
     id: wipeProc
     command: ["cliphist", "wipe"]
-    
+
     onExited: (exitCode, exitStatus) => {
       clipboardManagerRoot.refresh()
     }
   }
-  
+
   IpcHandler {
     target: "minimaClipboard"
 
@@ -111,14 +117,14 @@ MenuPanel {
       clipboardManagerRoot.visible = !clipboardManagerRoot.visible
       clipboardManagerRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
     }
-  } 
-  
+  }
+
   Rectangle {
     anchors.fill: parent
     topLeftRadius: Global.format.radius_xlarge + Global.format.spacing_small
     topRightRadius: Global.format.radius_xlarge + Global.format.spacing_small
     color: Global.colors.surface_variant
-    
+
     Rectangle {
       anchors {
         top: parent.top
@@ -132,7 +138,7 @@ MenuPanel {
       }
       radius: Global.format.radius_large
       color: Global.colors.surface
-      
+
       ListView {
         id: clipList
         anchors.fill: parent
@@ -141,37 +147,37 @@ MenuPanel {
         clip: true
         highlightFollowsCurrentItem: true
         focus: false
-        
+
         populate: Transition {
           NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 100 }
         }
-        
+
         model: clipboardManagerRoot.filterEntries()
-        
+
         delegate: Rectangle {
           id: clipItem
           required property string modelData
           required property int index
           property bool isImage: clipboardManagerRoot.isImageEntry(modelData)
           property string displayText: modelData.replace(/^\d+\t/, "")
-          
+
           width: clipList.width - scrollBar.width
           height: Math.max(Global.format.module_height + Global.format.spacing_medium * 2, contentText.implicitHeight + Global.format.spacing_medium * 2)
           radius: Global.format.radius_medium
           color: mouseArea.containsMouse || clipList.currentIndex === index ? Global.colors.surface_container_high : "transparent"
-          
+
           Behavior on color {
             ColorAnimation {
               duration: 150
               easing.type: Easing.OutCubic
             }
           }
-          
+
           RowLayout {
             anchors.fill: parent
             anchors.margins: Global.format.spacing_small
             spacing: Global.format.spacing_medium
-            
+
             Text {
               Layout.preferredWidth: Global.format.icon_size
               Layout.alignment: Qt.AlignTop
@@ -179,12 +185,12 @@ MenuPanel {
               font.pixelSize: Global.format.icon_size
               font.family: "JetBrainsMono Nerd Font"
             }
-            
+
             ColumnLayout {
               Layout.fillWidth: true
               Layout.alignment: Qt.AlignVCenter
               spacing: 0
-              
+
               Text {
                 id: contentText
                 Layout.fillWidth: true
@@ -196,22 +202,22 @@ MenuPanel {
                 maximumLineCount: 3
               }
             }
-            
+
             Button {
               Layout.preferredWidth: Global.format.icon_size
               Layout.preferredHeight: Global.format.icon_size
               Layout.alignment: Qt.AlignVCenter
               text: "   󰩺   "
-              
+
               onClicked: {
                 clipboardManagerRoot.deleteEntry(clipItem.modelData)
               }
-              
+
               background: Rectangle {
                 color: parent.pressed ? Global.colors.error : (parent.hovered ? Global.colors.error_container : "transparent")
                 radius: Global.format.radius_small
               }
-              
+
               contentItem: Text {
                 text: parent.text
                 color: parent.pressed ? Global.colors.on_error : Global.colors.on_error_container
@@ -222,7 +228,7 @@ MenuPanel {
               }
             }
           }
-          
+
           MouseArea {
             id: mouseArea
             anchors.fill: parent
@@ -231,7 +237,7 @@ MenuPanel {
             onClicked: (mouse) => {
               clipList.currentIndex = clipItem.index
             }
-            
+
             onDoubleClicked: {
               clipboardManagerRoot.selectEntry(clipItem.modelData)
               clipboardManagerRoot.visible = false
@@ -239,12 +245,12 @@ MenuPanel {
             }
           }
         }
-        
+
         ScrollBar.vertical: ScrollBar {
           id: scrollBar
           policy: ScrollBar.AsNeeded
         }
-        
+
         Text {
           anchors.centerIn: parent
           visible: clipList.count === 0
@@ -254,7 +260,7 @@ MenuPanel {
         }
       }
     }
-    
+
     RowLayout {
       id: searchRow
       anchors {
@@ -266,7 +272,7 @@ MenuPanel {
         rightMargin: Global.format.spacing_large
       }
       spacing: Global.format.spacing_medium
-      
+
       TextField {
         id: searchBox
         Layout.fillWidth: true
@@ -274,11 +280,11 @@ MenuPanel {
         color: Global.colors.on_surface
         font.pixelSize: Global.format.text_size
         placeholderText: "Search clipboard..."
-        
+
         onTextChanged: {
           clipboardManagerRoot.searchText = text
         }
-        
+
         onAccepted: {
           if (clipList.count > 0) {
             clipboardManagerRoot.selectEntry(clipList.model[clipList.currentIndex])
@@ -291,7 +297,7 @@ MenuPanel {
         onFocusChanged: {
           focus: true
         }
-        
+
         Keys.onPressed: (event) => {
           if (event.key === Qt.Key_Up) {
             if (clipList.currentIndex > 0) {
@@ -317,27 +323,27 @@ MenuPanel {
           if (clipList.currentIndex < 0) clipList.currentIndex = 0
           if (clipList.currentIndex >= clipList.count) clipList.currentIndex = clipList.count -1
         }
-        
+
         background: Rectangle {
           anchors.fill: parent
           color: Global.colors.surface
           radius: Global.format.radius_large
         }
       }
-      
+
       Button {
         implicitHeight: 39
         text: "  Clear All  "
-        
+
         onClicked: {
           clipboardManagerRoot.wipeAll()
         }
-        
+
         background: Rectangle {
           color: parent.pressed ? Global.colors.error : (parent.hovered ? Global.colors.error_container : Global.colors.surface)
           radius: Global.format.radius_large
         }
-        
+
         contentItem: Text {
           text: parent.text
           color: parent.pressed ? Global.colors.on_error : Global.colors.on_error_container
