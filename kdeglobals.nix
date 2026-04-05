@@ -141,7 +141,7 @@ with lib;
     AccentColor=232,203,45
     LastUsedCustomAccentColor=232,203,45
     TerminalApplication=${config.minima.terminal.name}
-    TerminalService=${config.minima.terminal.name}.desktop
+    TerminalService=${config.minima.terminal.package}/share/applications/${config.minima.terminal.name}.desktop
     ColorScheme=BreezeDark
     UseSystemBell=true
 
