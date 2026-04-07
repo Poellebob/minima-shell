@@ -1,10 +1,10 @@
-//@ pragma UseQApplication
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import qs.bar
 import qs.widgets.logout
 import qs.launcher
+import qs.widgets.notificationCenter
 
 ShellRoot {
   id: root
@@ -19,6 +19,14 @@ ShellRoot {
     delegate: LauncherOpener {
       screen: modelData
       implicitWidth: 600
+    }
+  }
+
+  Instantiator {
+    model: Quickshell.screens
+
+    delegate: NotificationOpener {
+      screen: modelData
     }
   }
 }
