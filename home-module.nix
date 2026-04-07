@@ -8,6 +8,7 @@ in {
     ./lib.nix
     ./nixvim.nix
     ./kdeglobals.nix
+    ./config.nix
   ];
 
   config = mkIf cfg.enable {
@@ -271,9 +272,6 @@ in {
       cp -n ${./config/matugen/config.toml} $HOME/.config/matugen/config.toml
       cp -n ${./config/matugen/quickshell.template.json} $HOME/.config/matugen/quickshell.template.json
       cp -n ${./defaults/quickshell.json} $HOME/.config/matugen/quickshell.json
-      cp -n ${./defaults/config.ini} $dir/config.ini
-      cp -n ${./defaults/hypr.conf} $dir/hypr.conf
-      cp -n ${./defaults/sway.conf} $dir/sway.conf
     '';
   };
 }
