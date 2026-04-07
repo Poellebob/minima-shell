@@ -35,13 +35,6 @@ MenuPanel {
     }
   }
 
-  IpcHandler {
-    target: "minimaNotifications"
-    function open(): void {
-      NotificationMenu.open()
-    }
-  }
-
   function open(): void {
     notifRoot.visible = !notifRoot.visible
   }

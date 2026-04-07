@@ -110,14 +110,6 @@ MenuPanel {
     }
   }
 
-  IpcHandler {
-    target: "minimaClipboard"
-
-    function open(): void {
-      clipboardManagerRoot.visible = !clipboardManagerRoot.visible
-      clipboardManagerRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
-    }
-  }
 
   Rectangle {
     anchors.fill: parent

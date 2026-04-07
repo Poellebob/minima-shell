@@ -20,20 +20,12 @@ MenuPanel {
     bottom: true
   }
 
-  IpcHandler {
-    id: handeler
-    target: "minimaLauncher"
-
-    function open(): void {
-      searchBox.clear()
-      launcherRoot.visible = !launcherRoot.visible
-      searchBox.focus = true
-      launcherRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
-    }
-  }
 
   function open(): void {
-    handeler.open()
+    searchBox.clear()
+    launcherRoot.visible = !launcherRoot.visible
+    searchBox.focus = true
+    launcherRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
   }
 
   Process {
