@@ -26,7 +26,7 @@ PanelWindow {
 
   Rectangle {
     color: Global.colors.surface
-    implicitHeight: mouseActive.containsMouse ? parent.height : 3
+    implicitHeight: mouseActive.containsMouse ? parent.height : 1
     visible: mouseActive.containsMouse
     topRightRadius: height
     topLeftRadius: height

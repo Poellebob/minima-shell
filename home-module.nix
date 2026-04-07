@@ -14,7 +14,7 @@ in {
     home.packages = with pkgs; [
       matugen wiremix bluetui hyprlock bluez bluez-tools upower
       grim slurp swappy swww xdg-utils cliphist wl-clipboard quickshell
-      wireplumber jq bc power-profiles-daemon brightnessctl
+      wireplumber jq bc power-profiles-daemon brightnessctl libnotify
       nerd-fonts.jetbrains-mono lazygit papirus-icon-theme
       rose-pine-cursor qt5.qtwayland qt6.qtwayland kdePackages.qt6ct 
       linux-wallpaperengine
