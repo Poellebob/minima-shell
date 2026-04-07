@@ -442,15 +442,6 @@ MenuPanel {
     }
   }
 
-  IpcHandler {
-    target: "minimaWallpaperSelector"
-
-    function open(): void {
-      wallpaperSelectorRoot.visible = !wallpaperSelectorRoot.visible
-      wallpaperSelectorRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
-      searchBox.focus = true
-    }
-  }
 
   ColumnLayout {
     anchors.fill: parent
