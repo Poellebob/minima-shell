@@ -4,6 +4,42 @@ with lib;
 {
   options.minima = {
     enable = mkEnableOption "Minima shell";
+
+    wm = mkOption {
+      type = types.enum [ "sway" "swayfx" "scroll" "hyprland" ];
+      default = "sway";
+      internal = true;
+    };
+    enableNvidia   = mkOption { type = types.bool;   default = false; internal = true; };
+    modifier       = mkOption { type = types.str;    default = "Mod4"; internal = true; };
+    apps.fileManager = mkOption { type = types.str;  default = "dolphin"; internal = true; };
+    apps.browser     = mkOption { type = types.str;  default = "zen-browser"; internal = true; };
+    hypr.layout    = mkOption {
+      type = types.enum [ "dwindle" "master" ];
+      default = "dwindle";
+      internal = true;
+    };
+    displays = mkOption {
+      type = types.listOf types.anything;
+      default = [];
+      internal = true;
+    };
+    workspaceOutputs = mkOption {
+      type = types.listOf types.anything;
+      default = [];
+      internal = true;
+    };
+    autostart = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      internal = true;
+    };
+    specialWorkspaces = mkOption {
+      type = types.listOf types.anything;
+      default = [];
+      internal = true;
+    };
+
     theming.enable = mkOption {
       type = types.bool;
       default = true;
@@ -13,44 +49,52 @@ with lib;
     enableBranding = mkOption {
       type = types.bool;
       default = true;
-      description = "Enable Minima name in fetch";
-    };
-
-    enableNvidia = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable Nvidia graphics";
+      description = "Show 'minima' as XDG_CURRENT_DESKTOP";
     };
 
     terminal = {
-      name = mkOption {
-        type = types.str;
-        default = "kitty";
-      };
-
-      package = mkOption {
-        type = types.package;
-        default = pkgs.kitty;
-        description = "Terminal package";
-      };
+      name    = mkOption { type = types.str;     default = "kitty"; };
+      package = mkOption { type = types.package; default = pkgs.kitty; };
     };
 
     shell.enable = mkOption {
       type = types.bool;
       default = true;
-      description = "Enable shell integration (zsh, fzf, starship, etc.)";
+      description = "Enable zsh, fzf, starship, etc.";
     };
 
     extraPackages = mkOption {
       type = types.listOf types.package;
       default = [];
-      description = "Extra packages to install";
     };
 
-    wm = mkOption {
-      type = types.enum [ "sway" "swayfx" "scroll" "hyprland" ];
-      default = "sway";
-      description = "Window manager to use";
+    minimaConfig = {
+      darkTheme = mkOption { type = types.bool; default = true; };
+
+      panel = {
+        enable        = mkOption { type = types.bool; default = true; };
+        alwaysVisible = mkOption { type = types.bool; default = true; };
+      };
+
+    launcher = {
+      enable = mkOption { type = types.bool; default = true; };
+      qalcPath = mkOption { type = types.str; default = "${pkgs.libqalculate}/bin/qalc"; };
+    };
+
+    clipboard.enable = mkOption { type = types.bool; default = true; };
+
+      wallpaper = {
+        enable        = mkOption { type = types.bool; default = true; };
+        engineEnabled = mkOption { type = types.bool; default = false; };
+        enginePath    = mkOption { type = types.str;  default = ""; };
+        workshopPath  = mkOption {
+          type    = types.str;
+          default = "~/.steam/steam/steamapps/workshop/content/431960/";
+        };
+        fps           = mkOption { type = types.int;  default = 25; };
+        fill          = mkOption { type = types.bool; default = true; };
+        matureContent = mkOption { type = types.bool; default = false; };
+      };
     };
   };
 }

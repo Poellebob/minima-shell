@@ -111,126 +111,6 @@ let
   boolStr = b: if b then "true" else "false";
 
 in {
-  options.minima = {
-    modifier = mkOption {
-      type = types.str;
-      default = "Mod4";
-      description = "Main modifier key (Mod4 = Super/Windows).";
-    };
-
-    apps = {
-      fileManager = mkOption {
-        type = types.str;
-        default = "dolphin";
-      };
-      browser = mkOption {
-        type = types.str;
-        default = "zen-browser";
-      };
-    };
-
-    hypr.layout = mkOption {
-      type = types.enum [ "dwindle" "master" ];
-      default = "dwindle";
-    };
-
-    displays = mkOption {
-      type = types.listOf displayType;
-      default = [];
-      description = "Monitor/output configurations shared between compositors.";
-      example = literalExpression ''
-        [
-          {
-            name = "DP-1";
-            res = "1920x1080";
-            position = { x = 0; y = 0; };
-            scale = 1.0;
-          }
-          {
-            name = "HDMI-A-1";
-            res = "1920x1080";
-            position = { x = -1920; y = 0; };
-            scale = 1.0;
-          }
-        ]
-      '';
-    };
-
-    workspaceOutputs = mkOption {
-      type = types.listOf workspaceOutputType;
-      default = [];
-      description = "Assigns workspaces to specific outputs.";
-      example = literalExpression ''
-        [
-          { workspace = "1"; output = "DP-1"; }
-          { workspace = "10"; output = "HDMI-A-1"; }
-        ]
-      '';
-    };
-
-    autostart = mkOption {
-      type = types.listOf types.str;
-      default = [];
-      description = "Commands to run on compositor startup (exec/exec-once).";
-      example = [ "spotify" "flatpak run com.discordapp.Discord" ];
-    };
-
-    specialWorkspaces = mkOption {
-      type = types.listOf specialWorkspaceType;
-      default = [];
-      description = "Named workspaces with optional autostart and keybinds.";
-      example = literalExpression ''
-        [
-          {
-            name = "discord";
-            key = "m";
-            rule = "app_id=\"discord|WebCord\"";
-            autostart = true;
-            startCommand = "flatpak run com.discordapp.Discord";
-          }
-        ]
-      '';
-    };
-
-    minimaConfig = {
-      darkTheme = mkOption {
-        type = types.bool;
-        default = true;
-      };
-
-      panel = {
-        enable = mkOption { type = types.bool; default = true; };
-        alwaysVisible = mkOption { type = types.bool; default = true; };
-      };
-
-      launcher = {
-        enable = mkOption { type = types.bool; default = true; };
-        mathEnabled = mkOption { type = types.bool; default = true; };
-        mathjsPath = mkOption { type = types.str; default = "mathjs"; };
-      };
-
-      clipboard = {
-        enable = mkOption { type = types.bool; default = true; };
-      };
-
-      wallpaper = {
-        enable = mkOption { type = types.bool; default = true; };
-        engineEnabled = mkOption { type = types.bool; default = false; };
-        enginePath = mkOption {
-          type = types.str;
-          default = "/home/${config.home.username}/.nix-profile/bin/linux-wallpaperengine";
-        };
-        workshopPath = mkOption {
-          type = types.str;
-          default = "~/.steam/steam/steamapps/workshop/content/431960/";
-        };
-        fps = mkOption { type = types.int; default = 25; };
-        fill = mkOption { type = types.bool; default = true; };
-        matureContent = mkOption { type = types.bool; default = false; };
-      };
-    };
-  };
-
   config = mkIf cfg.enable {
 
     home.file.".config/minima/hypr.conf" = mkIf (cfg.wm == "hyprland") {
@@ -276,8 +156,7 @@ in {
 
         [Launcher]
         enabled = ${boolStr cfg.minimaConfig.launcher.enable}
-        mathEnabled = ${boolStr cfg.minimaConfig.launcher.mathEnabled}
-        mathjsPath = ${cfg.minimaConfig.launcher.mathjsPath}
+        qalcPath = ${cfg.minimaConfig.launcher.qalcPath}
 
         [Clipboard]
         enabled = ${boolStr cfg.minimaConfig.clipboard.enable}
