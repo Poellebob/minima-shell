@@ -34,7 +34,7 @@
 
     nixosModules.minima = { ... }: {
       imports = [
-        inputs.scroll-flake.nixosModules.default
+        scroll-flake.nixosModules.default
         ./nixos-module.nix
       ];
     };
