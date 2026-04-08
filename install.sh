@@ -454,13 +454,13 @@ build_aur_pkg() {
 
 install_deps_arch() {
     echo "Installing base dependencies (pacman)..."
-    sudo pacman -Sy --needed wireplumber libgtop bluez bluez-utils btop networkmanager jemalloc\
+    sudo pacman -Sy --needed wireplumber libgtop bluez bluez-tools btop networkmanager jemalloc\
       dart-sass wl-clipboard brightnessctl swww python upower neovim\
       pacman-contrib power-profiles-daemon gvfs cliphist \
       hyprlock hypridle kitty ttf-jetbrains-mono-nerd qt6-wayland qt5-wayland qt5ct \
       grim slurp swappy wiremix bluetui polkit-kde-agent\
       archlinux-xdg-menu xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal \
-      jq bc git breeze breeze-gtk breeze5 papirus-icon-theme fzf zoxide
+      jq bc git breeze breeze-gtk breeze5 papirus-icon-theme fzf zoxide libqalculate
 
     echo "Installing AUR build dependencies..."
     sudo pacman -Sy --needed base-devel

@@ -21,6 +21,10 @@ MenuPanel {
   }
 
 
+  function close(): void {
+    launcherRoot.visible = false
+  }
+
   function open(): void {
     searchBox.clear()
     launcherRoot.visible = !launcherRoot.visible
@@ -30,20 +34,29 @@ MenuPanel {
 
   Process {
     id: mathProc
-    property string expr: "0+0"
+    property string expr: ""
     property string res: ""
-    command: [launcherRoot.mathjsPath, expr]
+    command: [Global.settings["Launcher"]["qalcPath"], expr]
 
     stdout: StdioCollector {
       onStreamFinished: {
-        mathProc.res = this.text.trim()
+        var res = this.text.trim()
+        const lines = this.text.trim().split("\n")
+
+        if (lines.length === 0) {
+          return
+        }
+
+        const lastLine = lines[lines.length - 1]
+
+        mathProc.res = lastLine
         console.log(this.text.trim())
       }
     }
   }
 
   property bool isCustomCommand: searchBox.text.length > 0 && searchBox.text[0] === ">"
-  property bool isExpr: searchBox.text.length > 0 && searchBox.text[0] === "=" && Global.settings["Launcher"]["mathEnabled"]
+  property bool isExpr: searchBox.text.length > 0 && searchBox.text[0] === "="
 
   property var customCommands: [
     {
@@ -146,7 +159,7 @@ MenuPanel {
         width: appList.width - scrollBar.width
         height: 40
         radius: Global.format.radius_medium
-        color: mouseArea.containsMouse || appList.currentItem.modelData == modelData ? Global.colors.surface_container_high : "transparent"
+        color: mouseArea.containsMouse || (appList.currentItem && appList.currentItem.modelData == modelData) ? Global.colors.surface_container_high : "transparent"
 
         Behavior on color {
           ColorAnimation {
@@ -205,9 +218,7 @@ MenuPanel {
           onDoubleClicked: {
             if (appItem.modelData) {
               appItem.modelData?.execute()
-              launcherRoot.visible = false
-              grab.active = false
-              searchBox.clear()
+              close()
             }
           }
         }
@@ -247,15 +258,18 @@ MenuPanel {
     onTextEdited: {
       if (launcherRoot.isExpr) {
         mathProc.expr = searchBox.text.slice(1)
+        if (mathProc.expr.length === 0) {
+          mathProc.expr = "0"
+        }
         mathProc.running = true
       }
     }
 
     onAccepted: {
-      console.log(appList.currentItem?.name)
-      appList.currentItem?.modelData.execute()
-      clear()
-      launcherRoot.visible = false
+      if (appList.currentItem?.modelData) {
+        appList.currentItem.modelData.execute()
+      }
+      close()
     }
 
     Keys.onPressed: (event) => {
@@ -266,8 +280,7 @@ MenuPanel {
         appList.currentIndex += 1
         event.accepted = true
       } else if (event.key === Qt.Key_Escape) {
-        clear()
-        launcherRoot.visible = false
+        close()
         event.accepted = true
       }
       if (appList.currentIndex < 0) appList.currentIndex = 0
