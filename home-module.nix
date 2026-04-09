@@ -203,7 +203,6 @@ in {
         ELECTRON_OZONE_PLATFORM_HINT = "wayland";
         XDG_SESSION_TYPE = "wayland";
         WM = cfg.wm;
-        PYTHONPATH = "${pkgs.sagetex}/lib/python/site-packages:$PYTHONPATH";
       }
       (mkIf cfg.theming.enable {
         XCURSOR_THEME = "BreezeX-RosePine-Linux";
