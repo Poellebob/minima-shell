@@ -40,13 +40,10 @@ MenuPanel {
   property string favoritesPath: Quickshell.env("HOME") + "/.config/wallpaper-favorites.conf"
 
   Component.onCompleted: {
-    // Load favorites first
     readFavoritesProc.running = true
 
-    // Always load wallpapers on startup
     scanWallpapers()
 
-    // Try to read the saved wallpaper from config
     readWallpaperConf.running = true
 
     if (visible) {
@@ -93,7 +90,9 @@ MenuPanel {
   function startNextEngineProject() {
     if (engineQueueIndex >= engineQueue.length) {
       // All engine wallpapers have been scanned
-      checkAndApplyInitialWallpaper()
+      if (!savedWallpaper) {
+        checkAndApplyInitialWallpaper()
+      }
       sortWallpapers()
       return
     }
@@ -198,7 +197,7 @@ MenuPanel {
         const lines = this.text.trim().split('\n').filter(line => line.trim() !== "")
         wallpaperSelectorRoot.favorites = lines
         console.log("Loaded", lines.length, "favorites")
-        
+
         if (wallpaperSelectorRoot.wallpapers.length > 0) {
           sortWallpapers()
         }
@@ -245,6 +244,7 @@ MenuPanel {
         console.log("No wallpaper.conf found or error reading it")
         wallpaperSelectorRoot.savedWallpaper = ""
       }
+      checkAndApplyInitialWallpaper()
     }
   }
 
@@ -280,9 +280,8 @@ MenuPanel {
         wallpaperSelectorRoot.wallpapers = images
         scanImagesProc.buffer = []
 
-        // If engine is not enabled, check for initial wallpaper now
+        // If engine is not enabled, sort wallpapers now
         if (!engineEnabled) {
-          checkAndApplyInitialWallpaper()
           sortWallpapers()
         }
       }
@@ -311,8 +310,8 @@ MenuPanel {
         scanEngineProc.buffer = []
         if (engineQueue.length > 0) {
           startNextEngineProject()
-        } else {
-          // No engine wallpapers found, check for initial wallpaper
+        } else if (!savedWallpaper) {
+          // No engine wallpapers found, check for initial wallpaper only if not already loaded
           checkAndApplyInitialWallpaper()
         }
       }
@@ -441,7 +440,7 @@ MenuPanel {
       }
       Quickshell.execDetached([
         "/bin/sh", "-c",
-        "matugen -j hex image \"" + previewPath + "\" 2>/dev/null"
+        "matugen -c " + Quickshell.env("HOME") + "/.config/minima/colors/config.toml -j hex image \"" + previewPath + "\""
       ])
     }
   }

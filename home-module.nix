@@ -264,16 +264,18 @@ in {
     home.file.".config/hypr/terminal.conf" = mkIf (cfg.wm == "hyprland") { text = "$terminal = ${cfg.terminal.name}"; };
 
     home.file.".config/quickshell/".source = ./config/quickshell;
-    home.file.".config/quickshell/scripts/sysfetch.sh" = { source = ./config/quickshell/scripts/sysfetch.sh; executable = true; };
+    home.file.".config/quickshell/scripts/sysfetch.sh" = { 
+      source = ./config/quickshell/scripts/sysfetch.sh; 
+      executable = true; 
+    };
 
     home.file.".config/qalculate/qalc.cfg".source = ./config/qalculate/qalc.cfg;
 
     home.activation.minimaBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      dir="$HOME/.config/minima"
-      mkdir -p "$dir" $HOME/.config/matugen
-      cp -n ${./config/matugen/config.toml} $HOME/.config/matugen/config.toml
-      cp -n ${./config/matugen/quickshell.template.json} $HOME/.config/matugen/quickshell.template.json
-      cp -n ${./defaults/quickshell.json} $HOME/.config/matugen/quickshell.json
+      cp -n ${./config/matugen/config.toml} $HOME/.config/minima/colors/config.toml
+      cp -n ${./config/matugen/quickshell.template.json} $HOME/.config/minima/colors/quickshell.template.json
+      cp -n ${./defaults/quickshell.json} $HOME/.config/minima/colors/quickshell.json
+      chmod 644 $HOME/.config/minima/colors/quickshell.json
     '';
   };
 }

@@ -7,7 +7,7 @@ Item {
 
   FileView {
     id: colorFile
-    path: Quickshell.env("HOME") + "/.config/matugen/quickshell.json"
+    path: Quickshell.env("HOME") + "/.config/minima/colors/quickshell.json"
     watchChanges: true
     blockLoading: true
 
