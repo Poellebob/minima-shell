@@ -22,7 +22,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, stylix, scroll-flake, ... }: {
+  outputs = { self, nixpkgs, home-manager, nixvim, stylix, scroll-flake, ... }@inputs: {
     homeModules.minima = { ... }: {
       imports = [
         stylix.homeModules.stylix

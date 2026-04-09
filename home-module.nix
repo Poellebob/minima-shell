@@ -18,7 +18,7 @@ in {
       wireplumber jq bc power-profiles-daemon brightnessctl libnotify
       nerd-fonts.jetbrains-mono lazygit papirus-icon-theme
       rose-pine-cursor qt5.qtwayland qt6.qtwayland kdePackages.qt6ct 
-      linux-wallpaperengine
+      linux-wallpaperengine libqalculate
       cfg.terminal.package
     ]
     ++ optionals cfg.shell.enable [ fzf zoxide git afetch ]
@@ -133,7 +133,7 @@ in {
         alias ll='eza -lh --git'
         alias la='eza -lah --git'
         alias tree='eza --tree'
-        alias cat='bat --style=numbers,changes,header --number=false'
+        alias cat='bat'
         alias du='dust'
         alias df='duf'
         alias top='btop'
@@ -265,6 +265,8 @@ in {
 
     home.file.".config/quickshell/".source = ./config/quickshell;
     home.file.".config/quickshell/scripts/sysfetch.sh" = { source = ./config/quickshell/scripts/sysfetch.sh; executable = true; };
+
+    home.file.".config/qalculate/qalc.cfg".source = ./config/qalculate/qalc.cfg;
 
     home.activation.minimaBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       dir="$HOME/.config/minima"

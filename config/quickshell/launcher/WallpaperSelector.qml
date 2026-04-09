@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Io
+import Quickshell.Wayland
 import qs.components.widget
 import qs
 
@@ -32,7 +33,7 @@ MenuPanel {
   property int engineFps: Global.settings["Wallpaper"]["fps"]
   property bool engineFill: Global.settings["Wallpaper"]["fill"]
   property bool matureContent: Global.settings["Wallpaper"]["matureContent"]
-  property int volume: Global.settings["Wallpaper"]["volume"]
+  property int volume: Global.settings["Wallpaper"]["volume"] || 50
   property bool initialLoadComplete: false
   property string savedWallpaper: ""
   property var favorites: []
@@ -160,7 +161,7 @@ MenuPanel {
 
     // If no saved wallpaper or it wasn't found, apply the first wallpaper
     if (wallpapers.length > 0) {
-      console.log("No saved wallpaper foAutumnund, applying first wallpaper")
+      console.log("No saved wallpaper found, applying first wallpaper")
       setWallpaper(wallpapers[0])
     }
   }
@@ -197,6 +198,10 @@ MenuPanel {
         const lines = this.text.trim().split('\n').filter(line => line.trim() !== "")
         wallpaperSelectorRoot.favorites = lines
         console.log("Loaded", lines.length, "favorites")
+        
+        if (wallpaperSelectorRoot.wallpapers.length > 0) {
+          sortWallpapers()
+        }
       }
     }
 
@@ -339,7 +344,6 @@ MenuPanel {
                 )
               const folderId =
                 projectDir.substring(projectDir.lastIndexOf('/') + 1)
-              let current = wallpaperSelectorRoot.wallpapers.slice()
               if (!hasEngineWallpaper(folderId)) {
                 let current = wallpaperSelectorRoot.wallpapers.slice()
                 current.push({
@@ -587,7 +591,7 @@ MenuPanel {
                     color: "transparent"
                     border.width: wallpaperGrid.currentIndex === wallpaperItem.index ? 2 : 0
                     border.color: Global.colors.primary
-                    radius: parent.radius
+                    radius: previewContainer.radius
                   }
                 }
               }
@@ -771,7 +775,6 @@ MenuPanel {
           } else if (event.key === Qt.Key_Escape) {
             searchBox.clear()
             wallpaperSelectorRoot.visible = false
-            grab.active = false
             event.accepted = true
           }
         }
