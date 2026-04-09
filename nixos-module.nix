@@ -5,17 +5,11 @@ let
   cfg = config.minima;
 in {
   imports = [
-    ./lib.nix
+    ./lib-system.nix
   ];
 
-  config = mkIf cfg.enable {
-    programs.sway = mkIf (cfg.wm == "sway") {
-      enable = true;
-      wrapperFeatures.gtk = true;
-      extraPackages = with pkgs; [];
-    };
-
-    programs.swayfx = mkIf (cfg.wm == "swayfx") {
+  config = mkIf (cfg.wm != null) {
+    programs.sway = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
       enable = true;
       wrapperFeatures.gtk = true;
       extraPackages = with pkgs; [];
@@ -28,5 +22,21 @@ in {
     programs.scroll = mkIf (cfg.wm == "scroll") {
       enable = true;
     };
+
+    home-manager.sharedModules = [
+      {
+        minima = {
+          wm                = mkDefault cfg.wm;
+          enableNvidia      = mkDefault cfg.enableNvidia;
+          modifier          = mkDefault cfg.modifier;
+          apps              = mkDefault cfg.apps;
+          hypr.layout       = mkDefault cfg.hypr.layout;
+          displays          = mkDefault cfg.displays;
+          workspaceOutputs  = mkDefault cfg.workspaceOutputs;
+          autostart         = mkDefault cfg.autostart;
+          specialWorkspaces = mkDefault cfg.specialWorkspaces;
+        };
+      }
+    ];
   };
 }

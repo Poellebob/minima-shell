@@ -233,7 +233,6 @@ MenuPanel {
             onDoubleClicked: {
               clipboardManagerRoot.selectEntry(clipItem.modelData)
               clipboardManagerRoot.visible = false
-              grab.active = false
             }
           }
         }
@@ -282,7 +281,6 @@ MenuPanel {
             clipboardManagerRoot.selectEntry(clipList.model[clipList.currentIndex])
             clear()
             clipboardManagerRoot.visible = false
-            grab.active = false
           }
         }
 
@@ -304,7 +302,6 @@ MenuPanel {
           } else if (event.key === Qt.Key_Escape) {
             clear()
             clipboardManagerRoot.visible = false
-            grab.active = false
             event.accepted = true
           } else if (event.key === Qt.Key_Delete) {
             if (clipList.count > 0) {
