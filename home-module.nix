@@ -22,7 +22,13 @@ in {
       cfg.terminal.package
     ]
     ++ optionals cfg.shell.enable [ fzf zoxide git afetch ]
-    ++ cfg.extraPackages;
+    ++ cfg.extraPackages
+    ++ optionals cfg.tex.enable [
+      (pkgs.texlive.combine (
+        optionalAttrs (cfg.tex.scheme != null) { ${cfg.tex.scheme} = pkgs.texlive.${cfg.tex.scheme}; }
+        // optionalAttrs (cfg.tex.packages != null) cfg.tex.packages
+      ))
+    ];
 
     qt = mkIf cfg.theming.enable {
       enable = true;
@@ -137,6 +143,7 @@ in {
         alias du='dust'
         alias df='duf'
         alias top='btop'
+        alias lg=lazygit
       '';
     };
 

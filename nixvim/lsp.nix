@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 {
   config = lib.mkIf config.minima.vim.enable {
     programs.nixvim.plugins = {
@@ -39,7 +39,13 @@
       };
 
       vimtex = {
-        enable = true;
+        enable = config.minima.tex.enable;
+        texlivePackage = lib.optionals config.minima.tex.enable (
+          pkgs.texlive.combine (
+            { ${config.minima.tex.scheme} = pkgs.texlive.${config.minima.tex.scheme}; }
+            // lib.optionalAttrs (config.minima.tex.packages != null) config.minima.tex.packages
+          )
+        );
         settings = {
           view_method = "zathura";
           view_automatic = 1;

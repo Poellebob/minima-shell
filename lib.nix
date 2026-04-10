@@ -68,6 +68,24 @@ with lib;
       default = [];
     };
 
+    tex = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable texlive";
+      };
+      scheme = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Texlive scheme name, e.g. \"scheme-full\"";
+      };
+      packages = mkOption {
+        type = types.nullOr (types.attrsOf types.anything);
+        default = null;
+        description = "Extra texlive packages as an attrset, e.g. { inherit (pkgs.texlive) dvisvgm dvipng; }";
+      };
+    };
+
     minimaConfig = {
       darkTheme = mkOption { type = types.bool; default = true; };
 
