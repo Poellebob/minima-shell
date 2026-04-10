@@ -277,9 +277,10 @@ in {
 
     home.file.".config/qalculate/qalc.cfg".source = ./config/qalculate/qalc.cfg;
 
+    home.file.".config/minima/colors/config.toml".source = ./config/matugen/config.toml;
+    home.file.".config/minima/colors/quickshell.template.json".source = ./config/matugen/quickshell.template.json;
+
     home.activation.minimaBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      cp -n ${./config/matugen/config.toml} $HOME/.config/minima/colors/config.toml
-      cp -n ${./config/matugen/quickshell.template.json} $HOME/.config/minima/colors/quickshell.template.json
       cp -n ${./defaults/quickshell.json} $HOME/.config/minima/colors/quickshell.json
       chmod 644 $HOME/.config/minima/colors/quickshell.json
     '';
