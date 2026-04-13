@@ -3,7 +3,7 @@ include ~/.config/sway/config.d/*
 
 # Autostart applications
 exec swww-daemon
-exec env WM=sway qs -d
+exec env WM=sway qs -c ~/.config/quickshell/ -d
 exec  sh -c "~/.config/hypr/getkeys.sh"
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 exec /usr/lib/polkit-kde-authentication-agent-1

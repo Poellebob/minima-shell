@@ -39,7 +39,7 @@ PanelWindow {
       }
 
       Rectangle {
-        visible: NotificationMenu.notifServer.trackedNotifications > 0
+        visible: NotificationMenu.notifServer.trackedNotifications.values.count > 0
         width:  paret.width - Global.format.spacing_normal * 2
         height: prent.height - Global.format.spacing_noraml * 2
         radius: width / 2

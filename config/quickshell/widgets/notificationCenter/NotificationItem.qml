@@ -156,7 +156,7 @@ Rectangle {
 
             onClicked: {
               modelData.invoke()
-              itemRoot.notification.close()
+              itemRoot.notification.dismiss()
             }
 
             text: modelData.text
@@ -176,7 +176,7 @@ Rectangle {
       Layout.alignment: Qt.AlignTop
       text: "󰅖"
 
-      onClicked: itemRoot.notification.close()
+      onClicked: itemRoot.notification.dismiss()
 
       colorDefault: "transparent"
       colorHovered: Global.colors.error_container

@@ -8,6 +8,7 @@
         servers = {
           nixd.enable = true;
           lua_ls.enable = true;
+          #texlab.enable = config.minima.tex.enable;
         } // config.minima.vim.lsp.servers;
         onAttach = ''
           if client.supports_method("textDocument/formatting") then
@@ -22,6 +23,11 @@
           end
         '';
       };
+      cmp-nvim-lsp.enable = true;
+      cmp-omni.enable = true;
+      cmp_luasnip.enable = true;
+      cmp-buffer.enable = true;
+      cmp-path.enable = true;
 
       conform-nvim = {
         enable = true;
@@ -33,11 +39,13 @@
           formatters_by_ft = {
             nix = [ "nixfmt" ];
             lua = [ "stylua" ];
+            tex = [ "latexindent" ];
           } // config.minima.vim.lsp.conform;
           formatters = config.minima.vim.lsp.formatterOpts;
         };
       };
-
+      
+      cmp-vimtex.enable = config.minima.tex.enable;
       vimtex = {
         enable = config.minima.tex.enable;
         texlivePackage = lib.optionals config.minima.tex.enable (
@@ -64,6 +72,38 @@
               "-shell-escape"
             ];
           };
+        };
+      };
+
+      cmp = {
+        enable = true;
+        settings = {
+          sources = [
+            { name = "omni"; }
+            { name = "nvim_lsp"; }
+            { name = "buffer"; }
+            { name = "path"; }
+            { name = "luasnip"; }
+            { name = "vimtex"; }
+          ];
+          filetype_extend = {
+            tex = [ "vimtex" ];
+          };
+          mapping = {
+            "<C-Space>" = "cmp.mapping.complete()";
+            "<C-e>" = "cmp.mapping.abort()";
+            "<CR>" = "cmp.mapping.confirm({ select = true })";
+            "<Tab>" = "cmp.mapping.select_next_item()";
+            "<S-Tab>" = "cmp.mapping.select_prev_item()";
+          };
+        };
+      };
+
+      luasnip = {
+        enable = true;
+        settings = {
+          region_check_events = "InsertEnter";
+          delete_check_events = "TextChanged,InsertLeave";
         };
       };
     };
