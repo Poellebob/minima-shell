@@ -2,21 +2,54 @@
 {
   config = lib.mkIf config.minima.vim.enable {
     programs.nixvim.plugins = {
-      web-devicons.enable = true;
 
-      which-key = {
+      colorschemes.catppuccin = {
         enable = true;
         settings = {
-          delay = 300;
-          spec = [
-            { __unkeyed-1 = "<leader>b"; group = "Buffers"; }
-            { __unkeyed-1 = "<leader>f"; group = "Find"; }
-            { __unkeyed-1 = "<leader>g"; group = "Git"; }
-            { __unkeyed-1 = "<leader>S"; group = "Sessions"; }
-            { __unkeyed-1 = "<leader>t"; group = "Terminal"; }
-            { __unkeyed-1 = "<leader>u"; group = "UI"; }
-            { __unkeyed-1 = "<leader>x"; group = "Lists"; }
-          ];
+          background = { light = "macchiato"; dark = "mocha"; };
+          flavour = "macchiato";
+          transparent_background = true;
+          no_bold = false;
+          no_italic = false;
+          no_underline = false;
+          custom_highlights = ''
+            function(highlights)
+              return {
+                CursorLineNr = { fg = highlights.peach, style = {} },
+                NavicText = { fg = highlights.text },
+              }
+            end
+          '';
+          integrations = {
+            cmp = true;
+            notify = true;
+            gitsigns = true;
+            neotree = true;
+            which_key = true;
+            illuminate = { enabled = true; lsp = true; };
+            navic = { enabled = true; custom_bg = "NONE"; };
+            treesitter = true;
+            telescope.enabled = true;
+            indent_blankline.enabled = true;
+            mini = { enabled = true; indentscope_color = "rosewater"; };
+            native_lsp = {
+              enabled = true;
+              inlay_hints = { background = true; };
+              virtual_text = {
+                errors = [ "italic" ];
+                hints = [ "italic" ];
+                information = [ "italic" ];
+                warnings = [ "italic" ];
+                ok = [ "italic" ];
+              };
+              underlines = {
+                errors = [ "underline" ];
+                hints = [ "underline" ];
+                information = [ "underline" ];
+                warnings = [ "underline" ];
+              };
+            };
+          };
         };
       };
 
@@ -79,24 +112,17 @@
       bufferline = {
         enable = true;
         settings.options = {
-          numbers = "none";
-          close_command = "Bdelete";
           diagnostics = "nvim_lsp";
-          diagnostics_indicator.__raw = ''
-            function(count, level)
-              local icons = { error = " ", warning = " " }
-              return icons[level] and (icons[level] .. count) or tostring(count)
-            end
-          '';
-          separator_style = "slant";
-          show_buffer_close_icons = true;
-          show_close_icon = false;
+          mode = "buffers";
+          close_icon = " ";
+          buffer_close_icon = "󰱝 ";
+          modified_icon = "󰔯 ";
           offsets = [
             {
               filetype = "neo-tree";
-              text = "File Explorer";
-              text_align = "center";
-              separator = true;
+              text = "Neo-tree";
+              highlight = "Directory";
+              text_align = "left";
             }
           ];
         };
@@ -107,22 +133,65 @@
         settings = {
           options = {
             globalstatus = true;
-            component_separators = {
-              left = "";
-              right = "";
+            extensions = [ "fzf" "neo-tree" ];
+            disabledFiletypes = {
+              statusline = [ "startup" "alpha" ];
             };
-            section_separators = {
-              left = "";
-              right = "";
-            };
+            theme = "catppuccin";
           };
           sections = {
-            lualine_a = [ "mode" ];
-            lualine_b = [ "branch" "diff" "diagnostics" ];
-            lualine_c = [ "filename" ];
-            lualine_x = [ "filetype" ];
-            lualine_y = [ "progress" ];
-            lualine_z = [ "location" ];
+            lualine_a = [ { "mode" = "mode"; icon = ""; } ];
+            lualine_b = [
+              { "branch" = "branch"; icon = ""; }
+              {
+                "diff" = "diff";
+                symbols = {
+                  added = " ";
+                  modified = " ";
+                  removed = " ";
+                };
+              }
+            ];
+            lualine_c = [
+              {
+                "diagnostics" = "diagnostics";
+                sources = [ "nvim_lsp" ];
+                symbols = {
+                  error = " ";
+                  warn = " ";
+                  info = " ";
+                  hint = "󰝶 ";
+                };
+              }
+              { "navic" = "navic"; }
+            ];
+            lualine_x = [
+              {
+                "filetype" = "filetype";
+                icon_only = true;
+                separator = "";
+                padding = { left = 1; right = 0; };
+              }
+              {
+                "filename" = "filename";
+                path = 1;
+              }
+              {
+                __raw = ''
+                  function()
+                    local icon = " "
+                    local status = require("copilot.api").status.data
+                    return icon .. (status.message or " ")
+                  end,
+                  cond = function()
+                   local ok, clients = pcall(vim.lsp.get_clients, { name = "copilot", bufnr = 0 })
+                   return ok and #clients > 0
+                  end,
+                '';
+              }
+            ];
+            lualine_y = [ { "progress" = "progress"; } ];
+            lualine_z = [ { "location" = "location"; } ];
           };
         };
       };
@@ -143,6 +212,22 @@
             height = 0.80;
             preview_cutoff = 120;
           };
+        };
+      };
+
+      which-key = {
+        enable = true;
+        settings = {
+          delay = 300;
+          spec = [
+            { __unkeyed-1 = "<leader>b"; group = "Buffers"; }
+            { __unkeyed-1 = "<leader>f"; group = "Find"; }
+            { __unkeyed-1 = "<leader>g"; group = "Git"; }
+            { __unkeyed-1 = "<leader>S"; group = "Sessions"; }
+            { __unkeyed-1 = "<leader>t"; group = "Terminal"; }
+            { __unkeyed-1 = "<leader>u"; group = "UI"; }
+            { __unkeyed-1 = "<leader>x"; group = "Lists"; }
+          ];
         };
       };
 
@@ -280,6 +365,8 @@
       bufdelete = {
         enable = true;
       };
+
+      web-devicons.enable = true;
     };
   };
 }

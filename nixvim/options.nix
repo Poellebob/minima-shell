@@ -10,6 +10,7 @@
       globals = {
         mapleader = " ";
         maplocalleader = " ";
+        vimtex_syntax_enabled = 1;
       };
       opts = {
         tabstop = 2;
@@ -155,6 +156,15 @@
           command = "let v:swapchoice = 'e'";
           desc = "Edit file anyway when swap exists";
         }
+        {
+          event = "FileType";
+          pattern = "tex";
+          callback.__raw = ''
+            function()
+              vim.treesitter.stop()
+            end
+          '';
+        }
       ] ++ map (a: {
         event = a.event;
         pattern = a.pattern;
@@ -186,32 +196,6 @@
         nvim-autopairs.enable = true;
         comment.enable = true;
         which-key.enable = true;
-        cmp = {
-          enable = true;
-          settings = {
-            sources = [
-              { name = "nvim_lsp"; }
-              { name = "buffer"; }
-              { name = "path"; }
-              { name = "luasnip"; }
-            ];
-            mapping = {
-              "<C-Space>" = "cmp.mapping.complete()";
-              "<C-e>" = "cmp.mapping.abort()";
-              "<CR>" = "cmp.mapping.confirm({ select = true })";
-              "<Tab>" = "cmp.mapping.select_next_item()";
-              "<S-Tab>" = "cmp.mapping.select_prev_item()";
-            };
-          };
-        };
-
-        luasnip = {
-          enable = true;
-          settings = {
-            region_check_events = "InsertEnter";
-            delete_check_events = "TextChanged,InsertLeave";
-          };
-        };
       } // config.minima.vim.plugins;
     };
   };
