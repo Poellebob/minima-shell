@@ -18,9 +18,9 @@ bindsym $mod+Mod1+k move right nomode after
 bindsym --no-repeat $mod+tab scale_workspace overview
 
 # Screenshots
-bindsym Print exec grim -g "$(slurp)" - | convert - -shave 1x1 PNG:- | wl-copy
+bindsym Print exec grim -g "$(slurp)" - | magick - -shave 1x1 PNG:- | wl-copy
 bindsym Shift+Print exec grim - | wl-copy
-bindsym $mod+Print exec grim -g "$(slurp)" - | convert - -shave 1x1 PNG:- | swappy -f -
+bindsym $mod+Print exec grim -g "$(slurp)" - | magick - -shave 1x1 PNG:- | swappy -f -
 bindsym $mod+Shift+Print exec grim - | swappy -f -
 
 # Focus movementv

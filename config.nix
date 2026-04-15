@@ -147,6 +147,9 @@ in {
 
     home.file.".config/minima/config.ini" = {
       text = ''
+        [System]
+        wm = ${cfg.wm}
+
         [Theme]
         darkTheme = ${boolStr cfg.minimaConfig.darkTheme}
 

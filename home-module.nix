@@ -15,7 +15,7 @@ in {
     home.packages = with pkgs; [
       matugen wiremix bluetui hyprlock bluez bluez-tools upower
       grim slurp swappy swww xdg-utils cliphist wl-clipboard quickshell
-      wireplumber jq bc power-profiles-daemon brightnessctl libnotify
+      wireplumber jq bc power-profiles-daemon brightnessctl libnotify inotify-tools
       nerd-fonts.jetbrains-mono lazygit papirus-icon-theme
       rose-pine-cursor qt5.qtwayland qt6.qtwayland kdePackages.qt6ct 
       linux-wallpaperengine libqalculate
@@ -245,14 +245,14 @@ in {
       '';
     };
 
-    home.file.".config/scroll/set-xft-dpi.sh" = mkIf (cfg.wm == "scroll") { source = ./config/sway/set-xft-dpi.sh; executable = true; };
-    home.file.".config/scroll/config" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config; };
-    home.file.".config/scroll/config.d/keybinds" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/keybinds; };
-    home.file.".config/scroll/config.d/workspace" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/workspace; };
-    home.file.".config/scroll/config.d/application-behavior" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/application-behavior; };
-    home.file.".config/scroll/config.d/env" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/env; };
-    home.file.".config/scroll/config.d/input" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/input; };
-    home.file.".config/scroll/config.d/application-style" = mkIf (cfg.wm == "scroll") { source = ./config/sway/config.d/application-style; };
+    home.file.".config/scroll/set-xft-dpi.sh" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/set-xft-dpi.sh; executable = true; };
+    home.file.".config/scroll/config" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config; };
+    home.file.".config/scroll/config.d/keybinds" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/keybinds; };
+    home.file.".config/scroll/config.d/workspace" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/workspace; };
+    home.file.".config/scroll/config.d/application-behavior" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/application-behavior; };
+    home.file.".config/scroll/config.d/env" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/env; };
+    home.file.".config/scroll/config.d/input" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/input; };
+    home.file.".config/scroll/config.d/application-style" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/application-style; };
     home.file.".config/scroll/config.d/terminal" = mkIf (cfg.wm == "scroll") { text = "set $terminal ${cfg.terminal.name}"; };
 
     home.file.".config/hypr/suspend.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/suspend.sh; executable = true; };
@@ -275,13 +275,18 @@ in {
       executable = true; 
     };
 
+    home.file.".local/bin/minima" = mkIf (cfg.wm != null) {
+      source = ./shell/minima;
+      executable = true;
+    };
+
     home.file.".config/qalculate/qalc.cfg".source = ./config/qalculate/qalc.cfg;
 
-    home.file.".config/minima/colors/config.toml".source = ./config/matugen/config.toml;
-    home.file.".config/minima/colors/quickshell.template.json".source = ./config/matugen/quickshell.template.json;
-
     home.activation.minimaBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      cp -n ${./defaults/quickshell.json} $HOME/.config/minima/colors/quickshell.json
+      mkdir -p $HOME/.config/minima/colors
+      cp -f ${./config/matugen/config.toml} $HOME/.config/minima/colors/config.toml
+      cp -f ${./config/matugen/quickshell.template.json} $HOME/.config/minima/colors/quickshell.template.json
+      cp -n ${./quickshell.json} $HOME/.config/minima/colors/quickshell.json
       chmod 644 $HOME/.config/minima/colors/quickshell.json
     '';
   };

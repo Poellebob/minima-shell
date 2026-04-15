@@ -39,6 +39,7 @@ MenuPanel {
     bodySupported:    true
     onNotification: (notif) => {
       notif.tracked = true
+      console.log(notifServer.trackedNotifications.values.length)
     }
   }
   Item {
@@ -73,18 +74,18 @@ MenuPanel {
             color: Global.colors.on_surface_variant
           }
           Text {
-            visible: notifServer.trackedNotifications.values.count > 0
-            text: notifServer.trackedNotifications.values.count + " unread"
+            visible: notifServer.trackedNotifications.values.length > 0
+            text: notifServer.trackedNotifications.values.length + " unread"
             font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: Global.format.text_size
             color: Global.colors.outline
           }
           Item { Layout.fillWidth: true }
           StyledButton {
-            visible: notifServer.trackedNotifications.values.count > 0
+            visible: notifServer.trackedNotifications.values.length > 0
             implicitHeight: Global.format.module_height
             onClicked: {
-              for (let i = notifServer.trackedNotifications.values.count - 1; i >= 0; i--) {
+              for (let i = notifServer.trackedNotifications.values.length - 1; i >= 0; i--) {
                 notifServer.trackedNotifications[i].dismiss()
               }
             }
@@ -102,7 +103,7 @@ MenuPanel {
           color:  Global.colors.surface
           Text {
             anchors.centerIn: parent
-            visible: notifServer.trackedNotifications.values.count === 0
+            visible: notifServer.trackedNotifications.values.length === 0
             text: "No notifications"
             color: Global.colors.outline
             font.pixelSize: Global.format.text_size

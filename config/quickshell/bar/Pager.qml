@@ -18,11 +18,12 @@ ModuleBase {
   property bool i3: false
 
   Component.onCompleted: {
-    switch (Quickshell.env("WM")) {
-    case "Hyprland":
+    switch (Global.settings["System"]["wm"]) {
+    case "hyprland":
       pagerRoot.hyprland = true;
       break;
     case "sway":
+    case "swayfx":
     case "scroll":
       pagerRoot.i3 = true;
       break;

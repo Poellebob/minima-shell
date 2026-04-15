@@ -14,7 +14,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixvim.url = "github:nix-community/nixvim";
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      #inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     scroll-flake = {
       url = "github:Diax170/scroll-flake";
@@ -37,6 +40,7 @@
         scroll-flake.nixosModules.default
         ./nixos-module.nix
       ];
+      _module.args.scroll-flake = scroll-flake;
     };
     nixosModules.default = self.nixosModules.minima;
   };
