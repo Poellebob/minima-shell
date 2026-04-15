@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, scroll-flake, ... }:
 
 with lib;
 let
@@ -13,13 +13,13 @@ in {
       programs.sway = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
         enable = true;
         wrapperFeatures.gtk = true;
-        extraPackages = with pkgs; [];
       };
       programs.hyprland = mkIf (cfg.wm == "hyprland") {
         enable = true;
       };
       programs.scroll = mkIf (cfg.wm == "scroll") {
         enable = true;
+        wrapperFeatures.gtk = true;
       };
       home-manager.sharedModules = [
         {

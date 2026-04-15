@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+LINK="$HOME/.config/quickshell/shell.qml"
+
+QS_PID=""
+
+start_qs() {
+  nohup qs > /dev/null 2>&1 &
+  QS_PID=$!
+  disown "$QS_PID"
+}
+
+stop_qs() {
+  if [[ -n "${QS_PID:-}" ]] && kill -0 "$QS_PID" 2>/dev/null; then
+    kill "$QS_PID"
+    wait "$QS_PID" 2>/dev/null || true
+  fi
+}
+
+get_target() {
+  readlink -f "$LINK" 2>/dev/null || true
+}
+
+cleanup() {
+  stop_qs
+  exit 0
+}
+
+main() {
+  trap cleanup INT TERM EXIT
+
+  current_target="$(get_target)"
+
+  start_qs
+
+  while true; do
+    sleep 0.5
+
+    new_target="$(get_target)"
+
+    # skip if unchanged
+    [[ "$new_target" == "$current_target" ]] && continue
+
+    current_target="$new_target"
+
+    stop_qs
+    start_qs
+  done
+}
+
+main
