@@ -11,26 +11,26 @@
             nixd.enable = true;
             lua_ls.enable = true;
 
-            texlab = {
-              enable = config.minima.tex.enable;
-
-              settings.texlab = {
-                build = {
-                  executable = "latexmk";
-                  args = [
-                    "-pdf"
-                    "-interaction=nonstopmode"
-                    "-synctex=1"
-                  ];
-                  onSave = true;
-                };
-
-                chktex = {
-                  onOpenAndSave = true;
-                  onEdit = true;
-                };
-              };
-            };
+            # texlab = {
+            #   enable = config.minima.tex.enable;
+            #
+            #   settings.texlab = {
+            #     build = {
+            #       executable = "latexmk";
+            #       args = [
+            #         "-pdf"
+            #         "-interaction=nonstopmode"
+            #         "-synctex=1"
+            #       ];
+            #       onSave = true;
+            #     };
+            #
+            #     chktex = {
+            #       onOpenAndSave = true;
+            #       onEdit = true;
+            #     };
+            #   };
+            # };
           };
         };
 
@@ -67,6 +67,12 @@
 
         vimtex = {
           enable = config.minima.tex.enable;
+          texlivePackage = lib.optionals config.minima.tex.enable (
+            pkgs.texlive.combine (
+              { ${config.minima.tex.scheme} = pkgs.texlive.${config.minima.tex.scheme}; }
+              // lib.optionalAttrs (config.minima.tex.packages != null) config.minima.tex.packages
+            )
+          );
 
           settings = {
             view_method = "zathura";
@@ -99,22 +105,6 @@
           };
         };
       };
-
-      extraConfigLua = ''
-        local cmp = require("cmp")
-
-        cmp.setup.filetype("tex", {
-          sources = cmp.config.sources({
-            { name = "latex_symbols" },
-            { name = "vimtex" },
-            { name = "luasnip" },
-            { name = "buffer" },
-            { name = "path" },
-          }, {
-            { name = "nvim_lsp" },
-          }),
-        })
-      '';
     };
   };
 }
