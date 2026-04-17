@@ -116,9 +116,9 @@ in {
     home.file.".config/minima/hypr.conf" = mkIf (cfg.wm == "hyprland") {
       text = ''
         $mainMod = ${cfg.modifier}
-        $terminal = ${cfg.terminal.name}
-        $fileManager = ${cfg.apps.fileManager}
-        $browser = ${cfg.apps.browser}
+        $terminal = ${cfg.programs.terminal.name}
+        $fileManager = ${cfg.programs.fileManager.name}
+        $browser = ${cfg.programs.browser.name}
         $layout = ${cfg.hypr.layout}
 
         ${concatMapStringsSep "\n" hyprMonitorLine cfg.displays}
@@ -128,8 +128,8 @@ in {
     home.file.".config/minima/sway.conf" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx" || cfg.wm == "scroll") {
       text = ''
         set $mod ${cfg.modifier}
-        set $fileManager ${cfg.apps.fileManager}
-        set $browser ${cfg.apps.browser}
+        set $fileManager ${cfg.programs.fileManager.name}
+        set $browser ${cfg.programs.browser.name}
 
         # display definitions
         ${concatMapStringsSep "\n" swayOutputBlock cfg.displays}

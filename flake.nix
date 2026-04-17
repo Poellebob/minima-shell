@@ -40,7 +40,9 @@
         scroll-flake.nixosModules.default
         ./nixos-module.nix
       ];
-      _module.args.scroll-flake = scroll-flake;
+      _module.args = {
+        inherit scroll-flake;
+      };
     };
     nixosModules.default = self.nixosModules.minima;
   };

@@ -1,6 +1,33 @@
 { lib, pkgs, ... }:
 
 with lib;
+let
+  dolphinOverlaySpec = final: prev: {
+    kdePackages = prev.kdePackages.overrideScope (kfinal: kprev: {
+      dolphin = prev.symlinkJoin {
+        name = "dolphin-wrapped";
+        paths = [
+          kprev.dolphin
+          kprev.ark
+          kprev.kio
+          kprev.kio-fuse
+          kprev.kio-extras
+          kprev.kservice
+          kprev.kde-cli-tools
+          kprev.kfilemetadata
+          kprev.solid
+        ];
+        nativeBuildInputs = [ prev.makeWrapper ];
+        postBuild = ''
+          rm $out/bin/dolphin
+          makeWrapper ${kprev.dolphin}/bin/dolphin $out/bin/dolphin \
+            --set XDG_CONFIG_DIRS "${kprev.kservice}/etc/xdg:$XDG_CONFIG_DIRS"
+        '';
+      };
+    });
+  };
+  pkgsPatched = pkgs.extend dolphinOverlaySpec;
+in
 {
   options.minima = {
     enable = mkEnableOption "Minima shell";
@@ -12,8 +39,22 @@ with lib;
     };
     enableNvidia   = mkOption { type = types.bool;   default = false; internal = true; };
     modifier       = mkOption { type = types.str;    default = "Mod4"; internal = true; };
-    apps.fileManager = mkOption { type = types.str;  default = "dolphin"; internal = true; };
-    apps.browser     = mkOption { type = types.str;  default = "zen-browser"; internal = true; };
+    programs = {
+      terminal = {
+        name    = mkOption { type = types.str;     default = "kitty"; };
+        package = mkOption { type = types.package; default = pkgs.kitty; };
+      };
+
+      fileManager = {
+        name    = mkOption { type = types.str;     default = "dolphin"; };
+        package = mkOption { type = types.package; default = pkgsPatched.kdePackages.dolphin; };
+      };
+
+      browser = {
+        name    = mkOption { type = types.str;     default = "firefox"; };
+        package = mkOption { type = types.package; default = pkgs.firefox; };
+      };
+    };
     hypr.layout    = mkOption {
       type = types.enum [ "dwindle" "master" ];
       default = "dwindle";
@@ -52,11 +93,6 @@ with lib;
       description = "Show 'minima' as XDG_CURRENT_DESKTOP";
     };
 
-    terminal = {
-      name    = mkOption { type = types.str;     default = "kitty"; };
-      package = mkOption { type = types.package; default = pkgs.kitty; };
-    };
-
     shell.enable = mkOption {
       type = types.bool;
       default = true;
@@ -66,6 +102,19 @@ with lib;
     extraPackages = mkOption {
       type = types.listOf types.package;
       default = [];
+    };
+
+    desktop = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable desktop integration (Dolphin, XDG portals, KDE packages)";
+      };
+      xdgPortal = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable XDG desktop portals (kde + gtk)";
+      };
     };
 
     tex = {
@@ -94,16 +143,20 @@ with lib;
         alwaysVisible = mkOption { type = types.bool; default = true; };
       };
 
-    launcher = {
-      enable = mkOption { type = types.bool; default = true; };
-      qalcPath = mkOption { type = types.str; default = "${pkgs.libqalculate}/bin/qalc"; };
-    };
+      launcher = {
+        enable = mkOption { type = types.bool; default = true; };
+        qalcPath = mkOption { type = types.str; default = "${pkgs.libqalculate}/bin/qalc"; };
+      };
 
-    clipboard.enable = mkOption { type = types.bool; default = true; };
+      clipboard.enable = mkOption { type = types.bool; default = true; };
 
       wallpaper = {
         enable        = mkOption { type = types.bool; default = true; };
-        engineEnabled = mkOption { type = types.bool; default = false; };
+        engineEnabled = mkOption {
+          description = "Enable wallpaper engine support";
+          type = types.bool; 
+          default = false; 
+        };
         enginePath    = mkOption { type = types.str;  default = ""; };
         workshopPath  = mkOption {
           type    = types.str;

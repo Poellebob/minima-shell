@@ -19,14 +19,21 @@ in {
       nerd-fonts.jetbrains-mono lazygit papirus-icon-theme
       rose-pine-cursor qt5.qtwayland qt6.qtwayland kdePackages.qt6ct 
       linux-wallpaperengine libqalculate
-      cfg.terminal.package
+      cfg.programs.terminal.package
+      cfg.programs.fileManager.package
+      cfg.programs.browser.package
+    ]
+    ++ optionals cfg.desktop.enable [
+      kdePackages.breeze
+      kdePackages.breeze-gtk
+      kdePackages.breeze-icons
     ]
     ++ optionals cfg.shell.enable [ fzf zoxide git afetch ]
     ++ cfg.extraPackages
     ++ optionals cfg.tex.enable [
       (pkgs.texlive.combine (
-        optionalAttrs (cfg.tex.scheme != null) { ${cfg.tex.scheme} = pkgs.texlive.${cfg.tex.scheme}; }
-        // optionalAttrs (cfg.tex.packages != null) cfg.tex.packages
+        { ${config.minima.tex.scheme} = pkgs.texlive.${config.minima.tex.scheme}; }
+          // lib.optionalAttrs (config.minima.tex.packages != null) config.minima.tex.packages
       ))
     ];
 
@@ -185,7 +192,7 @@ in {
       };
     };
 
-    programs.kitty = mkIf (cfg.terminal.name == "kitty") {
+    programs.kitty = mkIf (cfg.programs.terminal.name == "kitty") {
       enable = true;
       settings = {
         clear_all_shortcuts = true;
@@ -235,7 +242,7 @@ in {
     home.file.".config/sway/config.d/env" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/env; };
     home.file.".config/sway/config.d/input" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/input; };
     home.file.".config/sway/config.d/application-style" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/application-style; };
-    home.file.".config/sway/config.d/terminal" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { text = "set $terminal ${cfg.terminal.name}"; };
+    home.file.".config/sway/config.d/terminal" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { text = "set $terminal ${cfg.programs.terminal.name}"; };
     home.file.".config/sway/config.d/fx" = mkIf (cfg.wm == "swayfx") {
       text = ''
         corner_radius 8
@@ -253,7 +260,7 @@ in {
     home.file.".config/scroll/config.d/env" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/env; };
     home.file.".config/scroll/config.d/input" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/input; };
     home.file.".config/scroll/config.d/application-style" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/application-style; };
-    home.file.".config/scroll/config.d/terminal" = mkIf (cfg.wm == "scroll") { text = "set $terminal ${cfg.terminal.name}"; };
+    home.file.".config/scroll/config.d/terminal" = mkIf (cfg.wm == "scroll") { text = "set $terminal ${cfg.programs.terminal.name}"; };
 
     home.file.".config/hypr/suspend.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/suspend.sh; executable = true; };
     home.file.".config/hypr/hyprland.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/hyprland.conf; };
@@ -267,7 +274,7 @@ in {
     home.file.".config/hypr/components/application-behavior.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/application-behavior.conf; };
     home.file.".config/hypr/components/application-style.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/application-style.conf; };
     home.file.".config/hypr/components/keybinds.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/keybinds.conf; };
-    home.file.".config/hypr/terminal.conf" = mkIf (cfg.wm == "hyprland") { text = "$terminal = ${cfg.terminal.name}"; };
+    home.file.".config/hypr/terminal.conf" = mkIf (cfg.wm == "hyprland") { text = "$terminal = ${cfg.programs.terminal.name}"; };
 
     home.file.".config/quickshell/".source = ./config/quickshell;
     home.file.".config/quickshell/scripts/sysfetch.sh" = { 

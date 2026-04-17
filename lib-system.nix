@@ -50,9 +50,17 @@ in {
       default = "Mod4";
     };
 
-    apps = {
-      fileManager = mkOption { type = types.str; default = "dolphin"; };
-      browser     = mkOption { type = types.str; default = "zen-browser"; };
+    programs = {
+      terminal = {
+        name = mkOption { type = types.str; default = "kitty"; };
+      };
+      fileManager = {
+        name = mkOption { type = types.str; default = "dolphin"; };
+      };
+      browser = {
+        name = mkOption { type = types.str; default = "firefox"; };
+        package = mkOption { type = types.package; default = pkgs.firefox; };
+      };
     };
 
     hypr.layout = mkOption {
@@ -95,6 +103,19 @@ in {
         type = types.nullOr (types.attrsOf types.anything);
         default = null;
         description = "Extra texlive packages as an attrset, e.g. { inherit (pkgs.texlive) dvisvgm dvipng; }";
+      };
+    };
+
+    desktop = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable desktop integration (Dolphin, XDG portals, KDE packages)";
+      };
+      xdgPortal = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable XDG desktop portals (kde + gtk)";
       };
     };
   };
