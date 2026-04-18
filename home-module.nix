@@ -19,15 +19,26 @@ in {
       nerd-fonts.jetbrains-mono lazygit papirus-icon-theme
       rose-pine-cursor qt5.qtwayland qt6.qtwayland kdePackages.qt6ct 
       linux-wallpaperengine libqalculate
+      kdePackages.breeze
+      kdePackages.breeze-gtk
+      kdePackages.breeze-icons
       cfg.programs.terminal.package
       cfg.programs.fileManager.package
       cfg.programs.browser.package
     ]
-    ++ optionals cfg.desktop.enable [
-      kdePackages.breeze
-      kdePackages.breeze-gtk
-      kdePackages.breeze-icons
-    ]
+    ++ optionals (cfg.programs.fileManager.package == pkgs.kdePackages.dolphin) [
+        kdePackages.kio
+        kdePackages.kdf
+        kdePackages.kio-fuse
+        kdePackages.kio-extras
+        kdePackages.kio-admin
+        kdePackages.qtwayland
+        kdePackages.plasma-integration
+        kdePackages.kdegraphics-thumbnailers
+        kdePackages.breeze-icons
+        kdePackages.qtsvg
+        kdePackages.kservice
+      ]
     ++ optionals cfg.shell.enable [ fzf zoxide git afetch ]
     ++ cfg.extraPackages
     ++ optionals cfg.tex.enable [
@@ -36,6 +47,16 @@ in {
           // lib.optionalAttrs (config.minima.tex.packages != null) config.minima.tex.packages
       ))
     ];
+
+    xdg.mime.enable = true;
+    xdg.portal = mkIf cfg.desktop.xdgPortal {
+      enable = true;
+      extraPortals = [
+        pkgs.xdg-desktop-portal-gtk
+        pkgs.kdePackages.xdg-desktop-portal-kde
+      ];
+      config.common.default = [ "kde" "gtk" ];
+    };
 
     qt = mkIf cfg.theming.enable {
       enable = true;
