@@ -2,31 +2,36 @@
 
 with lib;
 let
-  dolphinOverlaySpec = final: prev: {
-    kdePackages = prev.kdePackages.overrideScope (kfinal: kprev: {
-      dolphin = prev.symlinkJoin {
-        name = "dolphin-wrapped";
-        paths = [
-          kprev.dolphin
-          kprev.ark
-          kprev.kio
-          kprev.kio-fuse
-          kprev.kio-extras
-          kprev.kservice
-          kprev.kde-cli-tools
-          kprev.kfilemetadata
-          kprev.solid
-        ];
-        nativeBuildInputs = [ prev.makeWrapper ];
-        postBuild = ''
-          rm $out/bin/dolphin
-          makeWrapper ${kprev.dolphin}/bin/dolphin $out/bin/dolphin \
-            --set XDG_CONFIG_DIRS "${kprev.kservice}/etc/xdg:$XDG_CONFIG_DIRS"
-        '';
+  displayType = types.submodule {
+    options = {
+      name     = mkOption { type = types.str;   default = ""; };
+      res      = mkOption { type = types.str;   default = "preferred"; };
+      hz       = mkOption { type = types.nullOr types.int; default = null; };
+      position = {
+        x = mkOption { type = types.int; default = 0; };
+        y = mkOption { type = types.int; default = 0; };
       };
-    });
+      scale = mkOption { type = types.float; default = 1.0; };
+    };
   };
-  pkgsPatched = pkgs.extend dolphinOverlaySpec;
+
+  workspaceOutputType = types.submodule {
+    options = {
+      workspace = mkOption { type = types.str; };
+      output    = mkOption { type = types.str; };
+    };
+  };
+
+  specialWorkspaceType = types.submodule {
+    options = {
+      name         = mkOption { type = types.str; };
+      key          = mkOption { type = types.str; };
+      rule         = mkOption { type = types.str; };
+      autostart    = mkOption { type = types.bool; default = false; };
+      startCommand = mkOption { type = types.str;  default = ""; };
+    };
+  };
+
 in
 {
   options.minima = {
@@ -47,7 +52,7 @@ in
 
       fileManager = {
         name    = mkOption { type = types.str;     default = "dolphin"; };
-        package = mkOption { type = types.package; default = pkgsPatched.kdePackages.dolphin; };
+        package = mkOption { type = types.package; default = pkgs.kdePackages.dolphin; };
       };
 
       browser = {
@@ -61,12 +66,12 @@ in
       internal = true;
     };
     displays = mkOption {
-      type = types.listOf types.anything;
+      type = types.listOf displayType;
       default = [];
       internal = true;
     };
     workspaceOutputs = mkOption {
-      type = types.listOf types.anything;
+      type = types.listOf workspaceOutputType;
       default = [];
       internal = true;
     };
@@ -76,7 +81,7 @@ in
       internal = true;
     };
     specialWorkspaces = mkOption {
-      type = types.listOf types.anything;
+      type = types.listOf specialWorkspaceType;
       default = [];
       internal = true;
     };

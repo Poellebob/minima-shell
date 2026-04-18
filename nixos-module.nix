@@ -5,6 +5,7 @@ let
   cfg = config.minima;
 in {
   imports = [
+    ./lib.nix
     ./lib-system.nix
   ];
 
@@ -29,6 +30,11 @@ in {
             modifier          = mkDefault cfg.modifier;
             programs              = mkDefault cfg.programs;
             hypr.layout       = mkDefault cfg.hypr.layout;
+            theming          = mkDefault cfg.theming;
+            enableBranding   = mkDefault cfg.enableBranding;
+            shell           = mkDefault cfg.shell;
+            extraPackages    = mkDefault cfg.extraPackages;
+            minimaConfig    = mkDefault cfg.minimaConfig;
             displays          = mkDefault cfg.displays;
             workspaceOutputs  = mkDefault cfg.workspaceOutputs;
             autostart         = mkDefault cfg.autostart;
@@ -48,23 +54,15 @@ in {
       ];
     })
     (mkIf cfg.desktop.xdgPortal {
+      environment.systemPackages = with pkgs; [
+        kdePackages.plasma-workspace
+      ];
+      environment.etc."/xdg/menus/applications.menu".text = builtins.readFile "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
       xdg.mime.enable = true;
       xdg.portal = {
         enable = true;
         wlr.enable = true;
-        extraPortals = [
-          pkgs.xdg-desktop-portal-gtk
-          pkgs.kdePackages.xdg-desktop-portal-kde
-        ];
-        config.common.default = [ "kde" "gtk" ];
       };
-    })
-    (mkIf cfg.desktop.enable {
-      environment.systemPackages = with pkgs; [
-        kdePackages.breeze
-        kdePackages.breeze-gtk
-        kdePackages.breeze-icons
-      ];
     })
   ];
 }
