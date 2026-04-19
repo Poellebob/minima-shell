@@ -42,22 +42,33 @@ A NixOS/home-manager flake providing a Wayland-focused desktop environment with 
             enable = true;
             wm = "hyprland";  # hyprland, sway, swayfx, or scroll
           };
-        }
+          home-manager.users.<username> = {
+            home.stateVersion = "25.11";
+            imports = [ 
+              minima.homeModules.default 
+            ];
+            minima = {
+              enable = true;
+              shell.enable = true;
+              theming.enable = true;
+              enableBranding = true;
+              minimaConfig = {
+                darkTheme = true;
+                wallpaper.engineEnabled = true;
+                panel.alwaysVisible = true;
+              };
+
+              vim = {
+                enable = true;
+              };
+            };
+          };
+        };
       ];
     };
   };
 }
 ```
-
-### Flake Inputs
-
-| Input | URL | Description |
-|-------|-----|-------------|
-| `nixpkgs` | `github:nixos/nixpkgs/nixos-unstable` | Nixpkgs unstable |
-| `home-manager` | `github:nix-community/home-manager` | Home Manager |
-| `stylix` | `github:nix-community/stylix` | System theming |
-| `nixvim` | `github:nix-community/nixvim` | Neovim configuration |
-| `scroll-flake` | `github:Diax170/scroll-flake` | Scroll WM support |
 
 ### Flake Outputs
 
