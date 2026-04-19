@@ -13,7 +13,7 @@ in {
 
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
-      matugen wiremix bluetui hyprlock bluez bluez-tools upower
+      matugen wiremix bluetui hyprlock bluez bluez-tools upower curl
       grim slurp swappy swww xdg-utils cliphist wl-clipboard quickshell
       wireplumber jq bc power-profiles-daemon brightnessctl libnotify inotify-tools
       nerd-fonts.jetbrains-mono lazygit papirus-icon-theme
@@ -50,14 +50,43 @@ in {
       ))
     ];
 
-    xdg.mime.enable = true;
+    home.activation.downloadVimSpellfiles = lib.hm.dag.entryAfter [ "writeBoundary" ]
+      (lib.optionalString (cfg.tex.spell != []) ''
+        mkdir -p $HOME/.local/share/nvim/site/spell
+        cd $HOME/.local/share/nvim/site/spell || exit 1
+        ${lib.concatMapStringsSep "\n" (lang: ''
+          if [[ ! -f "${lang}.utf-8.spl" ]]; then
+            ${pkgs.curl}/bin/curl -fsSL -O "https://ftp.nluug.nl/pub/vim/runtime/spell/${lang}.utf-8.spl"
+            ${pkgs.curl}/bin/curl -fsSL -O "https://ftp.nluug.nl/pub/vim/runtime/spell/${lang}.utf-8.sug"
+          fi
+        '') cfg.tex.spell}
+      '');
+
     xdg.portal = mkIf cfg.desktop.xdgPortal {
       enable = true;
       extraPortals = [
         pkgs.xdg-desktop-portal-gtk
         pkgs.kdePackages.xdg-desktop-portal-kde
+      ]
+      ++ lib.optionals (cfg.wm == "sway" || cfg.wm == "swayfx" || cfg.wm == "scroll") [
+        pkgs.xdg-desktop-portal-wlr
+      ]
+      ++ lib.optionals (cfg.wm == "hyprland") [
+        pkgs.xdg-desktop-portal-hyprland
       ];
-      config.common.default = [ "kde" "gtk" ];
+      config = {
+        common.default = [ "kde" "gtk" ];
+      }
+      // lib.optionalAttrs (cfg.wm == "sway" || cfg.wm == "swayfx" || cfg.wm == "scroll") {
+        sway = {
+          ScreenCast = [ "wlr" ];
+        };
+      }
+      // lib.optionalAttrs (cfg.wm == "hyprland") {
+        hyprland = {
+          ScreenCast = [ "hyprland" ];
+        };
+      };
     };
 
     qt = mkIf cfg.theming.enable {

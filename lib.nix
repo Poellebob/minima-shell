@@ -138,6 +138,11 @@ in
         default = null;
         description = "Extra texlive packages as an attrset, e.g. { inherit (pkgs.texlive) dvisvgm dvipng; }";
       };
+      spell = mkOption {
+        type = types.listOf types.str;
+        default = [];
+        description = "List of language codes for neovim spellfiles (e.g. [\"en\" \"de\"])";
+      };
     };
 
     minimaConfig = {
