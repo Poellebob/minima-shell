@@ -108,6 +108,25 @@ let
     bindsym ${cfg.modifier}+${ws.key} [workspace=$ws_${ws.name}] move workspace to output current, workspace $ws_${ws.name}
   '';
 
+  swayfxConfig = ''
+    # corner rounding
+    corner_radius 8
+
+    # window shadows
+    shadows enable
+    shadow_blur_radius 4
+    shadow_color #1a1a1aee
+    shadow_offset 0 2
+
+    # blur
+    blur enable
+    blur_radius 4
+    blur_passes 2
+
+    for_window [app_id=".*"] blur enable
+    for_window [class=".*"] blur enable
+  '';
+
   boolStr = b: if b then "true" else "false";
 
 in {
@@ -142,6 +161,8 @@ in {
 
         # special workspaces
         ${concatMapStringsSep "\n" swaySpecialWs cfg.specialWorkspaces}
+
+        ${optionalString (cfg.wm == "swayfx") swayfxConfig}
       '';
     };
 

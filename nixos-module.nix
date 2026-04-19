@@ -14,6 +14,12 @@ in {
       programs.sway = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
         enable = true;
         wrapperFeatures.gtk = true;
+        package = pkgs.${cfg.wm}.overrideAttrs (old: {
+          buildCommand = ''
+            ${old.buildCommand}
+            wrapProgram $out/bin/sway ${lib.optionalString cfg.enableNvidia "--add-flags --unsupported-gpu"}
+          '';
+        });
       };
       programs.hyprland = mkIf (cfg.wm == "hyprland") {
         enable = true;
@@ -28,13 +34,13 @@ in {
             wm                = mkDefault cfg.wm;
             enableNvidia      = mkDefault cfg.enableNvidia;
             modifier          = mkDefault cfg.modifier;
-            programs              = mkDefault cfg.programs;
+            programs          = mkDefault cfg.programs;
             hypr.layout       = mkDefault cfg.hypr.layout;
-            theming          = mkDefault cfg.theming;
-            enableBranding   = mkDefault cfg.enableBranding;
-            shell           = mkDefault cfg.shell;
-            extraPackages    = mkDefault cfg.extraPackages;
-            minimaConfig    = mkDefault cfg.minimaConfig;
+            theming           = mkDefault cfg.theming;
+            enableBranding    = mkDefault cfg.enableBranding;
+            shell             = mkDefault cfg.shell;
+            extraPackages     = mkDefault cfg.extraPackages;
+            minimaConfig      = mkDefault cfg.minimaConfig;
             displays          = mkDefault cfg.displays;
             workspaceOutputs  = mkDefault cfg.workspaceOutputs;
             autostart         = mkDefault cfg.autostart;
@@ -62,6 +68,11 @@ in {
       xdg.portal = {
         enable = true;
         wlr.enable = true;
+        extraPortals = [
+          pkgs.xdg-desktop-portal-gtk
+          pkgs.kdePackages.xdg-desktop-portal-kde
+        ];
+        config.common.default = [ "kde" "gtk" ];
       };
     })
   ];
