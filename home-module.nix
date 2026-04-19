@@ -27,6 +27,8 @@ in {
       cfg.programs.browser.package
     ]
     ++ optionals (cfg.programs.fileManager.package == pkgs.kdePackages.dolphin) [
+        kdePackages.ark
+        kdePackages.plasma-workspace
         kdePackages.kio
         kdePackages.kdf
         kdePackages.kio-fuse
