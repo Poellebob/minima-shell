@@ -4,7 +4,6 @@ with lib;
 let
   displayType = types.submodule {
     options = {
-      name     = mkOption { type = types.str;   default = ""; };
       res      = mkOption { type = types.str;   default = "preferred"; };
       hz       = mkOption { type = types.nullOr types.int; default = null; };
       position = {
@@ -12,6 +11,7 @@ let
         y = mkOption { type = types.int; default = 0; };
       };
       scale = mkOption { type = types.float; default = 1.0; };
+      workspace = mkOption { type = types.nullOr (types.either types.int types.str); default = null; };
     };
   };
 
@@ -24,9 +24,11 @@ let
 
   specialWorkspaceType = types.submodule {
     options = {
-      name         = mkOption { type = types.str; };
       key          = mkOption { type = types.str; };
-      rule         = mkOption { type = types.str; };
+      rule = mkOption {
+        type = types.attrsOf (types.listOf types.str);
+        default = {};
+      };
       autostart    = mkOption { type = types.bool; default = false; };
       startCommand = mkOption { type = types.str;  default = ""; };
     };
@@ -66,13 +68,8 @@ in
       internal = true;
     };
     displays = mkOption {
-      type = types.listOf displayType;
-      default = [];
-      internal = true;
-    };
-    workspaceOutputs = mkOption {
-      type = types.listOf workspaceOutputType;
-      default = [];
+      type = types.attrsOf displayType;
+      default = {};
       internal = true;
     };
     autostart = mkOption {
@@ -81,8 +78,8 @@ in
       internal = true;
     };
     specialWorkspaces = mkOption {
-      type = types.listOf specialWorkspaceType;
-      default = [];
+      type = types.attrsOf specialWorkspaceType;
+      default = {};
       internal = true;
     };
 
@@ -167,7 +164,6 @@ in
           type = types.bool; 
           default = false; 
         };
-        enginePath    = mkOption { type = types.str;  default = ""; };
         workshopPath  = mkOption {
           type    = types.str;
           default = "~/.steam/steam/steamapps/workshop/content/431960/";

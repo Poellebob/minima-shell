@@ -1,38 +1,8 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 with lib;
 let
   cfg = config.minima;
-
-  displayType = types.submodule {
-    options = {
-      name = mkOption {
-        type = types.str;
-        default = "";
-        description = "Output name. Empty string means all outputs (hyprland) or '*' (sway).";
-        example = "DP-1";
-      };
-      res = mkOption {
-        type = types.str;
-        default = "preferred";
-        description = "Resolution string, e.g. '1920x1080'. Use 'preferred' to let the compositor decide.";
-      };
-      hz = mkOption {
-        type = types.nullOr types.int;
-        default = null;
-        description = "Refresh rate in Hz. null means auto.";
-        example = 144;
-      };
-      position = {
-        x = mkOption { type = types.int; default = 0; };
-        y = mkOption { type = types.int; default = 0; };
-      };
-      scale = mkOption {
-        type = types.float;
-        default = 1.0;
-      };
-    };
-  };
 
   workspaceOutputType = types.submodule {
     options = {
@@ -48,38 +18,7 @@ let
     };
   };
 
-  specialWorkspaceType = types.submodule {
-    options = {
-      name = mkOption {
-        type = types.str;
-        description = "Workspace name, used as both the variable and the workspace identifier.";
-        example = "discord";
-      };
-      key = mkOption {
-        type = types.str;
-        description = "Key to bind (combined with modifier) for moving this workspace to the current output.";
-        example = "m";
-      };
-      rule = mkOption {
-        type = types.str;
-        description = "Sway assign/for_window criteria string, e.g. 'app_id=\"discord\"'.";
-        example = ''app_id="discord|WebCord"'';
-      };
-      autostart = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to autostart this app.";
-      };
-      startCommand = mkOption {
-        type = types.str;
-        default = "";
-        description = "Command to run on autostart. Only used when autostart = true.";
-        example = "flatpak run com.discordapp.Discord";
-      };
-    };
-  };
-
-  hyprMonitorLine = d:
+  hyprMonitorLine = name: d:
     let
       resHz = if d.hz != null
         then "${d.res}@${toString d.hz}"
@@ -88,11 +27,11 @@ let
         then "auto"
         else "${toString d.position.x}x${toString d.position.y}";
     in
-      "monitor = ${d.name},${resHz},${pos},${toString d.scale}";
+      "monitor = ${name},${resHz},${pos},${toString d.scale}";
 
-  swayOutputBlock = d:
+  swayOutputBlock = name: d:
     let
-      outputName = if d.name == "" then "*" else d.name;
+      outputName = if name == "" then "*" else name;
     in ''
       output ${outputName} {
         res ${d.res}
@@ -100,12 +39,15 @@ let
         scale ${toString d.scale}
       }'';
 
-  swaySpecialWs = ws: ''
-    set $ws_${ws.name} "${ws.name}"
+  swaySpecialWs = name: ws:
+    let
+      ruleStr = lib.concatStringsSep "," (lib.mapAttrsToList (k: vs: "${k}=${lib.concatStringsSep "|" vs}") ws.rule);
+    in ''
+    set $ws_${name} "${name}"
     ${optionalString ws.autostart "exec ${ws.startCommand}"}
-    assign [${ws.rule}] workspace $ws_${ws.name}
-    for_window [${ws.rule}] set_size h 1.0
-    bindsym ${cfg.modifier}+${ws.key} [workspace=$ws_${ws.name}] move workspace to output current, workspace $ws_${ws.name}
+    assign [${ruleStr}] workspace $ws_${name}
+    for_window [${ruleStr}] set_size h 1.0
+    bindsym ${cfg.modifier}+${ws.key} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}
   '';
 
   swayfxConfig = ''
@@ -140,7 +82,9 @@ in {
         $browser = ${cfg.programs.browser.name}
         $layout = ${cfg.hypr.layout}
 
-        ${concatMapStringsSep "\n" hyprMonitorLine cfg.displays}
+        ${lib.concatMapStringsSep "\n" (x: hyprMonitorLine x.name x.value) (lib.mapAttrsToList (n: v: { name = n; value = v; }) cfg.displays)}
+
+        ${lib.concatMapStringsSep "\n" (x: "workspace = ${toString x.value.workspace}, ${x.name}") (lib.mapAttrsToList (n: v: { name = n; value = v; }) (lib.filterAttrs (n: v: v.workspace != null) cfg.displays))}
       '';
     };
 
@@ -151,16 +95,16 @@ in {
         set $browser ${cfg.programs.browser.name}
 
         # display definitions
-        ${concatMapStringsSep "\n" swayOutputBlock cfg.displays}
+        ${lib.concatMapStringsSep "\n" (x: swayOutputBlock x.name x.value) (lib.mapAttrsToList (n: v: { name = n; value = v; }) cfg.displays)}
 
         # workspace → output assignments
-        ${concatMapStringsSep "\n" (w: "workspace ${w.workspace} output ${w.output}") cfg.workspaceOutputs}
+        ${lib.concatMapStringsSep "\n" (x: "workspace ${toString x.value.workspace} output ${x.name}") (lib.mapAttrsToList (n: v: { name = n; value = v; }) (lib.filterAttrs (n: v: v.workspace != null) cfg.displays))}
 
         # autostart
         ${concatMapStringsSep "\n" (a: "exec ${a}") cfg.autostart}
 
         # special workspaces
-        ${concatMapStringsSep "\n" swaySpecialWs cfg.specialWorkspaces}
+        ${lib.concatMapStringsSep "\n" (x: swaySpecialWs x.name x.value) (lib.mapAttrsToList (n: v: { name = n; value = v; }) cfg.specialWorkspaces)}
 
         ${optionalString (cfg.wm == "swayfx") swayfxConfig}
       '';
@@ -188,7 +132,7 @@ in {
         [Wallpaper]
         enabled = ${boolStr cfg.minimaConfig.wallpaper.enable}
         engineEnabled = ${boolStr cfg.minimaConfig.wallpaper.engineEnabled}
-        enginePath = ${cfg.minimaConfig.wallpaper.enginePath}
+        enginePath = ${pkgs.linux-wallpaperengine}/bin/linux-wallpaperengine
         workshopPath = ${cfg.minimaConfig.wallpaper.workshopPath}
         fps = ${toString cfg.minimaConfig.wallpaper.fps}
         fill = ${boolStr cfg.minimaConfig.wallpaper.fill}

@@ -2,7 +2,6 @@
 
 This document details all configuration options available in minima.
 
-For Nix/Flake usage, see [README.md](./README.md).  
 For non-Nix manual setup, see [NONNIX.md](./NONNIX.md).
 
 ---
@@ -89,70 +88,73 @@ For non-Nix manual setup, see [NONNIX.md](./NONNIX.md).
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `minima.displays` | list | `[]` | List of display configurations |
-| `minima.displays[].name` | string | - | Output name (e.g., `"DP-1"`) |
-| `minima.displays[].res` | string | `"preferred"` | Resolution (e.g., `"1920x1080"`) |
-| `minima.displays[].hz` | null/int | `null` | Refresh rate in Hz |
-| `minima.displays[].position.x` | int | `0` | X position |
-| `minima.displays[].position.y` | int | `0` | Y position |
-| `minima.displays[].scale` | float | `1.0` | Display scale |
+| `minima.displays` | attrs | `{}` | Attribute set of display configurations |
+| `minima.displays.<name>.res` | string | `"preferred"` | Resolution (e.g., `"1920x1080"`) |
+| `minima.displays.<name>.hz` | null/int | `null` | Refresh rate in Hz |
+| `minima.displays.<name>.position.x` | int | `0` | X position |
+| `minima.displays.<name>.position.y` | int | `0` | Y position |
+| `minima.displays.<name>.scale` | float | `1.0` | Display scale |
+| `minima.displays.<name>.workspace` | null/int/str | `null` | Workspace to assign to this output |
 
-### Workspace Configuration
+### Autostart
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `minima.workspaceOutputs` | list | `[]` | Workspace to output assignments |
-| `minima.workspaceOutputs[].workspace` | string | - | Workspace number or name |
-| `minima.workspaceOutputs[].output` | string | - | Output name |
 | `minima.autostart` | list | `[]` | List of commands to autostart |
-| `minima.specialWorkspaces` | list | `[]` | Special workspace definitions |
 
 ### Special Workspace Options
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `minima.specialWorkspaces[].name` | string | Workspace name |
-| `minima.specialWorkspaces[].key` | string | Key binding |
-| `minima.specialWorkspaces[].rule` | string | Window rule (app_id/class) |
-| `minima.specialWorkspaces[].autostart` | bool | Autostart app |
-| `minima.specialWorkspaces[].startCommand` | string | Command to run |
+| `minima.specialWorkspaces` | attrs | `{}` | Attribute set of special workspace definitions |
+| `minima.specialWorkspaces.<name>.key` | string | Key binding |
+| `minima.specialWorkspaces.<name>.rule` | attrs | Window rules (e.g., `{ app_id = ["discord"]; class = ["Spotify"]; }`) |
+| `minima.specialWorkspaces.<name>.autostart` | bool | Autostart app |
+| `minima.specialWorkspaces.<name>.startCommand` | string | Command to run |
 
 ### Example
 
 ```nix
 {
-  minima.displays = [
-    {
-      name = "DP-1";
+  minima.displays = {
+    DP-1 = {
       res = "1920x1080";
       hz = 144;
       position.x = 0;
       position.y = 0;
       scale = 1.0;
-    }
-    {
-      name = "HDMI-A-1";
+      workspace = "1";
+    };
+    HDMI-A-1 = {
       res = "1920x1080";
       position.x = 1920;
       position.y = 0;
       scale = 1.0;
-    }
+      workspace = "10";
+    };
+  };
+
+  minima.autostart = [
+    "discord"
   ];
 
-  minima.workspaceOutputs = [
-    { workspace = "1"; output = "DP-1"; }
-    { workspace = "10"; output = "HDMI-A-1"; }
-  ];
-
-  minima.specialWorkspaces = [
-    {
-      name = "Discord";
-      key = "M";
-      rule = "discord";
+  minima.specialWorkspaces = {
+    discord = {
+      key = "m";
+      rule = {
+        app_id = [ "discord" "WebCord" ];
+        class = [ "discord" ];
+      };
       autostart = true;
       startCommand = "discord";
-    }
-  ];
+    };
+    spotify = {
+      key = "s";
+      rule = {
+        class = [ "Spotify" ];
+      };
+    };
+  };
 }
 ```
 
@@ -206,7 +208,6 @@ For non-Nix manual setup, see [NONNIX.md](./NONNIX.md).
 | `minima.minimaConfig.clipboard.enable` | bool | `true` | Enable clipboard manager |
 | `minima.minimaConfig.wallpaper.enable` | bool | `true` | Enable wallpaper |
 | `minima.minimaConfig.wallpaper.engineEnabled` | bool | `false` | Enable wallpaper engine |
-| `minima.minimaConfig.wallpaper.enginePath` | string | `""` | Wallpaper engine path |
 | `minima.minimaConfig.wallpaper.workshopPath` | string | `"~/.steam/steam/steamapps/workshop/content/431960/"` | Workshop path |
 | `minima.minimaConfig.wallpaper.fps` | int | `25` | Animation FPS |
 | `minima.minimaConfig.wallpaper.fill` | bool | `true` | Fill mode |
@@ -351,27 +352,4 @@ The following settings are enabled by default in `nixvim/options.nix`:
 |--------|------|---------|-------------|
 | `minima.hypr.layout` | enum | `"dwindle"` | Layout: `"dwindle"` or `"master"` |
 
----
-
-## Quick Reference: Minimal Config
-
-```nix
-{
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
-  outputs = { self, nixpkgs, ... }: {
-    homeConfigurations."your-user" = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        self.homeModules.minima
-        { 
-          minima = {
-            enable = true;
-            wm = "hyprland";
-          };
-        }
-      ];
-    };
-  };
-}
 ```
