@@ -42,7 +42,6 @@ in {
             extraPackages     = mkDefault cfg.extraPackages;
             minimaConfig      = mkDefault cfg.minimaConfig;
             displays          = mkDefault cfg.displays;
-            workspaceOutputs  = mkDefault cfg.workspaceOutputs;
             autostart         = mkDefault cfg.autostart;
             specialWorkspaces = mkDefault cfg.specialWorkspaces;
             tex               = mkDefault cfg.tex;
