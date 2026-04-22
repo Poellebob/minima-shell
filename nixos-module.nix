@@ -20,13 +20,16 @@ in {
             wrapProgram $out/bin/sway ${lib.optionalString cfg.enableNvidia "--add-flags --unsupported-gpu"}
           '';
         });
+        xwayland.enable = true;
       };
       programs.hyprland = mkIf (cfg.wm == "hyprland") {
         enable = true;
+        xwayland.enable = true;
       };
       programs.scroll = mkIf (cfg.wm == "scroll") {
         enable = true;
         wrapperFeatures.gtk = true;
+        xwayland.enable = true;
       };
       home-manager.sharedModules = [
         {
