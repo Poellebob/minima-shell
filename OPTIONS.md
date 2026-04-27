@@ -23,7 +23,7 @@ For non-Nix manual setup, see [NONNIX.md](./NONNIX.md).
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `minima.enable` | bool | `false` | Enable Minima shell |
-| `minima.wm` | enum | `"sway"` | Window manager: `"sway"`, `"swayfx"`, `"scroll"`, `"hyprland"` |
+| `minima.wm` | enum | `"sway"` | Window manager: `"sway"`, `"swayfx"`, `"scroll"` |
 | `minima.enableNvidia` | bool | `false` | Enable NVIDIA GPU support |
 | `minima.modifier` | string | `"Mod4"` | Window manager modifier key |
 | `minima.theming.enable` | bool | `true` | Enable Breeze/Papirus/Rose-Pine styling |
@@ -37,7 +37,7 @@ For non-Nix manual setup, see [NONNIX.md](./NONNIX.md).
 {
   minima = {
     enable = true;
-    wm = "hyprland";
+    wm = "sway";
     enableNvidia = true;
     modifier = "Mod4";
     theming.enable = true;
@@ -343,13 +343,3 @@ The following settings are enabled by default in `nixvim/options.nix`:
 - `nixd` - Nix language server
 - `lua_ls` - Lua language server
 - `vimtex` - LaTeX support (only when `minima.tex.enable = true`)
-
----
-
-## Hyprland-Specific Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `minima.hypr.layout` | enum | `"dwindle"` | Layout: `"dwindle"` or `"master"` |
-
-```

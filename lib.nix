@@ -34,13 +34,101 @@ let
     };
   };
 
+  windowRuleType = types.submodule {
+    options = {
+      rule = mkOption {
+        type = types.str;
+        description = "Rule to apply, e.g. \"float\", \"opacity 0.9 0.9\", \"workspace 2\"";
+      };
+      class = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Window class regex, e.g. \"^(kitty)$\"";
+      };
+      title = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Window title regex";
+      };
+      initialClass = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Initial window class regex";
+      };
+      initialTitle = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Initial window title regex";
+      };
+      tag = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Window tag";
+      };
+      xwayland = mkOption {
+        type = types.nullOr types.bool;
+        default = null;
+        description = "Match XWayland windows";
+      };
+      floating = mkOption {
+        type = types.nullOr types.bool;
+        default = null;
+        description = "Match floating windows";
+      };
+      fullscreen = mkOption {
+        type = types.nullOr types.bool;
+        default = null;
+        description = "Match fullscreen windows";
+      };
+      pinned = mkOption {
+        type = types.nullOr types.bool;
+        default = null;
+        description = "Match pinned windows";
+      };
+      focus = mkOption {
+        type = types.nullOr types.bool;
+        default = null;
+        description = "Match focused window";
+      };
+      workspace = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Match windows on a workspace, e.g. \"1\" or \"name:foo\"";
+      };
+    };
+  };
+
+  workspaceRuleType = types.submodule {
+    options = {
+      workspace = mkOption {
+        type = types.str;
+        description = "Workspace selector, e.g. \"1\", \"name:foo\", \"w[tv1]\", \"f[1]\"";
+      };
+      monitor = mkOption { type = types.nullOr types.str; default = null; };
+      default = mkOption { type = types.nullOr types.bool; default = null; };
+      persistent = mkOption { type = types.nullOr types.bool; default = null; };
+      gapsIn = mkOption { type = types.nullOr types.int; default = null; };
+      gapsOut = mkOption { type = types.nullOr types.int; default = null; };
+      borderSize = mkOption { type = types.nullOr types.int; default = null; };
+      shadow = mkOption { type = types.nullOr types.bool; default = null; };
+      rounding = mkOption { type = types.nullOr types.bool; default = null; };
+      decorate = mkOption { type = types.nullOr types.bool; default = null; };
+      border = mkOption { type = types.nullOr types.bool; default = null; };
+      layoutopt = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Raw layoutopt string, e.g. \"layoutopt:orientation:left\"";
+      };
+    };
+  };
+
 in
 {
   options.minima = {
     enable = mkEnableOption "Minima shell";
 
     wm = mkOption {
-      type = types.enum [ "sway" "swayfx" "scroll" "hyprland" ];
+      type = types.enum [ "sway" "swayfx" "scroll" ];
       default = "sway";
       internal = true;
     };
@@ -62,11 +150,7 @@ in
         package = mkOption { type = types.package; default = pkgs.firefox; };
       };
     };
-    hypr.layout    = mkOption {
-      type = types.enum [ "dwindle" "master" ];
-      default = "dwindle";
-      internal = true;
-    };
+
     displays = mkOption {
       type = types.attrsOf displayType;
       default = {};
@@ -133,12 +217,12 @@ in
       packages = mkOption {
         type = types.nullOr (types.attrsOf types.anything);
         default = null;
-        description = "Extra texlive packages as an attrset, e.g. { inherit (pkgs.texlive) dvisvgm dvipng; }";
+        description = "Extra texlive packages as an attrset";
       };
       spell = mkOption {
         type = types.listOf types.str;
         default = [];
-        description = "List of language codes for neovim spellfiles (e.g. [\"en\" \"de\"])";
+        description = "List of language codes for neovim spellfiles";
       };
     };
 
@@ -161,8 +245,8 @@ in
         enable        = mkOption { type = types.bool; default = true; };
         engineEnabled = mkOption {
           description = "Enable wallpaper engine support";
-          type = types.bool; 
-          default = false; 
+          type = types.bool;
+          default = false;
         };
         workshopPath  = mkOption {
           type    = types.str;

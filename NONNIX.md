@@ -33,12 +33,6 @@ sudo mv /etc/xdg/menus/arch-applications.menu /etc/xdg/menus/applications.menu
 
 ## Window Manager Installation
 
-### Hyprland
-
-```sh
-yay -Sy hyprland xdg-desktop-portal-hyprland hypremoji
-```
-
 ### Sway / SwayFX / Scroll
 
 ```sh
@@ -67,15 +61,10 @@ cp -r ./config/*      ~/.config/
 cp -r ./Wallpapers/   ~/
 
 mkdir -p "$HOME/.config/minima" "$HOME/.config/quickshell"
-[ ! -f "$HOME/.config/minima/hypr.conf" ] && cp ./defaults/hypr.conf "$HOME/.config/minima/"
 [ ! -f "$HOME/.config/minima/sway.conf" ] && cp ./defaults/sway.conf "$HOME/.config/minima/"
 [ ! -f "$HOME/.config/quickshell/config.ini" ] && cp ./defaults/config.ini "$HOME/.config/quickshell/"
 
 chmod +x ~/.config/quickshell/scripts/generate-colors.sh
-chmod +x ~/.config/quickshell/scripts/sysfetch.sh
-chmod +x ~/.config/hypr/genkeys.sh
-chmod +x ~/.config/hypr/set-xft-dpi.sh
-chmod +x ~/.config/hypr/suspend.sh
 
 touch ~/.config/wallpaper.conf
 echo $HOME/Wallpapers/botw.png > ~/.config/wallpaper.conf

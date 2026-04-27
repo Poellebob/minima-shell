@@ -1,6 +1,6 @@
 # minima-shell
 
-A NixOS/home-manager flake providing a Wayland-focused desktop environment with [Hyprland](https://hypr.land/), [Sway](https://swaywm.org/), [SwayFX](https://github.com/Ericmorgenta/swayfx), and [Scroll](https://github.com/dawsers/scroll/) support.
+A NixOS/home-manager flake providing a Wayland-focused desktop environment with [Sway](https://swaywm.org/), [SwayFX](https://github.com/Ericmorgenta/swayfx), and [Scroll](https://github.com/dawsers/scroll/) support.
 
 **Warning:** This project is not done and is still **pre-alpha**; it will contain bugs.
 
@@ -40,7 +40,7 @@ A NixOS/home-manager flake providing a Wayland-focused desktop environment with 
         {
           minima = {
             enable = true;
-            wm = "hyprland";  # hyprland, sway, swayfx, or scroll
+            wm = "sway";  # sway, swayfx, or scroll
           };
           home-manager.users.<username> = {
             home.stateVersion = "25.11";
@@ -87,36 +87,31 @@ outputs = { self, ... }: {
 
 ### General
 
-| Keybind | Action (Hyprland) | Action (Sway) | Action (Scroll) |
-|--------|-------------------|---------------|-----------------|
-| `$mod + Return` | Open terminal | Open terminal | Open terminal |
-| `$mod + Q` | Kill focused window | - | - |
-| `$mod + q` | - | Kill focused window | Kill focused window |
-| `$mod + E` | Open file manager | - | - |
-| `$mod + e` | - | Open file manager | Open file manager |
-| `$mod + B` | Open browser | - | - |
-| `$mod + b` | - | Open browser | Open browser |
-| `$mod + Space` | Toggle floating | Toggle floating | Toggle floating |
-| `$mod + F` | Toggle fullscreen | - | - |
-| `$mod + f` | - | Toggle fullscreen | Toggle fullscreen |
-| `$mod + Shift + s` | - | Toggle sticky | Toggle sticky |
-| `$mod + Alt + Delete` | Lock screen | Lock screen (hyprlock) | Lock screen (hyprlock) |
-| `$mod + C` | Copy window class to clipboard | - | - |
-| `$mod + v` | Open clipboard manager | Open clipboard manager | Open clipboard manager |
-| `$mod + d` | Open app launcher | Open app launcher | Open app launcher |
-| `$mod + Shift + c` | - | Reload config | Reload config |
-| `$mod + Alt + l` | - | Tabbed layout | Set window height to 100% |
-| `$mod + Alt + h` | - | Stacking layout | Set window height to 50% |
-| `$mod + Alt + j` | - | Split vertical | Move window into column on left |
-| `$mod + Alt + k` | - | Split horizontal | Move window into column on right |
-| `$mod + a` | - | Split toggle | Direction mode |
-| `$mod + Shift + a` | - | Focus parent | - |
-| `$mod + Ctrl + a` | - | Focus child | - |
-| `$mod + Escape` | - | Default layout | - |
-| `$mod + Tab` | - | - | Workspace overview |
-| `$mod + Shift + -` | - | Move to scratchpad | Move to scratchpad |
-| `$mod + -` | - | Show scratchpad | Show scratchpad |
-| `XF86PowerOff` | Open logout menu | Open logout menu | Open logout menu |
+| Keybind | Action (Sway) | Action (Scroll) |
+|--------|---------------|---------------|
+| `$mod + Return` | Open terminal | Open terminal |
+| `$mod + q` | Kill focused window | Kill focused window |
+| `$mod + e` | Open file manager | Open file manager |
+| `$mod + b` | Open browser | Open browser |
+| `$mod + Space` | Toggle floating | Toggle floating |
+| `$mod + f` | Toggle fullscreen | Toggle fullscreen |
+| `$mod + Shift + s` | Toggle sticky | Toggle sticky |
+| `$mod + Alt + Delete` | Lock screen (hyprlock) | Lock screen (hyprlock) |
+| `$mod + v` | Open clipboard manager | Open clipboard manager |
+| `$mod + d` | Open app launcher | Open app launcher |
+| `$mod + Shift + c` | Reload config | Reload config |
+| `$mod + Alt + l` | Tabbed layout | Set window height to 100% |
+| `$mod + Alt + h` | Stacking layout | Set window height to 50% |
+| `$mod + Alt + j` | Split vertical | Move window into column on left |
+| `$mod + Alt + k` | Split horizontal | Move window into column on right |
+| `$mod + a` | Split toggle | Direction mode |
+| `$mod + Shift + a` | Focus parent | - |
+| `$mod + Ctrl + a` | Focus child | - |
+| `$mod + Escape` | Default layout | - |
+| `$mod + Tab` | - | Workspace overview |
+| `$mod + Shift + -` | - | Move to scratchpad |
+| `$mod + -` | - | Show scratchpad |
+| `XF86PowerOff` | Open logout menu | Open logout menu |
 
 ### Workspaces
 
@@ -154,18 +149,7 @@ outputs = { self, ... }: {
 | `$mod + Shift + K` | Shrink height 100px |
 | `$mod + Shift + J` | Grow height 100px |
 
-### Mouse Bindings (Hyprland only)
-
-| Keybind | Action |
-|--------|--------|
-| `$mod + Left Click` | Move window |
-| `$mod + Right Click` | Resize window |
-
 ### Screenshots
-
-| Keybind | Action |
-|--------|--------|
-| `Print` | Screenshot selection → clipboard |
 | `Shift + Print` | Screenshot fullscreen → clipboard |
 | `$mod + Print` | Screenshot selection → edit in swappy |
 | `$mod + Shift + Print` | Screenshot fullscreen → edit in swappy |
