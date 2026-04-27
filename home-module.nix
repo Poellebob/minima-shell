@@ -50,18 +50,6 @@ in {
       ))
     ];
 
-    home.activation.downloadVimSpellfiles = lib.hm.dag.entryAfter [ "writeBoundary" ]
-      (lib.optionalString (cfg.tex.spell != []) ''
-        mkdir -p $HOME/.local/share/nvim/site/spell
-        cd $HOME/.local/share/nvim/site/spell || exit 1
-        ${lib.concatMapStringsSep "\n" (lang: ''
-          if [[ ! -f "${lang}.utf-8.spl" ]]; then
-            ${pkgs.curl}/bin/curl -fsSL -O "https://ftp.nluug.nl/pub/vim/runtime/spell/${lang}.utf-8.spl"
-            ${pkgs.curl}/bin/curl -fsSL -O "https://ftp.nluug.nl/pub/vim/runtime/spell/${lang}.utf-8.sug"
-          fi
-        '') cfg.tex.spell}
-      '');
-
     xdg.portal = mkIf cfg.desktop.xdgPortal {
       enable = true;
       extraPortals = [
@@ -70,9 +58,6 @@ in {
       ]
       ++ lib.optionals (cfg.wm == "sway" || cfg.wm == "swayfx" || cfg.wm == "scroll") [
         pkgs.xdg-desktop-portal-wlr
-      ]
-      ++ lib.optionals (cfg.wm == "hyprland") [
-        pkgs.xdg-desktop-portal-hyprland
       ];
       config = {
         common.default = [ "kde" "gtk" ];
@@ -80,11 +65,6 @@ in {
       // lib.optionalAttrs (cfg.wm == "sway" || cfg.wm == "swayfx" || cfg.wm == "scroll") {
         sway = {
           ScreenCast = [ "wlr" ];
-        };
-      }
-      // lib.optionalAttrs (cfg.wm == "hyprland") {
-        hyprland = {
-          ScreenCast = [ "hyprland" ];
         };
       };
     };
@@ -295,14 +275,6 @@ in {
     home.file.".config/sway/config.d/input" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/input; };
     home.file.".config/sway/config.d/application-style" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/application-style; };
     home.file.".config/sway/config.d/terminal" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { text = "set $terminal ${cfg.programs.terminal.name}"; };
-    home.file.".config/sway/config.d/fx" = mkIf (cfg.wm == "swayfx") {
-      text = ''
-        corner_radius 8
-        shadows enable
-        blur enable
-        for_window [app_id=".*"] blur enable
-      '';
-    };
 
     home.file.".config/scroll/set-xft-dpi.sh" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/set-xft-dpi.sh; executable = true; };
     home.file.".config/scroll/config" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config; };
@@ -312,21 +284,7 @@ in {
     home.file.".config/scroll/config.d/env" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/env; };
     home.file.".config/scroll/config.d/input" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/input; };
     home.file.".config/scroll/config.d/application-style" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/application-style; };
-    home.file.".config/scroll/config.d/terminal" = mkIf (cfg.wm == "scroll") { text = "set $terminal ${cfg.programs.terminal.name}"; };
-
-    home.file.".config/hypr/suspend.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/suspend.sh; executable = true; };
-    home.file.".config/hypr/hyprland.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/hyprland.conf; };
-    home.file.".config/hypr/hypridle.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/hypridle.conf; };
-    home.file.".config/hypr/hyprlock.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/hyprlock.conf; };
-    home.file.".config/hypr/set-xft-dpi.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/set-xft-dpi.sh; executable = true; };
-    home.file.".config/hypr/getkeys.sh" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/getkeys.sh; executable = true; };
-    home.file.".config/hypr/components/input.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/input.conf; };
-    home.file.".config/hypr/components/env.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/env.conf; };
-    home.file.".config/hypr/components/workspace.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/workspace.conf; };
-    home.file.".config/hypr/components/application-behavior.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/application-behavior.conf; };
-    home.file.".config/hypr/components/application-style.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/application-style.conf; };
-    home.file.".config/hypr/components/keybinds.conf" = mkIf (cfg.wm == "hyprland") { source = ./config/hypr/components/keybinds.conf; };
-    home.file.".config/hypr/terminal.conf" = mkIf (cfg.wm == "hyprland") { text = "$terminal = ${cfg.programs.terminal.name}"; };
+home.file.".config/scroll/config.d/terminal" = mkIf (cfg.wm == "scroll") { text = "set $terminal ${cfg.programs.terminal.name}"; };
 
     home.file.".config/quickshell/".source = ./config/quickshell;
     home.file.".config/quickshell/scripts/sysfetch.sh" = { 
@@ -337,6 +295,7 @@ in {
     home.file.".local/bin/minima" = mkIf (cfg.wm != null) {
       source = ./shell/minima;
       executable = true;
+
     };
 
     home.file.".config/qalculate/qalc.cfg".source = ./config/qalculate/qalc.cfg;
@@ -348,5 +307,16 @@ in {
       cp -n ${./quickshell.json} $HOME/.config/minima/colors/quickshell.json
       chmod 644 $HOME/.config/minima/colors/quickshell.json
     '';
+
+    home.activation.downloadVimSpellfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] (lib.optionalString (cfg.tex.spell != []) ''
+      mkdir -p $HOME/.local/share/nvim/site/spell
+      cd $HOME/.local/share/nvim/site/spell || exit 1
+      ${lib.concatMapStringsSep "\n" (lang: ''
+        if [[ ! -f "${lang}.utf-8.spl" ]]; then
+          ${pkgs.curl}/bin/curl -fsSL -O "https://ftp.nluug.nl/pub/vim/runtime/spell/${lang}.utf-8.spl"
+          ${pkgs.curl}/bin/curl -fsSL -O "https://ftp.nluug.nl/pub/vim/runtime/spell/${lang}.utf-8.sug"
+        fi
+      '') cfg.tex.spell}
+    '');
   };
 }

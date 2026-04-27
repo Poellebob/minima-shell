@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, scroll-flake, ... }:
+{ config, lib, pkgs, scroll-flake, ... }:
 
 with lib;
 let
@@ -22,15 +22,13 @@ in {
         });
         xwayland.enable = true;
       };
-      programs.hyprland = mkIf (cfg.wm == "hyprland") {
-        enable = true;
-        xwayland.enable = true;
-      };
+
       programs.scroll = mkIf (cfg.wm == "scroll") {
         enable = true;
         wrapperFeatures.gtk = true;
         xwayland.enable = true;
       };
+
       home-manager.sharedModules = [
         {
           minima = {
@@ -38,7 +36,6 @@ in {
             enableNvidia      = mkDefault cfg.enableNvidia;
             modifier          = mkDefault cfg.modifier;
             programs          = mkDefault cfg.programs;
-            hypr.layout       = mkDefault cfg.hypr.layout;
             theming           = mkDefault cfg.theming;
             enableBranding    = mkDefault cfg.enableBranding;
             shell             = mkDefault cfg.shell;
@@ -53,6 +50,7 @@ in {
         }
       ];
     })
+
     (mkIf cfg.tex.enable {
       environment.systemPackages = [
         (pkgs.texlive.combine (
@@ -61,6 +59,7 @@ in {
         ))
       ];
     })
+
     (mkIf cfg.desktop.xdgPortal {
       environment.systemPackages = with pkgs; [
         kdePackages.plasma-workspace
