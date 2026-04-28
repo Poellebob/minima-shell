@@ -10,27 +10,13 @@
           servers = {
             nixd.enable = true;
             lua_ls.enable = true;
+          };
+        };
 
-            # texlab = {
-            #   enable = config.minima.tex.enable;
-            #
-            #   settings.texlab = {
-            #     build = {
-            #       executable = "latexmk";
-            #       args = [
-            #         "-pdf"
-            #         "-interaction=nonstopmode"
-            #         "-synctex=1"
-            #       ];
-            #       onSave = true;
-            #     };
-            #
-            #     chktex = {
-            #       onOpenAndSave = true;
-            #       onEdit = true;
-            #     };
-            #   };
-            # };
+        conform-nvim = {
+          settings = {
+            formatters_by_ft = config.minima.vim.lsp.comform;
+            formatters = config.minima.vim.lsp.formatters;
           };
         };
 
