@@ -44,7 +44,7 @@ with lib;
         default = {};
         description = "Extra conform formatters by filetype";
       };
-      formatterOpts = mkOption {
+      formatter = mkOption {
         type = types.attrsOf types.anything;
         default = {};
         description = "Formatter definitions (e.g. custom args for formatters)";
