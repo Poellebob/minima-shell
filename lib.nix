@@ -127,6 +127,30 @@ in
   options.minima = {
     enable = mkEnableOption "Minima shell";
 
+    osModule = mkOption {
+      type = types.bool;
+      default = false;
+      internal = true;
+    };
+
+    swayConfigFile = mkOption {
+      type = types.nullOr types.package;
+      default = null;
+      internal = true;
+    };
+
+    scrollConfigFile = mkOption {
+      type = types.nullOr types.package;
+      default = null;
+      internal = true;
+    };
+
+    quickshellStoreDir = mkOption {
+      type = types.nullOr types.package;
+      default = null;
+      internal = true;
+    };
+
     wm = mkOption {
       type = types.enum [ "sway" "swayfx" "scroll" ];
       default = "sway";

@@ -2,6 +2,4 @@
 
 with lib;
 {
-  options.minima = {
-  };
 }

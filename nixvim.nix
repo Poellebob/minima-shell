@@ -39,12 +39,12 @@ with lib;
             };
         '';
       };
-      conform = mkOption {
+      formatter = mkOption {
         type = types.attrsOf types.anything;
         default = {};
         description = "Extra conform formatters by filetype";
       };
-      formatter = mkOption {
+      formatterOpts = mkOption {
         type = types.attrsOf types.anything;
         default = {};
         description = "Formatter definitions (e.g. custom args for formatters)";

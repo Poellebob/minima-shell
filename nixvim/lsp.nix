@@ -22,7 +22,7 @@
 
         cmp = {
           enable = true;
-          autoEnableSources = true;
+          autoEnableSources = false;
 
           settings = {
             sources = [

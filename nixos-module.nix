@@ -7,25 +7,35 @@ in {
   imports = [
     ./lib.nix
     ./lib-system.nix
+    ./wm-config.nix
   ];
 
   config = mkMerge [
-    (mkIf (cfg.wm != null) {
+    (mkIf (cfg.enable && cfg.wm != null) {
       programs.sway = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
         enable = true;
         wrapperFeatures.gtk = true;
         package = pkgs.${cfg.wm}.overrideAttrs (old: {
           buildCommand = ''
-            ${old.buildCommand}
-            wrapProgram $out/bin/sway ${lib.optionalString cfg.enableNvidia "--add-flags --unsupported-gpu"}
+            ${old.buildCommand or ""}
+            wrapProgram $out/bin/sway \
+              ${lib.optionalString cfg.enableNvidia "--add-flags --unsupported-gpu"} \
+              --add-flags "-c ${cfg.swayConfigFile}"
           '';
         });
         xwayland.enable = true;
       };
 
-      programs.scroll = mkIf (cfg.wm == "scroll") {
+      programs.scroll = mkIf (cfg.enable && cfg.wm == "scroll") {
         enable = true;
         wrapperFeatures.gtk = true;
+        package = pkgs.scroll.overrideAttrs (old: {
+          buildCommand = ''
+            ${old.buildCommand or ""}
+            wrapProgram $out/bin/scroll \
+              --add-flags "-c ${cfg.scrollConfigFile}"
+          '';
+        });
         xwayland.enable = true;
       };
 
@@ -33,6 +43,7 @@ in {
         {
           minima = {
             wm                = mkDefault cfg.wm;
+            osModule          = true;
             enableNvidia      = mkDefault cfg.enableNvidia;
             modifier          = mkDefault cfg.modifier;
             programs          = mkDefault cfg.programs;
@@ -46,6 +57,10 @@ in {
             specialWorkspaces = mkDefault cfg.specialWorkspaces;
             tex               = mkDefault cfg.tex;
             desktop           = mkDefault cfg.desktop;
+            # pass store paths so HM doesn't have to recompute them
+            swayConfigFile    = mkDefault cfg.swayConfigFile;
+            scrollConfigFile  = mkDefault cfg.scrollConfigFile;
+            quickshellStoreDir = mkDefault cfg.quickshellStoreDir;
           };
         }
       ];
@@ -60,7 +75,7 @@ in {
       ];
     })
 
-    (mkIf cfg.desktop.xdgPortal {
+    (mkIf (cfg.desktop.xdgPortal) {
       environment.systemPackages = with pkgs; [
         kdePackages.plasma-workspace
       ];
