@@ -9,6 +9,7 @@ in {
     ./nixvim.nix
     ./kdeglobals.nix
     ./config.nix
+    ./wm-config.nix
   ];
 
   config = mkIf cfg.enable {
@@ -45,8 +46,8 @@ in {
     ++ cfg.extraPackages
     ++ optionals cfg.tex.enable [
       (pkgs.texlive.combine (
-        { ${config.minima.tex.scheme} = pkgs.texlive.${config.minima.tex.scheme}; }
-          // lib.optionalAttrs (config.minima.tex.packages != null) config.minima.tex.packages
+{ ${cfg.tex.scheme} = pkgs.texlive.${cfg.tex.scheme}; }
+           // lib.optionalAttrs (cfg.tex.packages != null) cfg.tex.packages
       ))
     ];
 
@@ -146,7 +147,7 @@ in {
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       initContent = ''
-        if [[ -o interactive ]]; then
+        if [[ -t 1 && -n "$TERM" && "$TERM" != "dumb" ]]; then
           eval "$(starship init zsh)"
         else
           git_prompt() {
@@ -266,36 +267,12 @@ in {
       text = cfg.kdeglobals;
     };
 
-    home.file.".config/sway/set-xft-dpi.sh" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/set-xft-dpi.sh; executable = true; };
-    home.file.".config/sway/config" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config; };
-    home.file.".config/sway/config.d/keybinds" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/keybinds; };
-    home.file.".config/sway/config.d/workspace" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/workspace; };
-    home.file.".config/sway/config.d/application-behavior" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/application-behavior; };
-    home.file.".config/sway/config.d/env" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/env; };
-    home.file.".config/sway/config.d/input" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/input; };
-    home.file.".config/sway/config.d/application-style" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { source = ./config/sway/config.d/application-style; };
-    home.file.".config/sway/config.d/terminal" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") { text = "set $terminal ${cfg.programs.terminal.name}"; };
-
-    home.file.".config/scroll/set-xft-dpi.sh" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/set-xft-dpi.sh; executable = true; };
-    home.file.".config/scroll/config" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config; };
-    home.file.".config/scroll/config.d/keybinds" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/keybinds; };
-    home.file.".config/scroll/config.d/workspace" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/workspace; };
-    home.file.".config/scroll/config.d/application-behavior" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/application-behavior; };
-    home.file.".config/scroll/config.d/env" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/env; };
-    home.file.".config/scroll/config.d/input" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/input; };
-    home.file.".config/scroll/config.d/application-style" = mkIf (cfg.wm == "scroll") { source = ./config/scroll/config.d/application-style; };
-home.file.".config/scroll/config.d/terminal" = mkIf (cfg.wm == "scroll") { text = "set $terminal ${cfg.programs.terminal.name}"; };
-
-    home.file.".config/quickshell/".source = ./config/quickshell;
-    home.file.".config/quickshell/scripts/sysfetch.sh" = { 
-      source = ./config/quickshell/scripts/sysfetch.sh; 
-      executable = true; 
+    home.file.".config/sway/config" = mkIf (!cfg.osModule && (cfg.wm == "sway" || cfg.wm == "swayfx")) {
+      text = "include ${cfg.swayConfigFile}";
     };
 
-    home.file.".local/bin/minima" = mkIf (cfg.wm != null) {
-      source = ./shell/minima;
-      executable = true;
-
+    home.file.".config/scroll/config" = mkIf (!cfg.osModule && cfg.wm == "scroll") {
+      text = "include ${cfg.scrollConfigFile}";
     };
 
     home.file.".config/qalculate/qalc.cfg".source = ./config/qalculate/qalc.cfg;
