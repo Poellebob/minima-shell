@@ -10,6 +10,7 @@
           servers = {
             nixd.enable = true;
             lua_ls.enable = true;
+            ltex.enable = config.minima.tex.enable;
           };
         };
 
@@ -22,18 +23,9 @@
 
         cmp = {
           enable = true;
-          autoEnableSources = false;
+          autoEnableSources = true;
 
           settings = {
-            sources = [
-              { name = "nvim_lsp"; }
-              { name = "buffer"; }
-              { name = "path"; }
-              { name = "luasnip"; }
-              { name = "vimtex"; }
-              { name = "latex_symbols"; }
-            ];
-
             mapping = {
               "<C-Space>" = "cmp.mapping.complete()";
               "<C-e>" = "cmp.mapping.abort()";

@@ -49,7 +49,7 @@ bindsym $mod+minus scratchpad show
 bindsym $mod+a set_mode toggle
 
 # Logout
-bindsym XF86PowerOff exec qs ipc call minimaLogout open
+bindsym XF86PowerOff exec qs -c $qs_path ipc call minimaLogout open
 
 # Multimedia keys
 bindsym XF86AudioRaiseVolume exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
