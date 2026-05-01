@@ -9,7 +9,6 @@ in {
     ./nixvim.nix
     ./kdeglobals.nix
     ./config.nix
-    ./wm-config.nix
   ];
 
   config = mkIf cfg.enable {
@@ -147,7 +146,7 @@ in {
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       initContent = ''
-        if [[ -t 1 && -n "$TERM" && "$TERM" != "dumb" ]]; then
+        if [[ "$TERM" != "linux" ]]; then
           eval "$(starship init zsh)"
         else
           git_prompt() {
@@ -249,7 +248,6 @@ in {
         CLUTTER_BACKEND = "wayland";
         ELECTRON_OZONE_PLATFORM_HINT = "wayland";
         XDG_SESSION_TYPE = "wayland";
-        WM = cfg.wm;
       }
       (mkIf cfg.theming.enable {
         XCURSOR_THEME = "BreezeX-RosePine-Linux";
@@ -261,6 +259,10 @@ in {
         GBM_BACKEND = "nvidia-drm";
         __GLX_VENDOR_LIBRARY_NAME = "nvidia";
       })
+      {
+        MINIMA_CONFIG = cfg.minimaConfigFile;
+        MATUGEN_CONFIG = cfg.matugenConfigFile;
+      }
     ];
 
     xdg.configFile."kdeglobals" = mkIf cfg.theming.enable {
@@ -278,11 +280,9 @@ in {
     home.file.".config/qalculate/qalc.cfg".source = ./config/qalculate/qalc.cfg;
 
     home.activation.minimaBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      mkdir -p $HOME/.config/minima/colors
-      cp -f ${./config/matugen/config.toml} $HOME/.config/minima/colors/config.toml
-      cp -f ${./config/matugen/quickshell.template.json} $HOME/.config/minima/colors/quickshell.template.json
-      cp -n ${./quickshell.json} $HOME/.config/minima/colors/quickshell.json
-      chmod 644 $HOME/.config/minima/colors/quickshell.json
+      mkdir -p $HOME/.config/minima
+      cp -n ${./colors.json} $HOME/.config/minima/colors.json
+      chmod 644 $HOME/.config/minima/colors.json
     '';
 
     home.activation.downloadVimSpellfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] (lib.optionalString (cfg.tex.spell != []) ''

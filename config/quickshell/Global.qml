@@ -16,9 +16,11 @@ Singleton {
   property var clipboardManager: null
   property var wallpaperSelector: null
 
+  readonly property string matugenConfigPath: Quickshell.env("MATUGEN_CONFIG") || (Quickshell.env("HOME") + "/.config/minima/matugen/config.toml")
+
   FileView {
     id: confFile
-    path: Quickshell.env("HOME") + "/.config/minima/config.ini"
+    path: Quickshell.env("MINIMA_CONFIG") || (Quickshell.env("HOME") + "/.config/minima/config.ini")
     blockLoading: true
     watchChanges: true
     
