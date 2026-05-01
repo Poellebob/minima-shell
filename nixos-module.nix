@@ -7,7 +7,7 @@ in {
   imports = [
     ./lib.nix
     ./lib-system.nix
-    ./wm-config.nix
+    ./config.nix
   ];
 
   config = mkMerge [
@@ -57,10 +57,12 @@ in {
             specialWorkspaces = mkDefault cfg.specialWorkspaces;
             tex               = mkDefault cfg.tex;
             desktop           = mkDefault cfg.desktop;
-            # pass store paths so HM doesn't have to recompute them
-            swayConfigFile    = mkDefault cfg.swayConfigFile;
-            scrollConfigFile  = mkDefault cfg.scrollConfigFile;
-            quickshellStoreDir = mkDefault cfg.quickshellStoreDir;
+             # pass store paths so HM doesn't have to recompute them
+             swayConfigFile    = mkDefault cfg.swayConfigFile;
+             scrollConfigFile  = mkDefault cfg.scrollConfigFile;
+             quickshellStoreDir = mkDefault cfg.quickshellStoreDir;
+             matugenConfigFile = mkDefault cfg.matugenConfigFile;
+             matugenTemplateFile = mkDefault cfg.matugenTemplateFile;
           };
         }
       ];

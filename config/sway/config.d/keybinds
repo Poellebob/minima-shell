@@ -8,8 +8,8 @@ bindsym $mod+f fullscreen toggle
 bindsym $mod+Shift+s sticky toggle
 bindsym $mod+Mod1+Delete exec hyprlock
 bindsym $mod+Shift+c exec swaymsg reload
-bindsym $mod+v exec qs ipc call minimaClipboard open
-bindsym $mod+d exec qs ipc call minimaLauncher open
+bindsym $mod+v exec qs -c $qs_path ipc call minimaClipboard open
+bindsym $mod+d exec qs -c $qs_path ipc call minimaLauncher open
 
 # Screenshots
 bindsym Print exec grim -g "$(slurp)" - | magick - -shave 1x1 PNG:- | wl-copy
