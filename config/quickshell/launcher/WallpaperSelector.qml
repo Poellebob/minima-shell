@@ -25,6 +25,7 @@ MenuPanel {
   property string searchText:          ""
   property bool   initialLoadComplete: false
   property string savedWallpaper:      ""
+  property bool wallpaperConfRead: false
 
   property var  imageScanResults: []
   property var  engineScanResults: []
@@ -37,7 +38,7 @@ MenuPanel {
   function mergeAndSort() {
     root.wallpapers = root.imageScanResults.concat(root.engineScanResults)
     sortWallpapers()
-    checkAndApplyInitialWallpaper()
+    tryApplyInitialWallpaper()
   }
 
   readonly property string wallpapersDir: Quickshell.env("HOME") + "/Wallpapers"
@@ -142,20 +143,14 @@ MenuPanel {
     engineProc.running     = true
   }
 
-  function checkAndApplyInitialWallpaper() {
+  function tryApplyInitialWallpaper() {
     if (initialLoadComplete) return
+    if (!iDone || (!eDone && engineEnabled)) return
+    if (!wallpaperConfRead) return
+
     initialLoadComplete = true
 
-    if (savedWallpaper && savedWallpaper.trim() !== "") {
-      if (savedWallpaper.startsWith("engine:")) {
-        const folderId = savedWallpaper.substring(7)
-        const found = wallpapers.find(w => w.type === "engine" && w.id === folderId)
-        if (found) { setWallpaper(found); return }
-      } else {
-        const found = wallpapers.find(w => w.type === "image" && w.path === savedWallpaper)
-        if (found) { setWallpaper(found); return }
-      }
-    }
+    if (savedWallpaper && savedWallpaper.trim() !== "") return
 
     if (wallpapers.length > 0)
       setWallpaper(wallpapers[0])
@@ -205,7 +200,8 @@ MenuPanel {
     onExited: (exitCode, _) => {
       if (exitCode !== 0)
         root.savedWallpaper = ""
-      root.checkAndApplyInitialWallpaper()
+      root.wallpaperConfRead = true
+      root.tryApplyInitialWallpaper()
     }
   }
 
@@ -685,7 +681,6 @@ MenuPanel {
           root.engineScanResults = []
           root.iDone             = false
           root.eDone             = false
-          root.initialLoadComplete = false
           root.scanWallpapers()
           searchBox.focus = true
         }
