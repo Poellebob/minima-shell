@@ -26,6 +26,15 @@
           autoEnableSources = true;
 
           settings = {
+            sources = [
+              { name = "nvim_lsp"; }
+              { name = "buffer"; }
+              { name = "path"; }
+              { name = "luasnip"; }
+              { name = "vimtex"; }
+              { name = "latex_symbols"; }
+            ];
+
             mapping = {
               "<C-Space>" = "cmp.mapping.complete()";
               "<C-e>" = "cmp.mapping.abort()";

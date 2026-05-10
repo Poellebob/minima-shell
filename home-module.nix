@@ -27,20 +27,20 @@ in {
       cfg.programs.browser.package
     ]
     ++ optionals (cfg.programs.fileManager.package == pkgs.kdePackages.dolphin) [
-        kdePackages.ark
-        kdePackages.plasma-workspace
-        kdePackages.kio
-        kdePackages.kdf
-        kdePackages.kio-fuse
-        kdePackages.kio-extras
-        kdePackages.kio-admin
-        kdePackages.qtwayland
-        kdePackages.plasma-integration
-        kdePackages.kdegraphics-thumbnailers
-        kdePackages.breeze-icons
-        kdePackages.qtsvg
-        kdePackages.kservice
-      ]
+      kdePackages.ark
+      kdePackages.plasma-workspace
+      kdePackages.kio
+      kdePackages.kdf
+      kdePackages.kio-fuse
+      kdePackages.kio-extras
+      kdePackages.kio-admin
+      kdePackages.qtwayland
+      kdePackages.plasma-integration
+      kdePackages.kdegraphics-thumbnailers
+      kdePackages.breeze-icons
+      kdePackages.qtsvg
+      kdePackages.kservice
+    ]
     ++ optionals cfg.shell.enable [ fzf zoxide git afetch ]
     ++ cfg.extraPackages
     ++ optionals cfg.tex.enable [
