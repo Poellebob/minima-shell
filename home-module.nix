@@ -178,7 +178,6 @@ in {
         alias ll='eza -lh --git'
         alias la='eza -lah --git'
         alias tree='eza --tree'
-        alias cat='bat'
         alias du='dust'
         alias df='duf'
         alias top='btop'
