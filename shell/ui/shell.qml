@@ -10,7 +10,13 @@ import qs.widgets.notificationCenter
 ShellRoot {
   id: root
 
-  LazyLoader { active: Global.settings["Panel"]["enabled"]; component: Bar{} }
+  Instantiator {
+    model: Quickshell.screens
+
+    delegate: Panel {
+      screen: modelData
+    }
+  }
 
   Logout { id: logout }
 

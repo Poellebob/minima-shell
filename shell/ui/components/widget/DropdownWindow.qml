@@ -12,9 +12,15 @@ PopupWindow {
   anchor.window: window
   anchor.edges: Edges.Top
   required property real x
+  property real dist: 0
   anchor.rect.x: x
-  anchor.rect.y: window.height + Global.format.spacing_large
+  anchor.rect.y: window.height + dist
   color: "transparent"
+
+  property alias topLeftRadius: rect.topLeftRadius
+  property alias topRightRadius: rect.topRightRadius
+  property alias bottomLeftRadius: rect.bottomLeftRadius
+  property alias bottomRightRadius: rect.bottomRightRadius
 
   onVisibleChanged: {
     if (visible) {
@@ -45,9 +51,13 @@ PopupWindow {
     onExited: hideTimer.restart()
 
     Rectangle {
+      id: rect
       anchors.fill: parent
       color: Global.colors.surface
-      radius: Global.format.radius_xlarge
+      topLeftRadius: Global.format.radius_xlarge
+      topRightRadius: Global.format.radius_xlarge
+      bottomLeftRadius: Global.format.radius_xlarge
+      bottomRightRadius: Global.format.radius_xlarge
     }
   }
 }

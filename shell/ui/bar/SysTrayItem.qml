@@ -14,6 +14,8 @@ MouseArea {
   property bool targetMenuOpen: false
   property int trayItemWidth: Global.format.systray_icon_size
 
+  signal showMenu(items: ObjectModel)
+
   anchors {
     verticalCenter: parent.verticalCenter
   }
@@ -30,8 +32,7 @@ MouseArea {
 
       case Qt.RightButton:
         if (item.hasMenu) {
-          menu.visible = !menu.visible;
-          menu.hideTimer.restart();
+          showMenu(menuOpen.children)
         }
       break;
     }
@@ -41,15 +42,6 @@ MouseArea {
   QsMenuOpener {
     id: menuOpen
     menu: sysTrayItem.item.menu
-  }
-
-  DropdownMenu {
-    id: menu
-    window: bar
-    x: sysTrayItem.x
-    anchor.edges: Edges.Top
-    model: menuOpen.children
-    onItemTriggered: menu.visible = false
   }
 
   IconImage {

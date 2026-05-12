@@ -8,9 +8,10 @@ import qs
 ColumnLayout {
   id: items
   required property var model
+  signal itemTriggered
+
   spacing: Global.format.radius_medium
-  anchors.horizontalCenter: parent.horizontalCenter
-  anchors.verticalCenter: parent.verticalCenter
+  anchors.fill: parent
 
   Repeater {
     model: items.model
@@ -18,9 +19,11 @@ ColumnLayout {
 
     Rectangle {
       required property QsMenuEntry modelData
-      color: mouseArea.containsMouse && !modelData.isSeparator ? Global.colors.surface_container_high : Global.colors.surface_variant
+      color: mouseArea.containsMouse && !modelData.isSeparator
+        ? Global.colors.surface_container_high
+        : Global.colors.surface_variant
       anchors.horizontalCenter: parent.horizontalCenter
-      implicitWidth: menu.width - Global.format.spacing_large
+      implicitWidth: items.width - Global.format.spacing_large
       implicitHeight: modelData.isSeparator ? 2 : Global.format.icon_size
       radius: Global.format.radius_large
 
@@ -50,7 +53,7 @@ ColumnLayout {
         onClicked: (event) => {
           if (event.button == Qt.LeftButton) {
             modelData.triggered()
-            menu.itemTriggered()
+            items.itemTriggered()
           }
         }
       }
