@@ -1,12 +1,12 @@
 import Quickshell
-import Quickshell.Io
+import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
 import qs
 
 PopupWindow {
-  id: menuRoot
-  default property alias content: menuMouseArea.data
+  id: root
+  default property alias content: contentArea.data
 
   required property var window
   anchor.window: window
@@ -15,28 +15,27 @@ PopupWindow {
   property real dist: 0
   anchor.rect.x: x
   anchor.rect.y: window.height + dist
+
+  property Item contentItem: null
+  property real padding: 0
+  property alias topLeftRadius: background.topLeftRadius
+  property alias topRightRadius: background.topRightRadius
+  property alias bottomLeftRadius: background.bottomLeftRadius
+  property alias bottomRightRadius: background.bottomRightRadius
+  property alias radius: background.radius
+  property alias backgroundColor: background.color
+
+  implicitWidth: contentItem ? (contentItem.implicitWidth + padding * 2) : 1
+  implicitHeight: contentItem ? (contentItem.implicitHeight + padding * 2) : 1
+
   color: "transparent"
-
-  property alias topLeftRadius: rect.topLeftRadius
-  property alias topRightRadius: rect.topRightRadius
-  property alias bottomLeftRadius: rect.bottomLeftRadius
-  property alias bottomRightRadius: rect.bottomRightRadius
-
-  onVisibleChanged: {
-    if (visible) {
-      menuRoot.raise()
-      menuRoot.requestActivate()
-    }
-  }
 
   Timer {
     id: hideTimer
     interval: Global.format.interval_short
     running: false
     repeat: false
-    onTriggered: {
-      menuRoot.visible = false;
-    }
+    onTriggered: root.visible = false
   }
 
   MouseArea {
@@ -51,13 +50,18 @@ PopupWindow {
     onExited: hideTimer.restart()
 
     Rectangle {
-      id: rect
+      id: background
       anchors.fill: parent
+      radius: Global.format.radius_xlarge
       color: Global.colors.surface
-      topLeftRadius: Global.format.radius_xlarge
-      topRightRadius: Global.format.radius_xlarge
-      bottomLeftRadius: Global.format.radius_xlarge
-      bottomRightRadius: Global.format.radius_xlarge
+
+      Item {
+        id: contentArea
+        x: root.padding
+        y: root.padding
+        width: parent.width - root.padding * 2
+        height: parent.height - root.padding * 2
+      }
     }
   }
 }

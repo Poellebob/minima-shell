@@ -44,7 +44,7 @@ PanelWindow {
     propagateComposedEvents: true
     preventStealing: true
 
-    anchors{
+    anchors {
       top: parent.top
       bottom: parent.bottom
       left: parent.left
@@ -57,7 +57,7 @@ PanelWindow {
       anchors.fill: parent
       bottomRightRadius: leftMenu.visible ? 0 : Global.format.radius_medium
       color: Global.colors.surface
-      visible: systray.visible && ( parent.containsMouse || Global.panelAlwaysVisible )
+      visible: systray.visible && (parent.containsMouse || Global.panelAlwaysVisible)
 
       RowLayout {
         id: itemsLeft
@@ -70,66 +70,36 @@ PanelWindow {
 
         Systray {
           id: systray
-          Layout.alignment: Qt.AlignVCenter
+          Layout.alignment: Qt.AlignCenter
           onMenuShow: (items) => leftMenu.showMenu(items)
         }
       }
     }
   }
-  
-  DropdownWindow {
-    id: leftMenu
-    window: panel
-    x: 0
-    color: "transparent"
 
-    // Using ternary logic to keep the bindings clean and reactive
-    implicitWidth: menuItems.visible ? (menuItems.implicitWidth + Global.format.radius_medium * 2) :
-                   startMenu.visible ? (startMenu.implicitWidth + Global.format.radius_medium * 2) : 1
-
-    implicitHeight: menuItems.visible ? (menuItems.implicitHeight + Global.format.radius_medium * 2) :
-                    startMenu.visible ? (startMenu.implicitHeight + Global.format.radius_medium * 2) : 1
-
-    function showMenu(items) {
-      leftMenu.visible = true
-      startMenu.visible = false
-      menuItems.visible = true
-      menuItems.model = items
+  // Left connector bridge
+  Rectangle {
+    color: Global.colors.surface
+    anchors {
+      top: parent.top
+      left: leftMouseArea.right
+      right: centerMouseArea.left
     }
-
-    function showStartMenu() {
-      leftMenu.visible = true
-      menuItems.visible = false
-      startMenu.visible = true
-    }
-
-    Menu {
-      id: menuItems
-      implicitWidth: 300
-      anchors.fill: parent
-      x: Global.format.radius_medium
-      y: Global.format.radius_medium
-      visible: false
-      model: []
-    }
-
-    Item {
-      id: startMenu
-      x: Global.format.radius_medium
-      y: Global.format.radius_medium
-      implicitWidth: 300
-      implicitHeight: 400
-      visible: false
-    }
+    implicitHeight: 6
+    visible: leftRect.visible && centerRect.visible
   }
 
-  DropdownWindow {
+  BarMenu {
     id: leftMenu
     window: panel
-    x: 0
-    implicitWidth:100
-    implicitHeight:100
-    color: "#fff"
+    edge: BarMenu.Left
+    padding: Global.format.radius_medium
+
+    Item {
+      id: startItem
+      implicitWidth: 300
+      implicitHeight: 400
+    }
   }
 
   MouseArea {
@@ -139,7 +109,7 @@ PanelWindow {
     propagateComposedEvents: true
     preventStealing: true
 
-    anchors{
+    anchors {
       top: parent.top
       bottom: parent.bottom
       horizontalCenter: parent.horizontalCenter
@@ -181,6 +151,17 @@ PanelWindow {
     }
   }
 
+  // Right connector bridge
+  Rectangle {
+    color: Global.colors.surface
+    anchors {
+      top: parent.top
+      left: centerMouseArea.right
+      right: rightMouseArea.left
+    }
+    implicitHeight: 6
+    visible: centerRect.visible && rightRect.visible
+  }
 
   MouseArea {
     id: rightMouseArea
@@ -189,7 +170,7 @@ PanelWindow {
     propagateComposedEvents: true
     preventStealing: true
 
-    anchors{
+    anchors {
       top: parent.top
       bottom: parent.bottom
       right: parent.right
