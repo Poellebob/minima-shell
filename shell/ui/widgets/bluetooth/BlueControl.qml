@@ -115,6 +115,7 @@ DropdownWindow {
             color: rowHover.containsMouse
               ? Global.colors.surface_container_high
               : "transparent"
+            visible: modelData.name
 
             Behavior on color {
               ColorAnimation { duration: 150; easing.type: Easing.OutCubic }

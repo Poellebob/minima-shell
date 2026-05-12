@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Widgets
+import qs.components.widget
 import qs.widgets.centerMenu
 import qs.widgets.audio
 import qs
@@ -48,12 +50,12 @@ PanelWindow {
       left: parent.left
     }
 
-    implicitWidth: itemsLeft.width + Global.format.spacing_medium * 2
+    implicitWidth: leftMenu.visible ? leftMenu.width : itemsLeft.width + Global.format.spacing_medium * 2
 
     Rectangle {
       id: leftRect
       anchors.fill: parent
-      bottomRightRadius: Global.format.radius_medium
+      bottomRightRadius: leftMenu.visible ? 0 : Global.format.radius_medium
       color: Global.colors.surface
       visible: systray.visible && ( parent.containsMouse || Global.panelAlwaysVisible )
 
@@ -69,8 +71,55 @@ PanelWindow {
         Systray {
           id: systray
           Layout.alignment: Qt.AlignVCenter
+          onMenuShow: (items) => leftMenu.showMenu(items)
         }
       }
+    }
+  }
+  
+  DropdownWindow {
+    id: leftMenu
+    window: panel
+    x: 0
+    color: "transparent"
+
+    // Using ternary logic to keep the bindings clean and reactive
+    implicitWidth: menuItems.visible ? (menuItems.implicitWidth + Global.format.radius_medium * 2) :
+                   startMenu.visible ? (startMenu.implicitWidth + Global.format.radius_medium * 2) : 1
+
+    implicitHeight: menuItems.visible ? (menuItems.implicitHeight + Global.format.radius_medium * 2) :
+                    startMenu.visible ? (startMenu.implicitHeight + Global.format.radius_medium * 2) : 1
+
+    function showMenu(items) {
+      leftMenu.visible = true
+      startMenu.visible = false
+      menuItems.visible = true
+      menuItems.model = items
+    }
+
+    function showStartMenu() {
+      leftMenu.visible = true
+      menuItems.visible = false
+      startMenu.visible = true
+    }
+
+    Menu {
+      id: menuItems
+      implicitWidth: 300
+      anchors.fill: parent
+      x: Global.format.radius_medium
+      y: Global.format.radius_medium
+      visible: false
+      model: []
+    }
+
+    Item {
+      id: startMenu
+      x: Global.format.radius_medium
+      y: Global.format.radius_medium
+      implicitWidth: 300
+      implicitHeight: 400
+      visible: false
     }
   }
 
