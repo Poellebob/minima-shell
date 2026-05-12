@@ -10,22 +10,24 @@ ColumnLayout {
   required property var model
   signal itemTriggered
 
-  spacing: Global.format.radius_medium
-  anchors.fill: parent
+  spacing: Global.format.spacing_small
 
   Repeater {
     model: items.model
-    anchors.verticalCenter: parent.verticalCenter
 
     Rectangle {
       required property QsMenuEntry modelData
+      Layout.fillWidth: true
       color: mouseArea.containsMouse && !modelData.isSeparator
         ? Global.colors.surface_container_high
         : Global.colors.surface_variant
-      anchors.horizontalCenter: parent.horizontalCenter
-      implicitWidth: items.width - Global.format.spacing_large
-      implicitHeight: modelData.isSeparator ? 2 : Global.format.icon_size
       radius: Global.format.radius_large
+      implicitWidth: modelData.isSeparator
+        ? 0
+        : Math.max(200, label.implicitWidth + Global.format.spacing_large * 2)
+      implicitHeight: modelData.isSeparator
+        ? 2
+        : Global.format.icon_size
 
       Behavior on color {
         ColorAnimation {
@@ -35,14 +37,16 @@ ColumnLayout {
       }
 
       StyledText {
+        id: label
         visible: !modelData.isSeparator
-        anchors.fill: parent
-        color: Global.colors.on_background
-        text: modelData.text
         anchors.left: parent.left
         anchors.leftMargin: Global.format.font_size_small
+        anchors.right: parent.right
+        anchors.rightMargin: Global.format.font_size_small
+        anchors.verticalCenter: parent.verticalCenter
+        color: Global.colors.on_background
+        text: modelData.text
         verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignLeft
       }
 
       MouseArea {
