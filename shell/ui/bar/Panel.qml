@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import qs.components.widget
 import qs.widgets.centerMenu
 import qs.widgets.audio
 import qs
@@ -72,6 +73,15 @@ PanelWindow {
         }
       }
     }
+  }
+
+  DropdownWindow {
+    id: leftMenu
+    window: panel
+    x: 0
+    implicitWidth:100
+    implicitHeight:100
+    color: "#fff"
   }
 
   MouseArea {
