@@ -165,6 +165,12 @@
             end
           '';
         }
+        {
+          event = "FileType";
+          pattern = "qml";
+          command = "set indentexpr=";
+          desc = "Disable treesitter indent for QML (broken)";
+        }
       ] ++ map (a: {
         event = a.event;
         pattern = a.pattern;
