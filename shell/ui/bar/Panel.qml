@@ -123,6 +123,15 @@ PanelWindow {
     }
   }
 
+  DropdownWindow {
+    id: leftMenu
+    window: panel
+    x: 0
+    implicitWidth:100
+    implicitHeight:100
+    color: "#fff"
+  }
+
   MouseArea {
     id: centerMouseArea
     hoverEnabled: true
