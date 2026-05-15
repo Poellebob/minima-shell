@@ -53,7 +53,7 @@ let
     ${optionalString (cfg.wm == "swayfx") swayfxConfig}
   '';
 
-  quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./config/quickshell; } ''
+  quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./shell/quickshell; } ''
     mkdir -p $out
     cd $src
     shopt -s dotglob
