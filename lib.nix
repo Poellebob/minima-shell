@@ -107,12 +107,6 @@ in
       description = "Enable hardcoded Minima styling (Breeze/Papirus/Rose-Pine)";
     };
 
-    enableBranding = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Show 'minima' as XDG_CURRENT_DESKTOP";
-    };
-
     shell.enable = mkOption {
       type = types.bool;
       default = true;

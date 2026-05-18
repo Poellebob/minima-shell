@@ -34,7 +34,10 @@ PopupWindow {
   color: "transparent"
 
   onVisibleChanged: {
-    if (visible) hideTimer.running = true
+    if (visible) { 
+      hideTimer.running = true
+      root.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+    }
   }
 
   Timer {
