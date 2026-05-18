@@ -247,12 +247,12 @@ in {
         CLUTTER_BACKEND = "wayland";
         ELECTRON_OZONE_PLATFORM_HINT = "wayland";
         XDG_SESSION_TYPE = "wayland";
+        XDG_CURRENT_DESKTOP = "minima:KDE:${if cfg.wm == "swayfx" then "sway" else cfg.wm}"; 
       }
       (mkIf cfg.theming.enable {
         XCURSOR_THEME = "BreezeX-RosePine-Linux";
         XCURSOR_SIZE = "24";
       })
-      (mkIf cfg.enableBranding { XDG_CURRENT_DESKTOP = "minima"; })
       (mkIf cfg.enableNvidia {
         LIBVA_DRIVER_NAME = "nvidia";
         GBM_BACKEND = "nvidia-drm";
