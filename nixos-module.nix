@@ -55,7 +55,6 @@ in {
             modifier          = mkDefault cfg.modifier;
             programs          = mkDefault cfg.programs;
             theming           = mkDefault cfg.theming;
-            enableBranding    = mkDefault cfg.enableBranding;
             shell             = mkDefault cfg.shell;
             extraPackages     = mkDefault cfg.extraPackages;
             minimaConfig      = mkDefault cfg.minimaConfig;
