@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.I3
+import Quickshell.Hyprland
 import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.components.widget
@@ -97,6 +99,19 @@ PanelWindow {
           onMenuShow: (items) => leftMenu.showMenu(items)
         }
       }
+    }
+  }
+
+  function openHome() {
+    switch (Global.settings["System"]["wm"]) {
+    case "hyprland":
+      if (Hyprland.monitorFor(screen).focused) leftMenu.showContent(homeContent);
+      break;
+    case "sway":
+    case "swayfx":
+    case "scroll":
+      if (I3.monitorFor(screen).focused) leftMenu.showContent(homeContent);
+      break;
     }
   }
 

@@ -15,11 +15,15 @@ let
       }'';
 
   swaySpecialWs = name: ws:
-    let ruleStr = lib.concatStringsSep "," (lib.mapAttrsToList (k: vs: "${k}=${lib.concatStringsSep "|" vs}") ws.rule); in ''
+    let
+      ruleStrings = lib.mapAttrsToList (k: vs: ''${k}="${lib.concatStringsSep "|" vs}"'') ws.rule;
+      assigns = lib.concatMapStringsSep "\n      " (r: "assign [${r}] workspace $ws_${name}") ruleStrings;
+      forWindows = lib.concatMapStringsSep "\n      " (r: "for_window [${r}] set_size h 1.0") ruleStrings;
+    in ''
       set $ws_${name} "${name}"
       ${optionalString ws.autostart "exec ${ws.startCommand}"}
-      assign [${ruleStr}] workspace $ws_${name}
-      for_window [${ruleStr}] set_size h 1.0
+      ${assigns}
+      ${forWindows}
       bindsym ${cfg.modifier}+${ws.key} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}
     '';
 
