@@ -42,13 +42,11 @@ Item {
       spacing: Global.format.spacing_large
       anchors.fill: parent
 
-      // Left column
       ColumnLayout {
         spacing: Global.format.spacing_large
         Layout.fillHeight: true
         Layout.preferredWidth: parent.width * 0.8
 
-        // Expanded DateDisplay (full width)
         Rectangle {
           Layout.fillWidth: true
           Layout.preferredHeight: parent.height * 0.14

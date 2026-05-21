@@ -11,15 +11,18 @@ import qs.components.widget
 import qs.components.text
 import qs
 pragma Singleton
+
 MenuPanel {
   id: notifRoot
   implicitWidth: 380
   implicitHeight: 550
   WlrLayershell.layer: WlrLayer.Overlay
+
   anchors {
     bottom: true
     right: true
   }
+
   onVisibleChanged: {
     if (visible) {
       notifRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.OnDemand
@@ -28,9 +31,11 @@ MenuPanel {
       notifRoot.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
     }
   }
+
   function open(): void {
     notifRoot.visible = !notifRoot.visible
   }
+
   NotificationServer {
     id: notifServer
     keepOnReload: true
@@ -42,6 +47,7 @@ MenuPanel {
       console.log(notifServer.trackedNotifications.values.length)
     }
   }
+
   Item {
     id: panelItem
     anchors.fill: parent

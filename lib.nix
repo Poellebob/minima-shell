@@ -93,12 +93,10 @@ in
     autostart = mkOption {
       type = types.listOf types.str;
       default = [];
-      internal = true;
     };
     specialWorkspaces = mkOption {
       type = types.attrsOf specialWorkspaceType;
       default = {};
-      internal = true;
     };
 
     theming.enable = mkOption {

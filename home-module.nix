@@ -268,11 +268,11 @@ in {
       text = cfg.kdeglobals;
     };
 
-    home.file.".config/sway/config" = mkIf (!cfg.osModule && (cfg.wm == "sway" || cfg.wm == "swayfx")) {
+    home.file.".config/sway/config" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
       text = "include ${cfg.swayConfigFile}";
     };
 
-    home.file.".config/scroll/config" = mkIf (!cfg.osModule && cfg.wm == "scroll") {
+    home.file.".config/scroll/config" = mkIf (cfg.wm == "scroll") {
       text = "include ${cfg.scrollConfigFile}";
     };
 

@@ -9,11 +9,35 @@ import qs.widgets.notificationCenter
 ShellRoot {
   id: root
 
+  Process {
+    command: [
+      "sh",
+      "-c",
+      "systemd-inhibit --who=\"minima shell\" --why=\"lock keybind\" --what=handle-power-key --mode=block sleep infinity"
+    ]
+    running: true
+  }
+
   Instantiator {
     model: Quickshell.screens
 
     delegate: Panel {
       screen: modelData
+
+      Connections {
+        target: root
+        function onOpenHomeMenu() { openHome() }
+      }
+    }
+  }
+
+  signal openHomeMenu()
+
+  IpcHandler {
+    target: "minimaHome"
+
+    function open(): void {
+      openHomeMenu()
     }
   }
 

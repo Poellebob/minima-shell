@@ -19,8 +19,7 @@ in {
           buildCommand = ''
             ${old.buildCommand or ""}
             wrapProgram $out/bin/sway \
-              ${lib.optionalString cfg.enableNvidia "--add-flags --unsupported-gpu"} \
-              --add-flags "-c ${cfg.swayConfigFile}"
+              ${lib.optionalString cfg.enableNvidia "--add-flags --unsupported-gpu"}
           '';
         });
         xwayland.enable = true;
@@ -32,11 +31,19 @@ in {
         package = pkgs.scroll.overrideAttrs (old: {
           buildCommand = ''
             ${old.buildCommand or ""}
-            wrapProgram $out/bin/scroll \
-              --add-flags "-c ${cfg.scrollConfigFile}"
+            wrapProgram $out/bin/scroll
           '';
         });
         xwayland.enable = true;
+      };
+
+      environment.etc = {
+        "sway/config" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
+          source = cfg.swayConfigFile;
+        };
+        "scroll/config" = mkIf (cfg.wm == "scroll") {
+          source = cfg.scrollConfigFile;
+        };
       };
 
       home-manager.sharedModules = [
@@ -57,12 +64,12 @@ in {
             specialWorkspaces = mkDefault cfg.specialWorkspaces;
             tex               = mkDefault cfg.tex;
             desktop           = mkDefault cfg.desktop;
-             # pass store paths so HM doesn't have to recompute them
-             swayConfigFile    = mkDefault cfg.swayConfigFile;
-             scrollConfigFile  = mkDefault cfg.scrollConfigFile;
-             quickshellStoreDir = mkDefault cfg.quickshellStoreDir;
-             matugenConfigFile = mkDefault cfg.matugenConfigFile;
-             matugenTemplateFile = mkDefault cfg.matugenTemplateFile;
+
+            swayConfigFile    = mkDefault cfg.swayConfigFile;
+            scrollConfigFile  = mkDefault cfg.scrollConfigFile;
+            quickshellStoreDir = mkDefault cfg.quickshellStoreDir;
+            matugenConfigFile = mkDefault cfg.matugenConfigFile;
+            matugenTemplateFile = mkDefault cfg.matugenTemplateFile;
           };
         }
       ];
