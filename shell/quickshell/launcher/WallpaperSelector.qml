@@ -329,7 +329,7 @@ MenuPanel {
     id: setWallpaperProc
     property string wallpaperPath: ""
     property string previewPath:   ""
-    command: ["swww", "img", wallpaperPath, "--transition-type", "fade", "--transition-duration", "1"]
+    command: ["awww", "img", wallpaperPath, "--transition-type", "fade", "--transition-duration", "1"]
 
     onExited: (exitCode, _) => {
       if (exitCode !== 0) return

@@ -70,7 +70,7 @@ let
   setXftDpi = pkgs.writeShellScript "set-xft-dpi.sh" (builtins.readFile ./shell/set-xft-dpi.sh);
 
   autostart = ''
-    exec swww-daemon
+    exec awww-daemon
     exec ${pkgs.quickshell}/bin/qs -c $qs_path
     exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
     exec /usr/lib/polkit-kde-authentication-agent-1

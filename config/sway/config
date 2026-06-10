@@ -2,7 +2,7 @@ include ~/.config/minima/sway.conf
 include ~/.config/sway/config.d/*
 
 # Autostart applications
-exec swww-daemon
+exec awww-daemon
 exec ~/.local/bin/minima &
 exec sh -c "~/.config/hypr/getkeys.sh"
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP

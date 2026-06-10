@@ -14,9 +14,9 @@ in {
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
       matugen wiremix bluetui hyprlock bluez bluez-tools upower curl
-      grim slurp swappy swww xdg-utils cliphist wl-clipboard quickshell
+      grim slurp swappy awww xdg-utils cliphist wl-clipboard quickshell
       wireplumber jq bc power-profiles-daemon brightnessctl libnotify inotify-tools
-      nerd-fonts.jetbrains-mono lazygit papirus-icon-theme
+      nerd-fonts.jetbrains-mono lazygit papirus-icon-theme playerctl
       rose-pine-cursor qt5.qtwayland qt6.qtwayland kdePackages.qt6ct 
       linux-wallpaperengine libqalculate
       kdePackages.breeze
