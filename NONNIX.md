@@ -10,7 +10,7 @@ This guide covers manual installation without Nix/Flakes.
 
 ```sh
 sudo pacman -Sy wireplumber libgtop bluez bluez-utils btop networkmanager \
-  dart-sass wl-clipboard brightnessctl swww python upower \
+  dart-sass wl-clipboard brightnessctl awww python upower \
   pacman-contrib power-profiles-daemon gvfs cliphist \
   hyprlock hypridle kitty ttf-jetbrains-mono-nerd qt6-wayland qt5-wayland qt5ct \
   grim slurp swappy wiremix bluetui polkit-kde-agent \
