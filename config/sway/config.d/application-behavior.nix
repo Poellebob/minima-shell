@@ -1,0 +1,23 @@
+{ wm }:
+''
+  # Application Behavior and Rules
+
+  # Window rules
+  # Float utility windows
+  for_window [app_id="^(nmtui|bluedevil-wizard)$"] floating enable
+
+  # VR applications
+  for_window [class="^(vrmonitor)$"] floating enable
+  for_window [title="^(SteamVR.*)$"] floating enable
+
+  # Xwayland drag fix
+  for_window [class="^$" title="^$"] floating enable, border none
+
+  ${if wm == "scroll" then ''
+  # Layout settings
+  layout_default_width 0.5
+  layout_default_height 1.0
+  layout_widths [0.33333333 0.5 0.666666667 1.0]
+  layout_heights [0.33333333 0.5 0.666666667 1.0]
+  '' else ""}
+''

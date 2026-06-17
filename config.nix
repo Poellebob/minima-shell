@@ -18,12 +18,12 @@ let
     let
       ruleStrings = lib.mapAttrsToList (k: vs: ''${k}="${lib.concatStringsSep "|" vs}"'') ws.rule;
       assigns = lib.concatMapStringsSep "\n      " (r: "assign [${r}] workspace $ws_${name}") ruleStrings;
-      forWindows = lib.concatMapStringsSep "\n      " (r: "for_window [${r}] set_size h 1.0") ruleStrings;
+      setSize = lib.concatMapStringsSep "\n      " (r: "for_window [${r}] set_size w 1.0") ruleStrings;
     in ''
       set $ws_${name} "${name}"
       ${optionalString ws.autostart "exec ${ws.startCommand}"}
       ${assigns}
-      ${forWindows}
+      ${optionalString (cfg.wm == "scroll") setSize}
       bindsym ${cfg.modifier}+${ws.key} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}
     '';
 
@@ -120,37 +120,27 @@ let
     scheme = "${cfg.matugen.scheme}"
   '';
 
+  mkWmConfig = wm: let
+    msgCmd = if wm == "scroll" then "scrollmsg" else "swaymsg";
+  in pkgs.writeText "${wm}-config" ''
+    ${swayConfText}
+
+    ${import ./config/sway/config.d/keybinds.nix { inherit wm; }}
+    ${builtins.readFile ./config/sway/config.d/workspace}
+    ${import ./config/sway/config.d/application-behavior.nix { inherit wm; }}
+    ${builtins.readFile ./config/sway/config.d/env}
+    ${builtins.readFile ./config/sway/config.d/input}
+    ${import ./config/sway/config.d/application-style.nix { inherit wm; }}
+
+    ${autostart}
+    exec_always --no-startup-id sh -c '${msgCmd} input type:keyboard xkb_layout "$(localectl status | sed -n "s/^\s*X11 Layout:\s*//p")"'
+    exec ${setXftDpi}
+  '';
+
 in {
   config = mkIf cfg.enable {
-    minima.swayConfigFile = pkgs.writeText "sway-config" ''
-      ${swayConfText}
-
-      ${builtins.readFile ./config/sway/config.d/keybinds}
-      ${builtins.readFile ./config/sway/config.d/workspace}
-      ${builtins.readFile ./config/sway/config.d/application-behavior}
-      ${builtins.readFile ./config/sway/config.d/env}
-      ${builtins.readFile ./config/sway/config.d/input}
-      ${builtins.readFile ./config/sway/config.d/application-style}
-
-      ${autostart}
-      exec_always --no-startup-id sh -c 'swaymsg input type:keyboard xkb_layout "$(localectl status | sed -n "s/^\s*X11 Layout:\s*//p")"'
-      exec ${setXftDpi}
-    '';
-
-    minima.scrollConfigFile = pkgs.writeText "scroll-config" ''
-      ${swayConfText}
-
-      ${builtins.readFile ./config/scroll/config.d/keybinds}
-      ${builtins.readFile ./config/scroll/config.d/workspace}
-      ${builtins.readFile ./config/scroll/config.d/application-behavior}
-      ${builtins.readFile ./config/scroll/config.d/env}
-      ${builtins.readFile ./config/scroll/config.d/input}
-      ${builtins.readFile ./config/scroll/config.d/application-style}
-
-      ${autostart}
-      exec_always --no-startup-id sh -c 'scrollmsg input type:keyboard xkb_layout "$(localectl status | sed -n "s/^\s*X11 Layout:\s*//p")"'
-      exec ${setXftDpi}
-    '';
+    minima.swayConfigFile = mkWmConfig "sway";
+    minima.scrollConfigFile = mkWmConfig "scroll";
 
     minima.quickshellStoreDir = quickshellStoreDir;
     minima.minimaConfigFile = "${minimaConfigIni}";
