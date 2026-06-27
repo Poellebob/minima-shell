@@ -125,7 +125,7 @@ let
   in pkgs.writeText "${wm}-config" ''
     ${swayConfText}
 
-    ${import ./config/sway/config.d/keybinds.nix { inherit wm; }}
+    ${import ./config/sway/config.d/keybinds.nix { inherit wm pkgs; }}
     ${builtins.readFile ./config/sway/config.d/workspace}
     ${import ./config/sway/config.d/application-behavior.nix { inherit wm; }}
     ${builtins.readFile ./config/sway/config.d/env}
