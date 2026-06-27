@@ -1,4 +1,4 @@
-{ wm }:
+{ wm, pkgs }:
 let
   msgCmd = if wm == "scroll" then "scrollmsg" else "swaymsg";
   logoutTarget = if wm == "scroll" then "minimaLogout" else "minimaHome";
@@ -25,10 +25,10 @@ in ''
   '' else ""}
 
   # Screenshots
-  bindsym Print exec grim -g "$(slurp)" - | magick - -shave 1x1 PNG:- | wl-copy
-  bindsym Shift+Print exec grim - | wl-copy
-  bindsym $mod+Print exec grim -g "$(slurp)" - | magick - -shave 1x1 PNG:- | swappy -f -
-  bindsym $mod+Shift+Print exec grim - | swappy -f -
+  bindsym Print exec ${pkgs.grim}/bin/grim -g "$(${pkgs.slurp}/bin/slurp -o -d)" - | ${pkgs.imagemagick}/bin/magick - -shave 1x1 PNG:- | ${pkgs.wl-clipboard}/bin/wl-copy
+  bindsym Shift+Print exec ${pkgs.grim}/bin/grim - | ${pkgs.wl-clipboard}/bin/wl-copy
+  bindsym $mod+Print exec ${pkgs.grim}/bin/grim -g "$(${pkgs.slurp}/bin/slurp -o -d)" - | ${pkgs.imagemagick}/bin/magick - -shave 1x1 PNG:- | ${pkgs.swappy}/bin/swappy -f -
+  bindsym $mod+Shift+Print exec ${pkgs.grim}/bin/grim - | ${pkgs.swappy}/bin/swappy -f -
 
   # Focus movement
   bindsym $mod+h focus left
