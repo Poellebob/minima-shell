@@ -18,7 +18,7 @@ in {
       wireplumber jq bc power-profiles-daemon brightnessctl libnotify inotify-tools
       nerd-fonts.jetbrains-mono lazygit papirus-icon-theme playerctl
       rose-pine-cursor qt5.qtwayland qt6.qtwayland kdePackages.qt6ct 
-      linux-wallpaperengine libqalculate
+      linux-wallpaperengine libqalculate killall
       kdePackages.breeze
       kdePackages.breeze-gtk
       kdePackages.breeze-icons
