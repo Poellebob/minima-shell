@@ -317,6 +317,7 @@ MenuPanel {
         ]
         if (root.engineFps > 0) args.push("--fps", root.engineFps)
         if (root.engineFill)   args.push("--scaling", "fill")
+        console.log(args.toString())
         Quickshell.execDetached({ command: args, environment: ["XDG_SESSION_TYPE=wayland"] })
       }
       updateConfProc.wallpaperPath = "engine:" + folderId
@@ -349,7 +350,7 @@ MenuPanel {
       if (exitCode !== 0) return
       Quickshell.execDetached([
         "/bin/sh", "-c",
-        "matugen -c " + Global.matugenConfigPath + " -j hex image \"" + previewPath + "\""
+        "matugen -c " + Global.matugenConfigPath + " -j hex image \"" + previewPath + "\" --source-color-index 0"
       ])
     }
   }

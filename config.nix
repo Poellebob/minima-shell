@@ -73,7 +73,7 @@ let
     exec awww-daemon
     exec ${pkgs.quickshell}/bin/qs -c $qs_path
     exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-    exec /usr/lib/polkit-kde-authentication-agent-1
+    exec ${kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1
     exec wl-paste --watch cliphist store
   '';
 
