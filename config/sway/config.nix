@@ -1,18 +1,76 @@
-{ wm }:
-let
-  cfgDir = if wm == "scroll" then "~/.config/scroll" else "~/.config/sway";
-  msgCmd = if wm == "scroll" then "scrollmsg" else "swaymsg";
-in ''
-  include ~/.config/minima/sway.conf
-  include ${cfgDir}/config.d/*
+{ cfg, pkgs, lib, quickshellStoreDir, setXftDpi }:
 
-  # Autostart applications
-  exec awww-daemon
-  exec ~/.local/bin/minima &
-  exec sh -c "~/.config/hypr/getkeys.sh"
-  exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-  exec /usr/lib/polkit-kde-authentication-agent-1
-  exec wl-paste --watch cliphist store
-  exec_always --no-startup-id sh -c '${msgCmd} input type:keyboard xkb_layout "$(localectl status | sed -n "s/^\s*X11 Layout:\s*//p")"'
-  exec sh -c "${cfgDir}/set-xft-dpi"
-''
+with lib;
+let
+  swayOutputBlock = name: d:
+    let outputName = if name == "" then "*" else name; in ''
+      output ${outputName} {
+        res ${d.res}
+        position ${toString d.position.x} ${toString d.position.y}
+        scale ${toString d.scale}
+      }'';
+
+  swaySpecialWs = name: ws:
+    let
+      ruleStrings = lib.mapAttrsToList (k: vs: ''${k}="${lib.concatStringsSep "|" vs}"'') ws.rule;
+      assigns = lib.concatMapStringsSep "\n      " (r: "assign [${r}] workspace $ws_${name}") ruleStrings;
+      setSize = lib.concatMapStringsSep "\n      " (r: "for_window [${r}] set_size w 1.0") ruleStrings;
+    in ''
+      set $ws_${name} "${name}"
+      ${optionalString ws.autostart "exec ${ws.startCommand}"}
+      ${assigns}
+      ${optionalString (cfg.wm == "scroll") setSize}
+      bindsym ${cfg.modifier}+${ws.key} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}
+    '';
+
+  swayfxConfig = ''
+    shadows enable
+    shadow_blur_radius 4
+    shadow_color #1a1a1aee
+    shadow_offset 0 2
+    blur enable
+    blur_radius 4
+    blur_passes 2
+    for_window [app_id=".*"] blur enable
+    for_window [class=".*"] blur enable
+  '';
+
+  swayConfText = ''
+    set $mod ${cfg.modifier}
+    set $fileManager ${cfg.programs.fileManager.name}
+    set $browser ${cfg.programs.browser.name}
+    set $terminal ${cfg.programs.terminal.name}
+    set $qs_path ${quickshellStoreDir}
+
+    ${concatMapStringsSep "\n" (x: swayOutputBlock x.name x.value) (mapAttrsToList (n: v: { name = n; value = v; }) cfg.displays)}
+
+    ${concatMapStringsSep "\n" (x: "workspace ${toString x.value.workspace} output ${x.name}") (mapAttrsToList (n: v: { name = n; value = v; }) (filterAttrs (n: v: v.workspace != null) cfg.displays))}
+
+    ${concatMapStringsSep "\n" (a: "exec ${a}") cfg.autostart}
+
+    ${concatMapStringsSep "\n" (x: swaySpecialWs x.name x.value) (mapAttrsToList (n: v: { name = n; value = v; }) cfg.specialWorkspaces)}
+
+    ${optionalString (cfg.wm == "swayfx") swayfxConfig}
+  '';
+in
+  wm: let
+    msgCmd = if wm == "scroll" then "scrollmsg" else "swaymsg";
+  in pkgs.writeText "${wm}-config" ''
+    ${swayConfText}
+
+    ${import ./config.d/keybinds.nix { inherit wm pkgs; }}
+    ${builtins.readFile ./config.d/workspace}
+    ${import ./config.d/application-behavior.nix { inherit wm; }}
+    ${builtins.readFile ./config.d/env}
+    ${builtins.readFile ./config.d/input}
+    ${import ./config.d/application-style.nix { inherit wm; }}
+
+    exec ${setXftDpi}
+    exec awww-daemon
+    exec ${pkgs.quickshell}/bin/qs -c $qs_path
+    exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+    exec ${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1
+    exec wl-paste --watch cliphist store
+
+    exec_always --no-startup-id sh -c '${msgCmd} input type:keyboard xkb_layout "$(localectl status | sed -n "s/^\s*X11 Layout:\s*//p")"'
+  ''

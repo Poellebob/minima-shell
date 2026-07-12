@@ -6,57 +6,6 @@ let
 
   boolStr = b: if b then "true" else "false";
 
-  swayOutputBlock = name: d:
-    let outputName = if name == "" then "*" else name; in ''
-      output ${outputName} {
-        res ${d.res}
-        position ${toString d.position.x} ${toString d.position.y}
-        scale ${toString d.scale}
-      }'';
-
-  swaySpecialWs = name: ws:
-    let
-      ruleStrings = lib.mapAttrsToList (k: vs: ''${k}="${lib.concatStringsSep "|" vs}"'') ws.rule;
-      assigns = lib.concatMapStringsSep "\n      " (r: "assign [${r}] workspace $ws_${name}") ruleStrings;
-      setSize = lib.concatMapStringsSep "\n      " (r: "for_window [${r}] set_size w 1.0") ruleStrings;
-    in ''
-      set $ws_${name} "${name}"
-      ${optionalString ws.autostart "exec ${ws.startCommand}"}
-      ${assigns}
-      ${optionalString (cfg.wm == "scroll") setSize}
-      bindsym ${cfg.modifier}+${ws.key} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}
-    '';
-
-  swayfxConfig = ''
-    shadows enable
-    shadow_blur_radius 4
-    shadow_color #1a1a1aee
-    shadow_offset 0 2
-    blur enable
-    blur_radius 4
-    blur_passes 2
-    for_window [app_id=".*"] blur enable
-    for_window [class=".*"] blur enable
-  '';
-
-  swayConfText = ''
-    set $mod ${cfg.modifier}
-    set $fileManager ${cfg.programs.fileManager.name}
-    set $browser ${cfg.programs.browser.name}
-    set $terminal ${cfg.programs.terminal.name}
-    set $qs_path ${quickshellStoreDir}
-
-    ${concatMapStringsSep "\n" (x: swayOutputBlock x.name x.value) (mapAttrsToList (n: v: { name = n; value = v; }) cfg.displays)}
-
-    ${concatMapStringsSep "\n" (x: "workspace ${toString x.value.workspace} output ${x.name}") (mapAttrsToList (n: v: { name = n; value = v; }) (filterAttrs (n: v: v.workspace != null) cfg.displays))}
-
-    ${concatMapStringsSep "\n" (a: "exec ${a}") cfg.autostart}
-
-    ${concatMapStringsSep "\n" (x: swaySpecialWs x.name x.value) (mapAttrsToList (n: v: { name = n; value = v; }) cfg.specialWorkspaces)}
-
-    ${optionalString (cfg.wm == "swayfx") swayfxConfig}
-  '';
-
   quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./shell/quickshell; } ''
     mkdir -p $out
     cd $src
@@ -67,14 +16,10 @@ let
     chmod -R u+rw $out
   '';
 
-  setXftDpi = pkgs.writeShellScript "set-xft-dpi.sh" (builtins.readFile ./shell/set-xft-dpi.sh);
+  setXftDpi = pkgs.writeShellScript "set-xft-dpi.sh" (builtins.readFile ./set-xft-dpi.sh);
 
   autostart = ''
-    exec awww-daemon
-    exec ${pkgs.quickshell}/bin/qs -c $qs_path
-    exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-    exec ${kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1
-    exec wl-paste --watch cliphist store
+
   '';
 
   minimaConfigIni = pkgs.writeText "minima-config.ini" ''
@@ -120,22 +65,7 @@ let
     scheme = "${cfg.matugen.scheme}"
   '';
 
-  mkWmConfig = wm: let
-    msgCmd = if wm == "scroll" then "scrollmsg" else "swaymsg";
-  in pkgs.writeText "${wm}-config" ''
-    ${swayConfText}
-
-    ${import ./config/sway/config.d/keybinds.nix { inherit wm pkgs; }}
-    ${builtins.readFile ./config/sway/config.d/workspace}
-    ${import ./config/sway/config.d/application-behavior.nix { inherit wm; }}
-    ${builtins.readFile ./config/sway/config.d/env}
-    ${builtins.readFile ./config/sway/config.d/input}
-    ${import ./config/sway/config.d/application-style.nix { inherit wm; }}
-
-    ${autostart}
-    exec_always --no-startup-id sh -c '${msgCmd} input type:keyboard xkb_layout "$(localectl status | sed -n "s/^\s*X11 Layout:\s*//p")"'
-    exec ${setXftDpi}
-  '';
+  mkWmConfig = import ./config/sway/config.nix { inherit cfg pkgs lib quickshellStoreDir setXftDpi; };
 
 in {
   config = mkIf cfg.enable {
