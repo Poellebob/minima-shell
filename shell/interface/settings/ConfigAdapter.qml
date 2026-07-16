@@ -44,7 +44,6 @@ Item {
       }
       property JsonObject Interface: JsonObject {
         property string position: "bottom"
-        property var modules: ["workspace", "audio", "battery", "network", "bluetooth", "clock"]
         property int expandedHeight: 400
       }
     }
