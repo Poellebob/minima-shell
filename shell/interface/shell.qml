@@ -3,18 +3,10 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import qs
-import qs.bar
-import qs.colors
-import qs.format
-import qs.settings
+import qs.panel
 
 ShellRoot {
   id: root
-
-  Singleton {
-    id: globalInstance
-    // Global singleton is auto-loaded from Global.qml
-  }
 
   Process {
     command: [
@@ -28,7 +20,7 @@ ShellRoot {
   Instantiator {
     model: Quickshell.screens
 
-    delegate: StatusBar {
+    delegate: Panel {
       screen: modelData
     }
   }

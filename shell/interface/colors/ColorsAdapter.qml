@@ -9,7 +9,7 @@ Item {
     id: colorFile
     path: Quickshell.env("HOME") + "/.config/minima/colors.json"
     watchChanges: true
-    blockLoading: true
+    blockLoading: false
 
     onFileChanged: reload()
 
