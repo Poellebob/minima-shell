@@ -18,12 +18,12 @@ Item {
     anchors.fill: parent
     color: Global.colors.background
 
-    Item {
+    ColumnLayout {
       id: contentArea
       x: root.padding
       y: root.padding
       width: parent.width - root.padding * 2
-      height: parent.height - root.padding * 2
+      spacing: 0
     }
   }
 }
