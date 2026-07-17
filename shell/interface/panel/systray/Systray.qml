@@ -10,6 +10,8 @@ Item {
   implicitHeight: Global.format.module_height
   implicitWidth: rowLayout.implicitWidth + Global.format.spacing_medium
 
+  signal showMenu(items: ObjectModel)
+
   RowLayout {
     id: rowLayout
     anchors.margins: Global.format.spacing_small
@@ -21,6 +23,7 @@ Item {
       delegate: SysTrayItem {
         required property SystemTrayItem modelData
         item: modelData
+        onShowMenu: (items) => systray.showMenu(items)
       }
     }
   }
