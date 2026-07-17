@@ -9,31 +9,31 @@ Item {
     id: confFile
     path: Quickshell.env("MINIMA_CONFIG") || (Quickshell.env("HOME") + "/.config/minima/config.json")
     watchChanges: true
-    blockLoading: true
+    blockLoading: false
 
     onFileChanged: reload()
 
     JsonAdapter {
       id: json
-      property JsonObject System: JsonObject {
+      property JsonObject system: JsonObject {
         property string wm: "sway"
         property string matugenConfigPath: ""
       }
-      property JsonObject Theme: JsonObject {
+      property JsonObject theme: JsonObject {
         property bool darkTheme: true
       }
-      property JsonObject Panel: JsonObject {
+      property JsonObject panel: JsonObject {
         property bool enabled: true
-        property bool panelAlwaysVisible: true
+        property bool top: false
       }
-      property JsonObject Launcher: JsonObject {
+      property JsonObject launcher: JsonObject {
         property bool enabled: true
         property string qalcPath: ""
       }
-      property JsonObject Clipboard: JsonObject {
+      property JsonObject clipboard: JsonObject {
         property bool enabled: true
       }
-      property JsonObject Wallpaper: JsonObject {
+      property JsonObject wallpaper: JsonObject {
         property bool enabled: true
         property bool engineEnabled: false
         property string enginePath: ""
@@ -42,12 +42,8 @@ Item {
         property bool fill: true
         property bool matureContent: false
       }
-      property JsonObject Interface: JsonObject {
-        property string position: "bottom"
-        property int expandedHeight: 400
-      }
     }
   }
 
-  readonly property var settings: json
+  readonly property var config: json
 }
