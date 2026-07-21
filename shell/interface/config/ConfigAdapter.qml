@@ -18,6 +18,7 @@ Item {
       property JsonObject system: JsonObject {
         property string wm: "sway"
         property string matugenConfigPath: ""
+        property string matugenBin: ""
       }
       property JsonObject theme: JsonObject {
         property bool darkTheme: true
@@ -41,6 +42,7 @@ Item {
         property int fps: 25
         property bool fill: true
         property bool matureContent: false
+        property int volume: 50
       }
     }
   }

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.I3
 import qs
 import qs.components.widget
 import qs.components.text
@@ -12,6 +13,7 @@ import qs.panel.bluetooth
 import qs.panel.network
 import qs.panel.clock
 import qs.panel.launcher
+import qs.panel.wallpaper
 
 PanelWindow {
   id: panel
@@ -30,9 +32,17 @@ PanelWindow {
   property Item activeBarContent: statusContent
 
   function openBarMenu(barContent: Item) {
+    if (!(screen.name == I3.focusedMonitor.name)) return
     activeBarContent.visible = false
     activeBarContent = barContent
     barContent.visible = true
+    content.forceActiveFocus()
+    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+  }
+
+  function openBarContent(barContent: Item) {
+    if (!(screen.name == I3.focusedMonitor.name)) return
+    barMenu.showContent(barContent)
     content.forceActiveFocus()
     panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
   }
@@ -42,6 +52,20 @@ PanelWindow {
     activeBarContent = statusContent
     statusContent.visible = true
     panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
+  }
+
+  function openWallpapers() {
+    openBarMenu(wallpaperSearchContent)
+    wallpaperSearchInput.text = ""
+    wallpaperSearchInput.forceActiveFocus()
+    wallpaperContent.open()
+    barMenu.showContent(wallpaperContent)
+  }
+
+  function closeWallpapers() {
+    barMenu.hideContent()
+    wallpaperContent.close()
+    closeBarMenu()
   }
 
   Item {
@@ -97,6 +121,7 @@ PanelWindow {
                 id: systray
                 Layout.alignment: Qt.AlignVCenter
                 onShowMenu: (items) => {
+                  if (!(screen.name == I3.focusedMonitor.name)) return
                   barMenu.showMenu(items)
                   content.forceActiveFocus()
                   panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
@@ -132,19 +157,11 @@ PanelWindow {
 
               Audio {
                 Layout.alignment: Qt.AlignVCenter
-                onAudioMenuTriggered: {
-                  barMenu.showContent(audioContent)
-                  content.forceActiveFocus()
-                  panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
-                }
+                onAudioMenuTriggered: openBarContent(audioContent)
               }
               Bluetooth {
                 Layout.alignment: Qt.AlignVCenter
-                onBluetoothMenuTriggered: {
-                  barMenu.showContent(btContent)
-                  content.forceActiveFocus()
-                  panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
-                }
+                onBluetoothMenuTriggered: openBarContent(btContent)
               }
               Network {
                 Layout.alignment: Qt.AlignVCenter
@@ -162,6 +179,50 @@ PanelWindow {
         anchors.fill: parent
         visible: false
         onClosed: panel.closeBarMenu()
+        onCommandTriggered: (name) => {
+          if (name === "Wallpapers")
+            openWallpapers()
+        }
+      }
+
+      Item {
+        id: wallpaperSearchContent
+        anchors.fill: parent
+        visible: false
+
+        RowLayout {
+          anchors.fill: parent
+          anchors.leftMargin: Global.format.spacing_medium
+          anchors.rightMargin: Global.format.spacing_medium
+
+          TextInput {
+            id: wallpaperSearchInput
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            color: Global.colors.on_surface_variant
+            font.family: "JetBrainsMono Nerd Font"
+            font.pixelSize: Global.format.text_size
+            verticalAlignment: Text.AlignVCenter
+            clip: true
+            focus: true
+            onTextChanged: wallpaperContent.searchText = text
+            Keys.onLeftPressed: wallpaperContent.movePrev()
+            Keys.onRightPressed: wallpaperContent.moveNext()
+            Keys.onReturnPressed: wallpaperContent.selectCurrent()
+            Keys.onEscapePressed: closeWallpapers()
+            Keys.onPressed: (event) => {
+              if (event.modifiers & Qt.ControlModifier) {
+                if (event.key === Qt.Key_F) {
+                  wallpaperContent.toggleFavoriteCurrent()
+                  event.accepted = true
+                } else if (event.key === Qt.Key_R) {
+                  wallpaperContent.reload()
+                  event.accepted = true
+                }
+              }
+            }
+          }
+        }
       }
     }
 
@@ -199,6 +260,13 @@ PanelWindow {
 
       NetworkControl {
         id: netContent
+        visible: false
+      }
+
+      WallpaperPicker {
+        id: wallpaperContent
+        anchors.left: parent.left
+        anchors.right: parent.right
         visible: false
       }
     }

@@ -23,7 +23,8 @@ let
   minimaConfigJson = pkgs.writeText "minima-config.json" (builtins.toJSON {
     system = {
       wm = cfg.wm;
-      matugenConfigPath = "";
+      matugenConfigPath = "${matugenConfigFile}";
+      matugenBin = "${cfg.matugen.package}/bin/matugen";
     };
     theme = {
       darkTheme = cfg.minimaConfig.darkTheme;
@@ -48,7 +49,7 @@ let
       fps = cfg.minimaConfig.wallpaper.fps;
       fill = cfg.minimaConfig.wallpaper.fill;
       matureContent = cfg.minimaConfig.wallpaper.matureContent;
-      volume = 50;
+      volume = cfg.minimaConfig.wallpaper.volume;
     };
   });
 
