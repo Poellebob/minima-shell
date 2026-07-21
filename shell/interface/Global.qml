@@ -47,4 +47,6 @@ Singleton {
   })
 
   property ColorsAdapter colorsRaw: ColorsAdapter {}
+
+  signal openSystrayMenu(index: int)
 }

@@ -43,6 +43,12 @@ MouseArea {
     menu: sysTrayItem.item.menu
   }
 
+  function triggerMenu() {
+    if (item.hasMenu) {
+      showMenu(menuOpen.children)
+    }
+  }
+
   IconImage {
     id: trayIcon
     visible: true

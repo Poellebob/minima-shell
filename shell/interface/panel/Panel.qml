@@ -21,30 +21,12 @@ PanelWindow {
     bottom: !Global.config.panel.top
   }
 
-  height: content.height + (activeMenu ? activeMenu.implicitHeight : 0)
-  exclusiveZone: Global.format.panel_height
+  height: content.height + (barMenu.visible ? barMenu.implicitHeight : 0)
+  exclusiveZone: height
   color: Global.colors.background
   aboveWindows: true
 
-  property Item activeMenu: null
   property Item activeBarContent: statusContent
-
-  function openMenu(menu: Item) {
-    if (activeMenu !== null)
-      activeMenu.visible = false
-    activeMenu = menu
-    menu.visible = true
-    content.forceActiveFocus()
-    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
-  }
-
-  function closeMenu() {
-    if (activeMenu !== null) {
-      activeMenu.visible = false
-      activeMenu = null
-    }
-    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
-  }
 
   function openBarMenu(barContent: Item) {
     activeBarContent.visible = false
@@ -72,8 +54,9 @@ PanelWindow {
     height: barRow.height
     focus: true
     Keys.onEscapePressed: (event) => {
-      if (activeMenu !== null) {
-        closeMenu()
+      if (barMenu.visible) {
+        barMenu.hideContent()
+        panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
       } else if (activeBarContent !== statusContent) {
         closeBarMenu()
       } else {
@@ -110,10 +93,12 @@ PanelWindow {
               spacing: Global.format.spacing_medium
 
               Systray {
+                id: systray
                 Layout.alignment: Qt.AlignVCenter
-
                 onShowMenu: (items) => {
-                  openMenu(homeMenu)
+                  barMenu.showMenu(items)
+                  content.forceActiveFocus()
+                  panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
                 }
               }
             }
@@ -146,9 +131,19 @@ PanelWindow {
 
               Audio {
                 Layout.alignment: Qt.AlignVCenter
+                onAudioMenuTriggered: {
+                  barMenu.showContent(audioContent)
+                  content.forceActiveFocus()
+                  panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+                }
               }
               Bluetooth {
                 Layout.alignment: Qt.AlignVCenter
+                onBluetoothMenuTriggered: {
+                  barMenu.showContent(btContent)
+                  content.forceActiveFocus()
+                  panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+                }
               }
               Network {
                 Layout.alignment: Qt.AlignVCenter
@@ -187,9 +182,8 @@ PanelWindow {
       }
     }
 
-    MenuWidget {
-      id: homeMenu
-      visible: false
+    BarMenu {
+      id: barMenu
       anchors {
         left: parent.left
         right: parent.right
@@ -197,19 +191,28 @@ PanelWindow {
         bottom: Global.config.panel.top ? undefined : barRow.top
       }
 
-      Item {
-        Layout.fillWidth: true
-        Layout.preferredHeight: 100
-      }
-    }
+      onItemTriggered: panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
 
-    MouseArea {
-      anchors.fill: parent
-      acceptedButtons: Qt.LeftButton
-      propagateComposedEvents: true
-      onClicked: (mouse) => {
-        panel.closeMenu()
-        mouse.accepted = false
+      Connections {
+        target: Global
+        function onOpenSystrayMenu(index: int) {
+          systray.triggerItem(index)
+        }
+      }
+
+      AudioControl {
+        id: audioContent
+        visible: false
+      }
+
+      BluetoothControl {
+        id: btContent
+        visible: false
+      }
+
+      NetworkControl {
+        id: netContent
+        visible: false
       }
     }
   }
