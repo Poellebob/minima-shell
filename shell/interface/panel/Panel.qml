@@ -11,6 +11,7 @@ import qs.panel.audio
 import qs.panel.bluetooth
 import qs.panel.network
 import qs.panel.clock
+import qs.panel.launcher
 
 PanelWindow {
   id: panel
@@ -156,29 +157,11 @@ PanelWindow {
         }
       }
 
-      Item {
+      Launcher {
         id: launcherContent
         anchors.fill: parent
         visible: false
-
-        RowLayout {
-          anchors.fill: parent
-          anchors.leftMargin: Global.format.spacing_medium
-          anchors.rightMargin: Global.format.spacing_medium
-          spacing: Global.format.spacing_medium
-
-          StyledText {
-            text: ">"
-          }
-
-          TextInput {
-            Layout.fillWidth: true
-            color: Global.colors.on_surface_variant
-            font.family: "JetBrainsMono Nerd Font"
-            font.pixelSize: Global.format.text_size
-            focus: visible
-          }
-        }
+        onClosed: panel.closeBarMenu()
       }
     }
 
@@ -197,6 +180,10 @@ PanelWindow {
         target: Global
         function onOpenSystrayMenu(index: int) {
           systray.triggerItem(index)
+        }
+        function onOpenLauncher() {
+          panel.openBarMenu(launcherContent)
+          launcherContent.open()
         }
       }
 

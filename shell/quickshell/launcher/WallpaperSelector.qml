@@ -45,13 +45,13 @@ MenuPanel {
   readonly property string favoritesPath: Quickshell.env("HOME") + "/.config/minima/wallpaper-favorites.conf"
   readonly property string wallpaperPath: Quickshell.env("HOME") + "/.config/minima/wallpaper.conf"
 
-  readonly property bool   engineEnabled: Global.settings["Wallpaper"]["engineEnabled"]
-  readonly property string enginePath:    Global.settings["Wallpaper"]["enginePath"]
-  readonly property string workshopPath:  Global.settings["Wallpaper"]["workshopPath"]
-  readonly property int    engineFps:     Global.settings["Wallpaper"]["fps"]
-  readonly property bool   engineFill:    Global.settings["Wallpaper"]["fill"]
-  readonly property bool   matureContent: Global.settings["Wallpaper"]["matureContent"]
-  readonly property int    volume:        Global.settings["Wallpaper"]["volume"] || 50
+  readonly property bool   engineEnabled: Global.config.wallpaper.engineEnabled
+  readonly property string enginePath:    Global.config.wallpaper.enginePath
+  readonly property string workshopPath:  Global.config.wallpaper.workshopPath
+  readonly property int    engineFps:     Global.config.wallpaper.fps
+  readonly property bool   engineFill:    Global.config.wallpaper.fill
+  readonly property bool   matureContent: Global.config.wallpaper.matureContent
+  readonly property int    volume:        Global.config.wallpaper.volume
 
   property var engineQueue:      []
   property int engineQueueIndex: 0

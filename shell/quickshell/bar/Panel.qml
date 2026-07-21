@@ -103,7 +103,7 @@ PanelWindow {
   }
 
   function openHome() {
-    switch (Global.settings["System"]["wm"]) {
+    switch (Global.config.system.wm) {
     case "hyprland":
       if (Hyprland.monitorFor(screen).focused) leftMenu.showContent(homeContent);
       break;

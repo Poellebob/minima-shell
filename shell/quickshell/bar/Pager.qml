@@ -18,7 +18,7 @@ ModuleBase {
   property bool i3: false
 
   Component.onCompleted: {
-    switch (Global.settings["System"]["wm"]) {
+    switch (Global.config.system.wm) {
     case "hyprland":
       pagerRoot.hyprland = true;
       break;
