@@ -11,6 +11,7 @@ import qs.panel.pager
 import qs.panel.audio
 import qs.panel.bluetooth
 import qs.panel.network
+import qs.panel.battery
 import qs.panel.clock
 import qs.panel.launcher
 import qs.panel.wallpaper
@@ -159,6 +160,9 @@ PanelWindow {
                 Layout.alignment: Qt.AlignVCenter
                 onAudioMenuTriggered: openBarContent(audioContent)
               }
+              Battery {
+                Layout.alignment: Qt.AlignVCenter
+              }
               Bluetooth {
                 Layout.alignment: Qt.AlignVCenter
                 onBluetoothMenuTriggered: openBarContent(btContent)
@@ -250,6 +254,8 @@ PanelWindow {
 
       AudioControl {
         id: audioContent
+        anchors.fill: parent
+        anchors.margins: Global.format.spacing_large
         visible: false
       }
 
