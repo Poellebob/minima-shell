@@ -181,6 +181,7 @@ in
         fps           = mkOption { type = types.int;  default = 25; };
         fill          = mkOption { type = types.bool; default = true; };
         matureContent = mkOption { type = types.bool; default = false; };
+        volume        = mkOption { type = types.int;  default = 50; };
       };
     };
 
@@ -211,6 +212,11 @@ in
         type = types.str;
         default = "color";
         description = "Matugen mode (color/image)";
+      };
+      package = mkOption {
+        type = types.package;
+        default = pkgs.matugen;
+        description = "Matugen package";
       };
     };
   };

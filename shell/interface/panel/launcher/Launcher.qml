@@ -10,17 +10,34 @@ Item {
 
   property string searchText: ""
   property int currentIndex: 0
-
-  readonly property var filteredEntries: {
-    const all = DesktopEntries.applications.values
-    if (searchText.trim() === "") return all
-    const term = searchText.toLowerCase()
-    return all.filter(e => e.name.toLowerCase().includes(term))
-  }
   property bool isExpr: false
+  property bool isCommand: searchText.length > 0 && searchText[0] === ">"
   property string mathRes: ""
 
+  readonly property var customCommands: [
+    {
+      name: "Wallpapers",
+      description: "Open wallpaper selector",
+      execute: function () { commandTriggered("Wallpapers") }
+    }
+  ]
+
+  readonly property var filteredEntries: {
+    let all
+    if (isCommand) {
+      all = customCommands
+    } else {
+      all = DesktopEntries.applications.values
+    }
+    if (searchText.trim() === "") return all
+    const term = isCommand
+      ? searchText.slice(1).trim().toLowerCase()
+      : searchText.toLowerCase()
+    return all.filter(e => e.name.toLowerCase().includes(term))
+  }
+
   signal closed
+  signal commandTriggered(string name)
 
   function open() {
     searchText = ""
@@ -40,8 +57,14 @@ Item {
 
   function executeSelected() {
     if (currentIndex >= 0 && currentIndex < filteredEntries.length) {
-      filteredEntries[currentIndex].execute()
-      close()
+      const entry = filteredEntries[currentIndex]
+      if (isCommand) {
+        close()
+        commandTriggered(entry.name)
+      } else {
+        entry.execute()
+        close()
+      }
     }
   }
 
@@ -171,13 +194,19 @@ Item {
         }
 
         MouseArea {
+          id: mouseArea
           anchors.fill: parent
           cursorShape: Qt.PointingHandCursor
           acceptedButtons: Qt.LeftButton
           onClicked: launcherRoot.currentIndex = index
           onDoubleClicked: {
-            modelData.execute()
-            launcherRoot.close()
+            if (launcherRoot.isCommand) {
+              launcherRoot.close()
+              launcherRoot.commandTriggered(modelData.name)
+            } else {
+              modelData.execute()
+              launcherRoot.close()
+            }
           }
           onWheel: (wheel) => {
             if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
