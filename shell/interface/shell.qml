@@ -31,4 +31,11 @@ ShellRoot {
       Global.openSystrayMenu(index)
     }
   }
+
+  IpcHandler {
+    target: "launcher"
+    function open(): void {
+      Global.openLauncher()
+    }
+  }
 }

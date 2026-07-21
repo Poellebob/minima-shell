@@ -4,8 +4,6 @@ with lib;
 let
   cfg = config.minima;
 
-  boolStr = b: if b then "true" else "false";
-
   quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./shell/quickshell; } ''
     mkdir -p $out
     cd $src
@@ -22,33 +20,37 @@ let
 
   '';
 
-  minimaConfigIni = pkgs.writeText "minima-config.ini" ''
-    [System]
-    wm = ${cfg.wm}
-
-    [Theme]
-    darkTheme = ${boolStr cfg.minimaConfig.darkTheme}
-
-    [Panel]
-    enabled = ${boolStr cfg.minimaConfig.panel.enable}
-    panelAlwaysVisible = ${boolStr cfg.minimaConfig.panel.alwaysVisible}
-
-    [Launcher]
-    enabled = ${boolStr cfg.minimaConfig.launcher.enable}
-    qalcPath = ${cfg.minimaConfig.launcher.qalcPath}
-
-    [Clipboard]
-    enabled = ${boolStr cfg.minimaConfig.clipboard.enable}
-
-    [Wallpaper]
-    enabled = ${boolStr cfg.minimaConfig.wallpaper.enable}
-    engineEnabled = ${boolStr cfg.minimaConfig.wallpaper.engineEnabled}
-    enginePath = ${pkgs.linux-wallpaperengine}/bin/linux-wallpaperengine
-    workshopPath = ${cfg.minimaConfig.wallpaper.workshopPath}
-    fps = ${toString cfg.minimaConfig.wallpaper.fps}
-    fill = ${boolStr cfg.minimaConfig.wallpaper.fill}
-    matureContent = ${boolStr cfg.minimaConfig.wallpaper.matureContent}
-  '';
+  minimaConfigJson = pkgs.writeText "minima-config.json" (builtins.toJSON {
+    system = {
+      wm = cfg.wm;
+      matugenConfigPath = "";
+    };
+    theme = {
+      darkTheme = cfg.minimaConfig.darkTheme;
+    };
+    panel = {
+      enabled = cfg.minimaConfig.panel.enable;
+      top = false;
+      panelAlwaysVisible = cfg.minimaConfig.panel.alwaysVisible;
+    };
+    launcher = {
+      enabled = cfg.minimaConfig.launcher.enable;
+      qalcPath = cfg.minimaConfig.launcher.qalcPath;
+    };
+    clipboard = {
+      enabled = cfg.minimaConfig.clipboard.enable;
+    };
+    wallpaper = {
+      enabled = cfg.minimaConfig.wallpaper.enable;
+      engineEnabled = cfg.minimaConfig.wallpaper.engineEnabled;
+      enginePath = "${pkgs.linux-wallpaperengine}/bin/linux-wallpaperengine";
+      workshopPath = cfg.minimaConfig.wallpaper.workshopPath;
+      fps = cfg.minimaConfig.wallpaper.fps;
+      fill = cfg.minimaConfig.wallpaper.fill;
+      matureContent = cfg.minimaConfig.wallpaper.matureContent;
+      volume = 50;
+    };
+  });
 
   matugenTemplateFile = pkgs.writeText "quickshell.template.json" (builtins.readFile ./config/matugen/quickshell.template.json);
 
@@ -73,7 +75,7 @@ in {
     minima.scrollConfigFile = mkWmConfig "scroll";
 
     minima.quickshellStoreDir = quickshellStoreDir;
-    minima.minimaConfigFile = "${minimaConfigIni}";
+    minima.minimaConfigFile = "${minimaConfigJson}";
     minima.matugenConfigFile = matugenConfigFile;
     minima.matugenTemplateFile = matugenTemplateFile;
   };

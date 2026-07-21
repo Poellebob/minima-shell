@@ -36,7 +36,7 @@ MenuPanel {
     id: mathProc
     property string expr: ""
     property string res: ""
-    command: [Global.settings["Launcher"]["qalcPath"], expr]
+    command: [Global.config.launcher.qalcPath, expr]
 
     stdout: StdioCollector {
       onStreamFinished: {
@@ -66,7 +66,7 @@ MenuPanel {
       execute: function () {
         ClipboardManager.open()
       },
-      active: Global.settings["Clipboard"]["enabled"]
+      active: Global.config.clipboard.enabled
     },
     {
       name: "Wallpapers",
@@ -75,7 +75,7 @@ MenuPanel {
       execute: function () {
         WallpaperSelector.open()
       },
-      active: Global.settings["Wallpaper"]["enabled"]
+      active: Global.config.wallpaper.enabled
     }
   ]
 
