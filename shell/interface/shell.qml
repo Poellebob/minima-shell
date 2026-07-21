@@ -26,37 +26,9 @@ ShellRoot {
   }
 
   IpcHandler {
-    target: "minimaHome"
-    function open(): void {
-      // Focus home module
-    }
-  }
-
-  IpcHandler {
-    target: "minimaLauncher"
-    function open(): void {
-      // Focus launcher module and expand
-    }
-  }
-
-  IpcHandler {
-    target: "minimaClipboard"
-    function open(): void {
-      // Focus clipboard module and expand
-    }
-  }
-
-  IpcHandler {
-    target: "minimaWallpaperSelector"
-    function open(): void {
-      // Focus wallpaper module and expand
-    }
-  }
-
-  IpcHandler {
-    target: "minimaNotifications"
-    function open(): void {
-      // Focus notification module and expand
+    target: "systray"
+    function open(index: int): void {
+      Global.openSystrayMenu(index)
     }
   }
 }
