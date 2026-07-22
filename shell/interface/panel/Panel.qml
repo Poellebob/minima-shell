@@ -129,9 +129,14 @@ PanelWindow {
                 Layout.alignment: Qt.AlignVCenter
                 onShowMenu: (items) => {
                   if (!(screen.name == I3.focusedMonitor.name)) return
-                  barMenu.showMenu(items)
-                  content.forceActiveFocus()
-                  panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+                  if (barMenu.isSameMenu(items)) {
+                    barMenu.hideContent()
+                    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
+                  } else {
+                    barMenu.showMenu(items)
+                    content.forceActiveFocus()
+                    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+                  }
                 }
               }
             }

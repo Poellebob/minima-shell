@@ -39,11 +39,11 @@ BarWidget {
   }
 
   onClicked: (mouse) => {
-    if (mouse.button === Qt.MiddleButton && defaultNode) {
+    if (mouse.button === Qt.LeftButton && defaultNode) {
       defaultNode.audio.muted = !defaultNode.audio.muted
     }
 
-    if (mouse.button === Qt.LeftButton && defaultNode) {
+    if (mouse.button === Qt.RightButton && defaultNode) {
       audioMenuTriggered()
     }
   }

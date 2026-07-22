@@ -29,7 +29,10 @@ BarWidget {
     }
   }
 
-  onClicked: bluetoothMenuTriggered()
+  onClicked: (mouse) => {
+    if (mouse.button === Qt.RightButton)
+      bluetoothMenuTriggered()
+  }
 
   property int currentDeviceIndex: 0
   property string displayText: ""

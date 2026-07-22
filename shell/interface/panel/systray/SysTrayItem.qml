@@ -10,14 +10,9 @@ MouseArea {
   id: sysTrayItem
 
   required property SystemTrayItem item
-  property bool targetMenuOpen: false
   property int trayItemWidth: Global.format.systray_icon_size
 
   signal showMenu(items: ObjectModel)
-
-  anchors {
-    verticalCenter: parent.verticalCenter
-  }
 
   acceptedButtons: Qt.LeftButton | Qt.RightButton
   Layout.fillHeight: true

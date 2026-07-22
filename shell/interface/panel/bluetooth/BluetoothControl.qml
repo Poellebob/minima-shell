@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Bluetooth
-import qs.components.text
 import qs
 
 Item {
@@ -314,20 +313,6 @@ Item {
                   }
                 }
               }
-            }
-
-            StyledText {
-              text: deviceItem.deviceName()
-              elide: Text.ElideRight
-              Layout.fillWidth: true
-            }
-
-            StyledText {
-              text: deviceItem.statusText()
-              elide: Text.ElideRight
-              Layout.fillWidth: true
-              font.pixelSize: Global.format.font_size_small
-              color: Global.colors.outline
             }
           }
         }
