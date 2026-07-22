@@ -19,6 +19,11 @@ Item {
       name: "Wallpapers",
       description: "Open wallpaper selector",
       execute: function () { commandTriggered("Wallpapers") }
+    },
+    {
+      name: "Clip",
+      description: "Open clipboard manager",
+      execute: function () { commandTriggered("Clip") }
     }
   ]
 

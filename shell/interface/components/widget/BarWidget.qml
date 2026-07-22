@@ -7,7 +7,7 @@ Item {
   id: root
   implicitHeight: Global.format.module_height
   implicitWidth: contentArea.children.length > 0
-    ? contentArea.implicitWidth + Global.format.spacing_medium * 2
+    ? contentArea.childrenRect.width + Global.format.spacing_medium * 2
     : label.implicitWidth + Global.format.spacing_medium * 2
 
   property string text: ""
@@ -26,7 +26,6 @@ Item {
   Item {
     id: contentArea
     anchors.centerIn: parent
-    implicitWidth: childrenRect.width
     implicitHeight: childrenRect.height
     visible: root.text === ""
   }

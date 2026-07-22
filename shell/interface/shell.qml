@@ -38,4 +38,11 @@ ShellRoot {
       Global.openLauncher()
     }
   }
+
+  IpcHandler {
+    target: "clipboard"
+    function open(): void {
+      Global.openClipboard()
+    }
+  }
 }

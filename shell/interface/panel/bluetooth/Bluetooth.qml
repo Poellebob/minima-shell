@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
+import Quickshell.Bluetooth
 import qs.components.widget
 import qs.components.text
 import qs
@@ -18,8 +18,8 @@ BarWidget {
 
     StyledText {
       id: bluetoothIcon
-      text: bluetoothRoot.bluetoothEnabled ? "󰂯" : "󰂲"
-      color: bluetoothRoot.bluetoothEnabled ? Global.colors.on_surface_variant : Global.colors.outline
+      text: Bluetooth.defaultAdapter?.enabled ? "󰂯" : "󰂲"
+      color: Bluetooth.defaultAdapter?.enabled ? Global.colors.on_surface_variant : Global.colors.outline
     }
 
     StyledText {
@@ -31,86 +31,44 @@ BarWidget {
 
   onClicked: bluetoothMenuTriggered()
 
-  property bool bluetoothEnabled: false
-  property var connectedDevices: []
   property int currentDeviceIndex: 0
   property string displayText: ""
 
-  function updateDisplayText() {
-    if (!bluetoothEnabled) {
-      displayText = "Disabled"
-      return
+  readonly property var defaultAdapter: Bluetooth.defaultAdapter
+  readonly property bool adapterEnabled: defaultAdapter?.enabled ?? false
+  readonly property var connectedDevices: {
+    const adapter = Bluetooth.defaultAdapter
+    if (!adapter) return []
+    const devices = []
+    for (const val in adapter.devices.values) {
+      const dev = adapter.devices.values[val]
+      if (dev.connected)
+        devices.push(dev.name || dev.address)
     }
+    return devices
+  }
 
+  onConnectedDevicesChanged: {
     if (connectedDevices.length === 0) {
-      displayText = "Not Connected"
-      return
-    }
-
-    if (connectedDevices.length === 1) {
+      displayText = adapterEnabled ? "Not Connected" : "Disabled"
+    } else if (connectedDevices.length === 1) {
       displayText = connectedDevices[0]
-      return
-    }
-
-    displayText = connectedDevices[currentDeviceIndex]
-    currentDeviceIndex = (currentDeviceIndex + 1) % connectedDevices.length
-  }
-
-  Process {
-    id: bluetoothProcess
-    command: ["bluetoothctl", "show"]
-    running: true
-    stdout: StdioCollector {
-      onStreamFinished: {
-        bluetoothRoot.bluetoothEnabled = this.text.includes("Powered: yes")
-        if (bluetoothRoot.bluetoothEnabled) {
-          connectedDevicesProcess.running = true
-        } else {
-          bluetoothRoot.connectedDevices = []
-          bluetoothRoot.currentDeviceIndex = 0
-          bluetoothRoot.updateDisplayText()
-        }
-      }
+    } else {
+      displayText = connectedDevices[currentDeviceIndex]
+      currentDeviceIndex = (currentDeviceIndex + 1) % connectedDevices.length
     }
   }
 
-  Process {
-    id: connectedDevicesProcess
-    command: ["bluetoothctl", "devices", "Connected"]
-    running: false
-    stdout: StdioCollector {
-      onStreamFinished: {
-        const lines = this.text.trim().split('\n')
-        let devices = []
-
-        for (let line of lines) {
-          if (line.startsWith("Device ")) {
-            const parts = line.split(' ')
-            if (parts.length >= 3) {
-              const deviceName = parts.slice(2).join(' ')
-              devices.push(deviceName)
-            }
-          }
-        }
-
-        bluetoothRoot.connectedDevices = devices
-        bluetoothRoot.currentDeviceIndex = 0
-        bluetoothRoot.updateDisplayText()
-      }
+  onAdapterEnabledChanged: {
+    if (!adapterEnabled) {
+      currentDeviceIndex = 0
+      displayText = "Disabled"
     }
   }
 
-  Timer {
-    interval: Global.format.interval_long
-    running: true
-    repeat: true
-    onTriggered: bluetoothProcess.running = true
-  }
-
-  Timer {
-    interval: Global.format.interval_medium
-    running: true
-    repeat: true
-    onTriggered: bluetoothRoot.updateDisplayText()
+  Component.onCompleted: {
+    if (!adapterEnabled) {
+      displayText = "Disabled"
+    }
   }
 }
