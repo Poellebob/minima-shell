@@ -14,6 +14,7 @@ import qs.panel.network
 import qs.panel.battery
 import qs.panel.clock
 import qs.panel.launcher
+import qs.panel.clipboard
 import qs.panel.wallpaper
 
 PanelWindow {
@@ -25,7 +26,7 @@ PanelWindow {
     bottom: !Global.config.panel.top
   }
 
-  height: content.height + (barMenu.visible ? barMenu.implicitHeight : 0)
+  implicitHeight: content.height + (barMenu.visible ? barMenu.implicitHeight : 0)
   exclusiveZone: height
   color: Global.colors.background
   aboveWindows: true
@@ -67,6 +68,11 @@ PanelWindow {
     barMenu.hideContent()
     wallpaperContent.close()
     closeBarMenu()
+  }
+
+  function openClipboard() {
+    openBarMenu(clipboardContent)
+    clipboardContent.open()
   }
 
   Item {
@@ -186,7 +192,16 @@ PanelWindow {
         onCommandTriggered: (name) => {
           if (name === "Wallpapers")
             openWallpapers()
+          else if (name === "Clip")
+            openClipboard()
         }
+      }
+
+      Clipboard {
+        id: clipboardContent
+        anchors.fill: parent
+        visible: false
+        onClosed: panel.closeBarMenu()
       }
 
       Item {
@@ -250,6 +265,9 @@ PanelWindow {
           panel.openBarMenu(launcherContent)
           launcherContent.open()
         }
+        function onOpenClipboard() {
+          panel.openClipboard()
+        }
       }
 
       AudioControl {
@@ -261,18 +279,22 @@ PanelWindow {
 
       BluetoothControl {
         id: btContent
+        anchors.fill: parent
+        anchors.margins: Global.format.spacing_large
         visible: false
       }
 
       NetworkControl {
         id: netContent
+        anchors.fill: parent
+        anchors.margins: Global.format.spacing_large
         visible: false
       }
 
       WallpaperPicker {
         id: wallpaperContent
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.fill: parent
+        anchors.margins: Global.format.spacing_large
         visible: false
       }
     }
