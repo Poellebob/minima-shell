@@ -7,26 +7,48 @@ import qs.components.text
 import qs
 
 BarWidget {
-  id: bluetoothRoot
+  id: root
 
   signal bluetoothMenuTriggered
 
-  RowLayout {
-    id: row
-    anchors.centerIn: parent
-    spacing: Global.format.spacing_small
+  property int currentDeviceIndex: 0
+  property string displayText: ""
 
-    StyledText {
-      id: bluetoothIcon
-      text: Bluetooth.defaultAdapter?.enabled ? "󰂯" : "󰂲"
-      color: Bluetooth.defaultAdapter?.enabled ? Global.colors.on_surface_variant : Global.colors.outline
+  readonly property var adapter: Bluetooth.defaultAdapter
+  readonly property bool adapterEnabled: adapter?.state === BluetoothAdapterState.Enabled
+  readonly property var connectedDevices: {
+    if (!adapter) return []
+    const devs = []
+    for (const key in adapter.devices.values) {
+      const dev = adapter.devices.values[key]
+      if (dev.connected)
+        devs.push(dev.name || dev.address)
     }
+    return devs
+  }
 
-    StyledText {
-      id: bluetoothText
-      text: bluetoothRoot.displayText
-      visible: bluetoothRoot.displayText !== ""
+  onConnectedDevicesChanged: {
+    if (connectedDevices.length === 0)
+      displayText = adapterEnabled ? "Not Connected" : "Disabled"
+    else if (connectedDevices.length === 1)
+      displayText = connectedDevices[0]
+    else {
+      displayText = connectedDevices[currentDeviceIndex]
+      currentDeviceIndex = (currentDeviceIndex + 1) % connectedDevices.length
     }
+  }
+
+  onAdapterEnabledChanged: {
+    currentDeviceIndex = 0
+    if (adapterEnabled)
+      displayText = connectedDevices.length > 0 ? connectedDevices[0] : "Not Connected"
+    else
+      displayText = "Disabled"
+  }
+
+  Component.onCompleted: {
+    if (!adapterEnabled)
+      displayText = "Disabled"
   }
 
   onClicked: (mouse) => {
@@ -34,44 +56,18 @@ BarWidget {
       bluetoothMenuTriggered()
   }
 
-  property int currentDeviceIndex: 0
-  property string displayText: ""
+  RowLayout {
+    anchors.centerIn: parent
+    spacing: Global.format.spacing_small
 
-  readonly property var defaultAdapter: Bluetooth.defaultAdapter
-  readonly property bool adapterEnabled: defaultAdapter?.enabled ?? false
-  readonly property var connectedDevices: {
-    const adapter = Bluetooth.defaultAdapter
-    if (!adapter) return []
-    const devices = []
-    for (const val in adapter.devices.values) {
-      const dev = adapter.devices.values[val]
-      if (dev.connected)
-        devices.push(dev.name || dev.address)
+    StyledText {
+      text: adapter?.state === BluetoothAdapterState.Enabled ? "󰂯" : "󰂲"
+      color: adapter?.state === BluetoothAdapterState.Enabled ? Global.colors.on_surface_variant : Global.colors.outline
     }
-    return devices
-  }
 
-  onConnectedDevicesChanged: {
-    if (connectedDevices.length === 0) {
-      displayText = adapterEnabled ? "Not Connected" : "Disabled"
-    } else if (connectedDevices.length === 1) {
-      displayText = connectedDevices[0]
-    } else {
-      displayText = connectedDevices[currentDeviceIndex]
-      currentDeviceIndex = (currentDeviceIndex + 1) % connectedDevices.length
-    }
-  }
-
-  onAdapterEnabledChanged: {
-    if (!adapterEnabled) {
-      currentDeviceIndex = 0
-      displayText = "Disabled"
-    }
-  }
-
-  Component.onCompleted: {
-    if (!adapterEnabled) {
-      displayText = "Disabled"
+    StyledText {
+      text: root.displayText
+      visible: root.displayText !== ""
     }
   }
 }
