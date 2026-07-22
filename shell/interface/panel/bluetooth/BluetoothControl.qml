@@ -153,7 +153,7 @@ Item {
 
       Text {
         visible: root.currentAdapter?.enabled
-        text: root.currentAdapter?.discoverable ? " 󰲨 Discoverable" : " 󰲩 Undiscoverable"
+        text: root.currentAdapter?.discoverable ? "  Discoverable" : "  Undiscoverable"
         color: root.currentAdapter?.discoverable ? Global.colors.primary : Global.colors.on_surface_variant
         font.family: "JetBrainsMono Nerd Font"
         font.pixelSize: Global.format.text_size
@@ -166,7 +166,7 @@ Item {
 
       Text {
         visible: root.currentAdapter?.enabled
-        text: root.currentAdapter?.pairable ? " 󰇯 Pairable" : " 󰇰 Unpairable"
+        text: root.currentAdapter?.pairable ? "  Pairable" : "  Unpairable"
         color: root.currentAdapter?.pairable ? Global.colors.primary : Global.colors.on_surface_variant
         font.family: "JetBrainsMono Nerd Font"
         font.pixelSize: Global.format.text_size
@@ -179,7 +179,7 @@ Item {
 
       Text {
         visible: root.currentAdapter?.enabled
-        text: root.currentAdapter?.discovering ? " 󰑎 Scanning…" : " 󰐷 Scan"
+        text: root.currentAdapter?.discovering ? "  Scanning…" : "  Scan"
         color: root.currentAdapter?.discovering ? Global.colors.primary : Global.colors.on_surface_variant
         font.family: "JetBrainsMono Nerd Font"
         font.pixelSize: Global.format.text_size

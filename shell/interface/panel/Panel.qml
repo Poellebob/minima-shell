@@ -45,8 +45,12 @@ PanelWindow {
   function openBarContent(barContent: Item) {
     if (!(screen.name == I3.focusedMonitor.name)) return
     barMenu.showContent(barContent)
-    content.forceActiveFocus()
-    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+    if (barMenu.visible) {
+      content.forceActiveFocus()
+      panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+    } else {
+      panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
+    }
   }
 
   function closeBarMenu() {
