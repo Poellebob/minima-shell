@@ -26,13 +26,12 @@ Item {
   Item {
     id: contentArea
     anchors.centerIn: parent
-    implicitHeight: childrenRect.height
     visible: root.text === ""
   }
 
   MouseArea {
     anchors.fill: parent
-    acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+    acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
     propagateComposedEvents: true
 
     onClicked: (mouse) => {

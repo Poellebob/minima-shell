@@ -12,10 +12,6 @@ Singleton {
 
   readonly property Colors colors: darkTheme ? colorsRaw.dark : colorsRaw.light
 
-  property var launcher: null
-  property var clipboardManager: null
-  property var wallpaperSelector: null
-
   ConfigAdapter {
     id: configAdapter
   }
