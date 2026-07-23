@@ -14,7 +14,7 @@ Item {
   property bool isCommand: searchText.length > 0 && searchText[0] === ">"
   property string mathRes: ""
 
-  readonly property var customCommands: [
+  readonly property var commands: [
     {
       name: "Wallpapers",
       description: "Open wallpaper selector",
@@ -24,13 +24,43 @@ Item {
       name: "Clip",
       description: "Open clipboard manager",
       execute: function () { commandTriggered("Clip") }
+    },
+    {
+      name: "Lock",
+      description: "Lock the session",
+      execute: function () { Quickshell.execDetached(["hyprlock"]) }
+    },
+    {
+      name: "Logout",
+      description: "Terminate the current session",
+      execute: function () { Quickshell.execDetached(["loginctl", "terminate-session", Quickshell.env("XDG_SESSION_ID")]) }
+    },
+    {
+      name: "Shutdown",
+      description: "Power off the machine",
+      execute: function () { Quickshell.execDetached(["systemctl", "poweroff"]) }
+    },
+    {
+      name: "Reboot",
+      description: "Restart the machine",
+      execute: function () { Quickshell.execDetached(["systemctl", "reboot"]) }
+    },
+    {
+      name: "Suspend",
+      description: "Suspend to RAM",
+      execute: function () { Quickshell.execDetached(["systemctl", "suspend"]) }
+    },
+    {
+      name: "Hibernate",
+      description: "Suspend to disk",
+      execute: function () { Quickshell.execDetached(["systemctl", "hibernate"]) }
     }
   ]
 
   readonly property var filteredEntries: {
     let all
     if (isCommand) {
-      all = customCommands
+      all = commands
     } else {
       all = DesktopEntries.applications.values
     }
