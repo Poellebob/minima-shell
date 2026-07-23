@@ -25,4 +25,5 @@ Singleton {
   signal openSystrayMenu(index: int)
   signal openLauncher()
   signal openClipboard()
+  signal openNotifications()
 }

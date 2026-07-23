@@ -13,8 +13,8 @@ in ''
   bindsym $mod+Shift+s sticky toggle
   bindsym $mod+Mod1+Delete exec hyprlock
   bindsym $mod+Shift+c exec ${msgCmd} reload
-  bindsym $mod+v exec qs -c $qs_path ipc call minimaClipboard open
-  bindsym $mod+d exec qs -c $qs_path ipc call minimaLauncher open
+  bindsym $mod+v exec qs -c $qs_path ipc call clipboard open
+  bindsym $mod+d exec qs -c $qs_path ipc call launcher open
 
   ${if wm == "scroll" then ''
   bindsym $mod+Mod1+l set_size h 1.0

@@ -4,7 +4,7 @@ with lib;
 let
   cfg = config.minima;
 
-  quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./shell/quickshell; } ''
+  quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./shell/interface; } ''
     mkdir -p $out
     cd $src
     shopt -s dotglob
