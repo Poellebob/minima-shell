@@ -109,11 +109,6 @@ Item {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                  Quickshell.execDetached([
-                    "sh",
-                    "-c",
-                    "pid=$(cat /tmp/.hyprland-systemd-inhibit 2>/dev/null); [ -n \"$pid\" ] && kill \"$pid\" && rm -f /tmp/.hyprland-systemd-inhibit"
-                  ])
                   Quickshell.execDetached(["loginctl", "terminate-session", Quickshell.env("XDG_SESSION_ID")])
                 }
               }
