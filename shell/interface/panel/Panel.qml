@@ -16,6 +16,7 @@ import qs.panel.clock
 import qs.panel.launcher
 import qs.panel.clipboard
 import qs.panel.wallpaper
+import qs.panel.notification
 
 PanelWindow {
   id: panel
@@ -188,6 +189,12 @@ PanelWindow {
               Clock {
                 Layout.alignment: Qt.AlignVCenter
               }
+              Notification {
+                id: notifWidget
+                Layout.alignment: Qt.AlignVCenter
+                onNotificationMenuTriggered: openBarContent(notifContent)
+              }
+
             }
           }
         }
@@ -277,6 +284,9 @@ PanelWindow {
         function onOpenClipboard() {
           panel.openClipboard()
         }
+        function onOpenNotifications() {
+          panel.openBarContent(notifContent)
+        }
       }
 
       AudioControl {
@@ -288,6 +298,14 @@ PanelWindow {
 
       BluetoothControl {
         id: btContent
+        anchors.fill: parent
+        anchors.margins: Global.format.spacing_large
+        visible: false
+      }
+
+      NotificationControl {
+        id: notifContent
+        notifServer: notifWidget.notifServer
         anchors.fill: parent
         anchors.margins: Global.format.spacing_large
         visible: false

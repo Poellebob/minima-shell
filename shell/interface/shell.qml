@@ -45,4 +45,11 @@ ShellRoot {
       Global.openClipboard()
     }
   }
+
+  IpcHandler {
+    target: "notifications"
+    function open(): void {
+      Global.openNotifications()
+    }
+  }
 }
