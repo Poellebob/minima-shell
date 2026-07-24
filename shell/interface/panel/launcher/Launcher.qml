@@ -93,13 +93,8 @@ Item {
   function executeSelected() {
     if (currentIndex >= 0 && currentIndex < filteredEntries.length) {
       const entry = filteredEntries[currentIndex]
-      if (isCommand) {
-        close()
-        commandTriggered(entry.name)
-      } else {
-        entry.execute()
-        close()
-      }
+      entry.execute()
+      close()
     }
   }
 
