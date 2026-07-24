@@ -13,13 +13,14 @@ Item {
   property var wallpapers: []
   property string searchText: ""
   property string savedWallpaper: ""
-  property bool confRead: false
   property var favorites: []
 
   property var imageScanResults: []
   property var engineScanResults: []
   property bool iDone: false
   property bool eDone: false
+
+  property bool wasEngineActive: false
 
   readonly property string homeDir: Quickshell.env("HOME")
   readonly property string resolvedWorkshopPath: workshopPath.replace("~", homeDir)
@@ -81,7 +82,7 @@ Item {
     else
       next.push(id)
     favorites = next
-    saveFavoritesProc.running = true
+    favoritesFileView.setText(next.join('\n'))
   }
 
   function reload() {
@@ -104,8 +105,7 @@ Item {
     scanImagesProc.running = true
     if (engineEnabled)
       scanEngineProc.running = true
-    readConfProc.running = true
-    readFavoritesProc.running = true
+    favoritesFileView.reload()
   }
 
   function close() {
@@ -136,22 +136,36 @@ Item {
 
   function setWallpaper(w) {
     if (w.type === "engine")
-      setEngineWallpaper(w.id, w.previewPath)
+      setEngineWallpaper(w.id, w.previewPath, false)
     else
-      setImageWallpaper(w.path)
+      setImageWallpaper(w.path, false)
   }
 
-  function setImageWallpaper(path) {
-    Quickshell.execDetached(["killall", "-9", "linux-wallpaperengine"])
+  function setImageWallpaper(path, isBackgroundApply) {
+    const background = isBackgroundApply === true
     setProc.wallpaperPath = path
     setProc.previewPath = path
+    setProc.skipAnimation = background || root.wasEngineActive
+    setProc.killEngineAfter = root.wasEngineActive
+    setProc.isBackgroundApply = background
     setProc.running = true
   }
 
-  function setEngineWallpaper(folderId, previewPath) {
+  function setEngineWallpaper(folderId, previewPath, isBackgroundApply) {
     engineProc.folderId = folderId
     engineProc.previewPath = previewPath
+    engineProc.isBackgroundApply = isBackgroundApply === true
     engineProc.running = true
+  }
+
+  function applyCurrentWallpaper() {
+    if (!savedWallpaper || savedWallpaper.trim() === "") return
+    if (savedWallpaper.indexOf("engine:") === 0) {
+      const folderId = savedWallpaper.substring("engine:".length)
+      setEngineWallpaper(folderId, "", true)
+    } else {
+      setImageWallpaper(savedWallpaper, true)
+    }
   }
 
   function startNextEngineProject() {
@@ -163,37 +177,55 @@ Item {
     parseProjectProc.running = true
   }
 
-  Component.onCompleted: readConfProc.running = true
-
-  Process {
-    id: readConfProc
-    command: ["cat", root.wallpaperConf]
-    stdout: StdioCollector {
-      onStreamFinished: root.savedWallpaper = this.text.trim()
-    }
-    onExited: (code, _) => {
-      if (code !== 0) root.savedWallpaper = ""
-      root.confRead = true
+  Connections {
+    target: Quickshell
+    function onScreensChanged() {
+      if (confFile.loaded)
+        root.applyCurrentWallpaper()
     }
   }
 
-  Process {
-    id: readFavoritesProc
-    command: ["cat", root.favoritesPath]
-    stdout: StdioCollector {
-      onStreamFinished: {
-        const lines = this.text.trim().split('\n').filter(l => l.trim() !== "")
-        root.favorites = lines
+  FileView {
+    id: confFile
+    path: root.wallpaperConf
+    blockLoading: true
+    onLoaded: {
+      root.savedWallpaper = text().trim()
+      root.applyCurrentWallpaper()
+    }
+    onSaved: {
+      if (!confFile._skipMatugen) {
+        const matugenBin = Global.config.system.matugenBin
+        const matugenConfig = Global.config.system.matugenConfigPath
+        if (matugenBin !== "" && matugenConfig !== "") {
+          Quickshell.execDetached([
+            "/bin/sh", "-c",
+            matugenBin + " -c " + matugenConfig + " -j hex image \"" + confFile._previewPath + "\" --source-color-index 0"
+          ])
+        }
       }
+      if (!confFile._isBackgroundApply)
+        root.closed()
     }
-    onExited: (code, _) => {
-      if (code !== 0) root.favorites = []
+    property bool _skipMatugen: false
+    property bool _isBackgroundApply: false
+    property string _previewPath: ""
+  }
+
+  FileView {
+    id: favoritesFileView
+    path: root.favoritesPath
+    onLoaded: {
+      const lines = text().trim().split('\n').filter(l => l.trim() !== "")
+      root.favorites = lines
     }
   }
 
-  Process {
-    id: saveFavoritesProc
-    command: ["/bin/sh", "-c", "echo \"" + favorites.join('\n') + "\" > " + root.favoritesPath]
+  function writeConf(wallpaperValue, previewPath, skipMatugen, isBackgroundApply) {
+    confFile._skipMatugen = skipMatugen
+    confFile._previewPath = previewPath
+    confFile._isBackgroundApply = isBackgroundApply
+    confFile.setText(wallpaperValue)
   }
 
   Process {
@@ -290,23 +322,20 @@ Item {
     id: engineProc
     property string folderId: ""
     property string previewPath: ""
+    property bool isBackgroundApply: false
     command: ["killall", "-9", "linux-wallpaperengine"]
     onExited: (_, __) => {
+      let args = [root.enginePath, "--volume", root.volume]
+      if (root.engineFps > 0) args.push("--fps", root.engineFps)
       for (let i in Quickshell.screens) {
         const screen = Quickshell.screens[i]
-        let args = [
-          root.enginePath,
-          "--screen-root", screen.name,
-          "--bg", root.resolvedWorkshopPath + folderId,
-          "--volume", root.volume
-        ]
-        if (root.engineFps > 0) args.push("--fps", root.engineFps)
-        if (root.engineFill) args.push("--scaling", "fill")
-        Quickshell.execDetached({ command: args, environment: ["XDG_SESSION_TYPE=wayland"] })
+        args.push("--scaling", root.engineFill ? "fill" : "stretch")
+        args.push("--screen-root", screen.name)
+        args.push("--bg", root.resolvedWorkshopPath + folderId)
       }
-      writeConfProc.wallpaperValue = "engine:" + folderId
-      writeConfProc.previewPath = previewPath
-      writeConfProc.running = true
+      Quickshell.execDetached({ command: args, environment: ["XDG_SESSION_TYPE=wayland"] })
+      root.wasEngineActive = true
+      writeConf("engine:" + folderId, previewPath, engineProc.isBackgroundApply, engineProc.isBackgroundApply)
     }
   }
 
@@ -314,31 +343,18 @@ Item {
     id: setProc
     property string wallpaperPath: ""
     property string previewPath: ""
-    command: ["awww", "img", wallpaperPath, "--transition-type", "fade", "--transition-duration", "1"]
+    property bool skipAnimation: false
+    property bool killEngineAfter: false
+    property bool isBackgroundApply: false
+    command: skipAnimation
+      ? ["awww", "img", wallpaperPath]
+      : ["awww", "img", wallpaperPath, "--transition-type", "fade", "--transition-duration", "1"]
     onExited: (code, _) => {
       if (code !== 0) return
-      writeConfProc.wallpaperValue = wallpaperPath
-      writeConfProc.previewPath = previewPath
-      writeConfProc.running = true
-    }
-  }
-
-  Process {
-    id: writeConfProc
-    property string wallpaperValue: ""
-    property string previewPath: ""
-    command: ["/bin/sh", "-c", "echo \"" + wallpaperValue + "\" > " + root.wallpaperConf]
-    onExited: (code, _) => {
-      if (code !== 0) return
-      const matugenBin = Global.config.system.matugenBin
-      const matugenConfig = Global.config.system.matugenConfigPath
-      if (matugenBin !== "" && matugenConfig !== "") {
-        Quickshell.execDetached([
-          "/bin/sh", "-c",
-          matugenBin + " -c " + matugenConfig + " -j hex image \"" + previewPath + "\" --source-color-index 0"
-        ])
-      }
-      root.closed()
+      if (setProc.killEngineAfter)
+        Quickshell.execDetached(["killall", "-9", "linux-wallpaperengine"])
+      root.wasEngineActive = false
+      writeConf(wallpaperPath, previewPath, setProc.isBackgroundApply, setProc.isBackgroundApply)
     }
   }
 
@@ -414,7 +430,7 @@ Item {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.margins: Global.format.spacing_tiny
-            text: ""
+            text: ""
             font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: 14
             color: Global.colors.primary
