@@ -23,8 +23,8 @@ PanelWindow {
   anchors {
     left: true
     right: true
-    top: Global.config.panel.top
-    bottom: !Global.config.panel.top
+    top: false
+    bottom: true
   }
 
   implicitHeight: content.height + (barMenu.visible ? barMenu.implicitHeight : 0)
@@ -85,8 +85,8 @@ PanelWindow {
     anchors {
       left: parent.left
       right: parent.right
-      top: Global.config.panel.top ? parent.top : undefined
-      bottom: Global.config.panel.top ? undefined : parent.bottom
+      top: undefined
+      bottom: parent.bottom
     }
     height: barRow.height
     focus: true
@@ -106,8 +106,8 @@ PanelWindow {
       anchors {
         left: parent.left
         right: parent.right
-        top: Global.config.panel.top ? parent.top : undefined
-        bottom: Global.config.panel.top ? undefined : parent.bottom
+        top: undefined
+        bottom: parent.bottom
       }
       height: Global.format.panel_height
 
@@ -266,8 +266,8 @@ PanelWindow {
       anchors {
         left: parent.left
         right: parent.right
-        top: Global.config.panel.top ? barRow.bottom : undefined
-        bottom: Global.config.panel.top ? undefined : barRow.top
+        top: undefined
+        bottom: barRow.top
       }
 
       onItemTriggered: panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
