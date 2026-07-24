@@ -31,7 +31,7 @@ let
     };
     panel = {
       enabled = cfg.minimaConfig.panel.enable;
-      top = false;
+      top = true;
       panelAlwaysVisible = cfg.minimaConfig.panel.alwaysVisible;
     };
     launcher = {

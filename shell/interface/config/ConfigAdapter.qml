@@ -25,7 +25,6 @@ Item {
       }
       property JsonObject panel: JsonObject {
         property bool enabled: true
-        property bool top: false
       }
       property JsonObject launcher: JsonObject {
         property bool enabled: true
