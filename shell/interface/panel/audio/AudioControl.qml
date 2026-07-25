@@ -68,23 +68,42 @@ Item {
 
             property bool isDefault: Pipewire.defaultAudioSource?.id === modelData.id
 
-            StyledText {
-              anchors.fill: parent
-              verticalAlignment: Text.AlignVCenter
-              text: "󰋋  " + (modelData.nickname || modelData.name || "Unnamed")
-              color: inputMouseArea.containsMouse
-                ? Global.colors.on_surface
-                : isDefault
-                  ? Global.colors.primary
-                  : Global.colors.on_surface_variant
-            }
-
             MouseArea {
               id: inputMouseArea
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
               onClicked: Pipewire.preferredDefaultAudioSource = modelData
+              propagateComposedEvents: true
+
+              RowLayout {
+                anchors.fill: parent
+                spacing: Global.format.spacing_small
+
+                StyledText {
+                  Layout.preferredWidth: parent.width * 0.4
+                  text: "  " + (modelData.nickname || modelData.name || "Unnamed")
+                  color: inputMouseArea.containsMouse
+                    ? Global.colors.on_surface
+                    : isDefault
+                      ? Global.colors.primary
+                      : Global.colors.on_surface_variant
+                  elide: Text.ElideRight
+                }
+
+                StyledSlider {
+                  Layout.fillWidth: true
+                  Layout.alignment: Qt.AlignVCenter
+                  visible: modelData.ready
+                  from: 0
+                  to: 100
+                  value: modelData.audio ? modelData.audio.volume * 100 : 0
+                  onMoved: (val) => {
+                    if (modelData.audio)
+                      modelData.audio.volume = val / 100
+                  }
+                }
+              }
             }
           }
         }
@@ -140,23 +159,43 @@ Item {
 
             property bool isDefault: Pipewire.defaultAudioSink?.id === modelData.id
 
-            StyledText {
-              anchors.fill: parent
-              verticalAlignment: Text.AlignVCenter
-              text: "󰓃  " + (modelData.nickname || modelData.name || "Unnamed")
-              color: outputMouseArea.containsMouse
-                ? Global.colors.on_surface
-                : isDefault
-                  ? Global.colors.primary
-                  : Global.colors.on_surface_variant
-            }
-
             MouseArea {
               id: outputMouseArea
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
               onClicked: Pipewire.preferredDefaultAudioSink = modelData
+              propagateComposedEvents: true
+
+              RowLayout {
+                anchors.fill: parent
+                spacing: Global.format.spacing_small
+
+                StyledText {
+                  Layout.preferredWidth: parent.width * 0.4
+                  text: "󰓃  " + (modelData.nickname || modelData.name || "Unnamed")
+                  color: outputMouseArea.containsMouse
+                    ? Global.colors.on_surface
+                    : isDefault
+                      ? Global.colors.primary
+                      : Global.colors.on_surface_variant
+                  elide: Text.ElideRight
+                }
+
+                StyledSlider {
+                  Layout.fillWidth: true
+                  Layout.alignment: Qt.AlignVCenter
+                  visible: modelData.ready
+                  from: 0
+                  to: 100
+                  value: modelData.audio ? modelData.audio.volume * 100 : 0
+                  onMoved: (val) => {
+                    if (modelData.audio)
+                      modelData.audio.volume = val / 100
+                  }
+                }
+              }
+
             }
           }
         }
@@ -226,6 +265,7 @@ Item {
               StyledSlider {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter
+                visible: modelData.ready
                 from: 0
                 to: 100
                 value: modelData.audio ? modelData.audio.volume * 100 : 0
