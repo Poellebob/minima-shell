@@ -83,18 +83,18 @@ Item {
     searchInput.forceActiveFocus()
   }
 
-  function close() {
+  function close(skipSignal = false) {
     searchInput.text = ""
     isExpr = false
     mathRes = ""
-    closed()
+    if (!skipSignal) closed()
   }
 
   function executeSelected() {
     if (currentIndex >= 0 && currentIndex < filteredEntries.length) {
       const entry = filteredEntries[currentIndex]
+      close(isCommand)
       entry.execute()
-      close()
     }
   }
 

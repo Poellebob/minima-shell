@@ -101,6 +101,20 @@ PanelWindow {
       }
     }
 
+    MouseArea {
+      anchors.fill: parent
+      hoverEnabled: true
+      propagateComposedEvents: true
+      acceptedButtons: Qt.NoButton
+
+      onContainsMouseChanged: {
+        if (containsMouse && (barMenu.visible || activeBarContent !== statusContent) && activeBarContent !== wallpaperSearchContent) {
+          content.forceActiveFocus()
+          panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+        }
+      }
+    }
+
     Item {
       id: barRow
       anchors {
