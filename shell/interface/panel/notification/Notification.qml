@@ -39,7 +39,7 @@ BarWidget {
   }
 
   onClicked: (mouse) => {
-    if (mouse.button === Qt.RightButton)
+    if (mouse.button === Qt.LeftButton)
       notificationMenuTriggered()
   }
 
