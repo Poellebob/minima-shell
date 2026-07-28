@@ -12,6 +12,7 @@ Item {
   property real value: 0
 
   signal moved(real value)
+  signal doneMoving(real value)
 
   property real _ratio: (value - from) / (to - from)
 
@@ -41,7 +42,10 @@ Item {
     color: Global.colors.primary
 
     Behavior on x {
-      NumberAnimation { duration: 80; easing.type: Easing.OutCubic }
+      NumberAnimation {
+        duration: 80
+        easing.type: Easing.OutCubic
+      }
     }
   }
 
@@ -53,17 +57,25 @@ Item {
     onClicked: (mouse) => {
       const ratio = Math.max(0, Math.min(1, mouse.x / width))
       const newVal = from + ratio * (to - from)
+
+      root.value = newVal
+      root.moved(newVal)
+      root.doneMoving(newVal)
+    }
+
+    onPositionChanged: (mouse) => {
+      if (!pressed)
+        return
+
+      const ratio = Math.max(0, Math.min(1, mouse.x / width))
+      const newVal = from + ratio * (to - from)
+
       root.value = newVal
       root.moved(newVal)
     }
 
-    onPositionChanged: (mouse) => {
-      if (pressed) {
-        const ratio = Math.max(0, Math.min(1, mouse.x / width))
-        const newVal = from + ratio * (to - from)
-        root.value = newVal
-        root.moved(newVal)
-      }
+    onReleased: {
+      root.doneMoving(root.value)
     }
   }
 }
