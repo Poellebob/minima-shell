@@ -106,10 +106,9 @@ Item {
       StyledText {
         id: shuffleLabel
         anchors.centerIn: parent
-        text: "󰒞"
-        color: player?.shuffle
-          ? Global.colors.primary
-          : Global.colors.on_surface_variant
+        text:  player?.shuffle
+          ? "󰒟"
+          : "󰒞"
       }
     }
 
