@@ -205,7 +205,7 @@ Item {
 
     StyledText {
       text: player?.trackTitle ?? ""
-      Layout.maximumWidth: 220
+      Layout.maximumWidth: 200
       elide: Text.ElideRight
       clip: true
     }
