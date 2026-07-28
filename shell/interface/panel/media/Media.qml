@@ -58,7 +58,10 @@ Item {
     interval: 1000
     running: player?.playbackState === MprisPlaybackState.Playing
     repeat: true
-    onTriggered: { if (player?.positionSupported) player.positionChanged() }
+
+    onTriggered: {
+      slider.value = player?.position ?? 0
+    }
   }
 
   Component.onCompleted: root._syncPlayer()
@@ -220,9 +223,10 @@ Item {
         }
 
         StyledSlider {
+
+          id: slider
           from: 0
           to: player?.length ?? 1
-          value: player?.position ?? 0
           enabled: player?.canSeek ?? false
           visible: root.width > 520
 
