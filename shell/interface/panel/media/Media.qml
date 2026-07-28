@@ -211,6 +211,7 @@ Item {
     }
 
     Item {
+      id: time
       Layout.fillWidth: true
       Layout.fillHeight: true
 
@@ -229,7 +230,7 @@ Item {
           from: 0
           to: player?.length ?? 1
           enabled: player?.canSeek ?? false
-          visible: root.width > 520
+          visible: time.width > 300
 
           Layout.fillWidth: true
           Layout.preferredWidth: 0
@@ -243,7 +244,7 @@ Item {
         StyledText {
           text: "-"
           font.pixelSize: Global.format.text_size
-          visible: root.width <= 520
+          visible: time.width <= 300
         }
 
         StyledText {
@@ -253,7 +254,7 @@ Item {
 
         Item {
           Layout.fillWidth: true
-          visible: root.width <= 520
+          visible: time.width <= 300
         }
       }
     }
