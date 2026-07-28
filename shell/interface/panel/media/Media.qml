@@ -61,6 +61,7 @@ Item {
 
     onTriggered: {
       slider.value = player?.position ?? 0
+      posText.text = formatTime(player?.position ?? 0)
     }
   }
 
@@ -218,12 +219,12 @@ Item {
         spacing: Global.format.spacing_small
 
         StyledText {
+          id: posText
           text: formatTime(player?.position ?? 0)
           font.pixelSize: Global.format.text_size
         }
 
         StyledSlider {
-
           id: slider
           from: 0
           to: player?.length ?? 1
