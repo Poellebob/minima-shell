@@ -17,6 +17,7 @@ import qs.panel.launcher
 import qs.panel.clipboard
 import qs.panel.wallpaper
 import qs.panel.notification
+import qs.panel.media
 
 PanelWindow {
   id: panel
@@ -139,7 +140,8 @@ PanelWindow {
 
             RowLayout {
               anchors.left: parent.left
-              anchors.leftMargin: Global.format.spacing_medium
+              anchors.right: parent.right
+              anchors.leftMargin: Global.format.spacing_tiny
               anchors.verticalCenter: parent.verticalCenter
               spacing: Global.format.spacing_medium
 
@@ -158,14 +160,26 @@ PanelWindow {
                   }
                 }
               }
+
+              Media {
+                id: mediaWidget
+                Layout.alignment: Qt.AlignVCenter
+                Layout.fillWidth: true
+                onShowPlayerMenu: {
+                  if (!(screen.name == I3.focusedMonitor.name)) return
+                  playerSelectorContent.activePlayer = mediaWidget.player
+                  openBarContent(playerSelectorContent)
+                }
+              }
             }
           }
 
           Item {
-            Layout.fillWidth: true
+            Layout.preferredWidth: midrow.width
             Layout.fillHeight: true
 
             RowLayout {
+              id: midrow
               anchors.centerIn: parent
               spacing: Global.format.spacing_medium
 
@@ -337,6 +351,17 @@ PanelWindow {
         anchors.fill: parent
         anchors.margins: Global.format.spacing_large
         visible: false
+      }
+
+      PlayerSelector {
+        id: playerSelectorContent
+        anchors.fill: parent
+        visible: false
+        onPlayerSelected: (player) => {
+          mediaWidget.player = player
+          barMenu.hideContent()
+          panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
+        }
       }
     }
   }
