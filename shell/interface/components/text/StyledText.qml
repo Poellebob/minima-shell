@@ -4,5 +4,5 @@ import qs
 Text {
   color: Global.colors.on_surface_variant
   font.pixelSize: Global.format.text_size
-  font.family: "JetBrainsMono Nerd Font"
+  font.family: "JetBrainsMono Nerd Font mono"
 }
