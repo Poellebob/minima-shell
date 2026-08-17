@@ -18,7 +18,7 @@ in {
       wireplumber jq bc power-profiles-daemon brightnessctl libnotify inotify-tools
       nerd-fonts.jetbrains-mono lazygit papirus-icon-theme playerctl
       rose-pine-cursor qt5.qtwayland qt6.qtwayland kdePackages.qt6ct 
-      linux-wallpaperengine libqalculate killall
+      linux-wallpaperengine libqalculate killall openssh
       kdePackages.breeze
       kdePackages.breeze-gtk
       kdePackages.breeze-icons
@@ -138,10 +138,6 @@ in {
       enableZshIntegration = true;
       git = true;
       icons = "auto";
-    };
-
-    programs.ssh = {
-      enable = true;
     };
 
     programs.zsh = mkIf (cfg.shell.enable) {
