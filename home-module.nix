@@ -140,6 +140,10 @@ in {
       icons = "auto";
     };
 
+    services.ssh-agent = {
+      enable = true;
+    };
+
     programs.zsh = mkIf (cfg.shell.enable) {
       enable = true;
       enableCompletion = true;
@@ -161,8 +165,6 @@ in {
 
           PS1='%{$( [ $? -ne 0 ] && printf "\e[31m%d\e[0m " $? )%}%{\e[36m%}%~%{\e[0m%}$(git_prompt) %{\e[90m%}›%{\e[0m%} '
         fi
-
-        eval "$(ssh-agent -s)"
 
         zv() { local prev="$PWD"; z "$1" || return; nvim .; cd "$prev"; }
         ziv() { local prev="$PWD"; zi || return; nvim .; cd "$prev"; }
