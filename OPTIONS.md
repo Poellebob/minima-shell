@@ -252,8 +252,19 @@ For non-Nix manual setup, see [NONNIX.md](./NONNIX.md).
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `minima.vim.lsp.servers` | attrs | `{}` | Extra LSP servers configuration |
-| `minima.vim.lsp.conform` | attrs | `{}` | Extra conform formatters |
-| `minima.vim.lsp.formatterOpts` | attrs | `{}` | Formatter definitions |
+| `minima.vim.lsp.formatter` | attrs | `{}` | Extra conform `formatters_by_ft` entries by filetype |
+| `minima.vim.lsp.formatterOpts` | attrs | `{}` | Formatter definitions (e.g. custom args) |
+
+The editor is built on Nixvim with a gnvim-style layout: `nixvim/options.nix`,
+`keymaps.nix`, `autocommands.nix`, `diagnostics.nix`, `performance.nix` and one
+file per plugin under `nixvim/plugins/`. Language-specific config (LSP server,
+linter, formatter) lives one file per language under `nixvim/languages/`.
+Completion uses blink-cmp, LSP is
+wired with inlay hints and `gd`/`gD`/`gi`/`K`/`<leader>ca` keymaps, formatting
+uses conform-nvim, linting uses nvim-lint, and the UI is mini.nvim + lualine +
+bufferline + noice. Any file dropped into `nixvim/plugins/*.nix` or
+`nixvim/languages/*.nix` is imported
+automatically.
 
 ### Keybindings
 
@@ -295,19 +306,16 @@ For non-Nix manual setup, see [NONNIX.md](./NONNIX.md).
         pyright = {};
         rust_analyzer = {};
       };
-      conform = {
-        formatters = {
-          black = {};
-          prettier = {};
-        };
+      formatter = {
+        python = [ "black" ];
       };
     };
     keybinds = [
       {
         mode = "n";
-        key = "<leader>ff";
-        action = "<cmd>Telescope find_files<cr>";
-        desc = "Find files";
+        key = "<leader>tt";
+        action = "<cmd>ToggleTerm direction=float<cr>";
+        desc = "Floating terminal";
       }
     ];
     autocmd = [
@@ -325,21 +333,27 @@ For non-Nix manual setup, see [NONNIX.md](./NONNIX.md).
 
 The following settings are enabled by default in `nixvim/options.nix`:
 
-- **Indentation**: `tabstop=2`, `shiftwidth=2`, `softtabstop=2`, `expandtab=true`
-- **UI**: `number`, `relativenumber`, `scrolloff=8`, `splitright`, `splitbelow`
+- **Indentation**: `tabstop=2`, `shiftwidth=2`, `expandtab=true`, `autoindent=true`
+- **UI**: `number`, `relativenumber`, `cursorline`, `cursorcolumn`, `signcolumn`, `splitright`, `splitbelow`, folding with custom fillchars
 - **Clipboard**: `"unnamedplus"`
-- **Files**: `autoread`, `undofile`, `swapfile`, `ignorecase`, `smartcase`
+- **Search**: `incsearch`, `ignorecase`, `smartcase`
 
 ### Default Enabled Vim Plugins
 
-- **UI**: catppuccin, indent-blankline, neo-tree, bufferline, lualine, which-key, noice, notify, snacks, alpha, dressing
-- **Navigation**: telescope
-- **Syntax**: treesitter
-- **Git**: gitsigns
-- **Completion**: cmp, luasnip
+- **UI**: catppuccin, mini.nvim (files/pick/surround/pairs/icons/...), lualine, bufferline, noice, smartcolumn
+- **Completion**: blink-cmp (+ luasnip, friendly-snippets)
+- **Syntax**: treesitter (all grammars)
+- **Git**: gitsigns (line blame), lazygit, gitignore
+- **LSP**: nvim-lsp (inlay hints), lsp-lines, lsp-signature, lspkind, trouble
+- **Formatting/Linting**: conform-nvim, nvim-lint
+- **Editing**: flash (disabled by default), smart-splits, toggleterm, comment via mini.ai/surround
+- **Markdown**: render-markdown, image.nvim (kitty backend)
+- **Nix**: direnv, nix, nix-develop
+- **Misc**: trouble diagnostics, lint, performance byte-compilation
 
 ### Default LSP Servers
 
-- `nixd` - Nix language server
+- `nixd` - Nix language server (flake-aware nixpkgs expr + nixfmt formatting)
 - `lua_ls` - Lua language server
-- `vimtex` - LaTeX support (only when `minima.tex.enable = true`)
+- `bashls`, `cssls`, `html`, `jsonls`, `marksman`, `pyright`, `yamlls`
+- `ltex` - Grammar/spell checking

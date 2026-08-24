@@ -1,9 +1,15 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 let
   cfg = config.minima;
-in {
+in
+{
   imports = [
     ./lib.nix
     ./nixvim.nix
@@ -12,43 +18,81 @@ in {
   ];
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [
-      matugen wiremix bluetui hyprlock bluez bluez-tools upower curl
-      grim slurp swappy awww xdg-utils cliphist wl-clipboard quickshell
-      wireplumber jq bc power-profiles-daemon brightnessctl libnotify inotify-tools
-      nerd-fonts.jetbrains-mono lazygit papirus-icon-theme playerctl
-      rose-pine-cursor qt5.qtwayland qt6.qtwayland kdePackages.qt6ct 
-      linux-wallpaperengine libqalculate killall openssh
-      kdePackages.breeze
-      kdePackages.breeze-gtk
-      kdePackages.breeze-icons
-      cfg.programs.terminal.package
-      cfg.programs.fileManager.package
-      cfg.programs.browser.package
-    ]
-    ++ optionals (cfg.programs.fileManager.package == pkgs.kdePackages.dolphin) [
-      kdePackages.ark
-      kdePackages.plasma-workspace
-      kdePackages.kio
-      kdePackages.kdf
-      kdePackages.kio-fuse
-      kdePackages.kio-extras
-      kdePackages.kio-admin
-      kdePackages.qtwayland
-      kdePackages.plasma-integration
-      kdePackages.kdegraphics-thumbnailers
-      kdePackages.breeze-icons
-      kdePackages.qtsvg
-      kdePackages.kservice
-    ]
-    ++ optionals cfg.shell.enable [ fzf zoxide git afetch ]
-    ++ cfg.extraPackages
-    ++ optionals cfg.tex.enable [
-      (pkgs.texlive.combine (
-{ ${cfg.tex.scheme} = pkgs.texlive.${cfg.tex.scheme}; }
-           // lib.optionalAttrs (cfg.tex.packages != null) cfg.tex.packages
-      ))
-    ];
+    home.packages =
+      with pkgs;
+      [
+        matugen
+        wiremix
+        bluetui
+        hyprlock
+        bluez
+        bluez-tools
+        upower
+        curl
+        grim
+        slurp
+        swappy
+        awww
+        xdg-utils
+        cliphist
+        wl-clipboard
+        quickshell
+        wireplumber
+        jq
+        bc
+        power-profiles-daemon
+        brightnessctl
+        libnotify
+        inotify-tools
+        nerd-fonts.jetbrains-mono
+        lazygit
+        papirus-icon-theme
+        playerctl
+        rose-pine-cursor
+        qt5.qtwayland
+        qt6.qtwayland
+        kdePackages.qt6ct
+        linux-wallpaperengine
+        libqalculate
+        killall
+        openssh
+        kdePackages.breeze
+        kdePackages.breeze-gtk
+        kdePackages.breeze-icons
+        cfg.programs.terminal.package
+        cfg.programs.fileManager.package
+        cfg.programs.browser.package
+      ]
+      ++ optionals (cfg.programs.fileManager.package == pkgs.kdePackages.dolphin) [
+        kdePackages.ark
+        kdePackages.plasma-workspace
+        kdePackages.kio
+        kdePackages.kdf
+        kdePackages.kio-fuse
+        kdePackages.kio-extras
+        kdePackages.kio-admin
+        kdePackages.qtwayland
+        kdePackages.plasma-integration
+        kdePackages.kdegraphics-thumbnailers
+        kdePackages.breeze-icons
+        kdePackages.qtsvg
+        kdePackages.kservice
+      ]
+      ++ optionals cfg.shell.enable [
+        fzf
+        zoxide
+        git
+        afetch
+      ]
+      ++ cfg.extraPackages
+      ++ optionals cfg.tex.enable [
+        (pkgs.texlive.combine (
+          {
+            ${cfg.tex.scheme} = pkgs.texlive.${cfg.tex.scheme};
+          }
+          // lib.optionalAttrs (cfg.tex.packages != null) cfg.tex.packages
+        ))
+      ];
 
     xdg.portal = mkIf cfg.desktop.xdgPortal {
       enable = true;
@@ -60,7 +104,10 @@ in {
         pkgs.xdg-desktop-portal-wlr
       ];
       config = {
-        common.default = [ "kde" "gtk" ];
+        common.default = [
+          "kde"
+          "gtk"
+        ];
       }
       // lib.optionalAttrs (cfg.wm == "sway" || cfg.wm == "swayfx" || cfg.wm == "scroll") {
         sway = {
@@ -91,12 +138,6 @@ in {
         package = pkgs.rose-pine-cursor;
         size = 24;
       };
-      # gtk3.extraConfig = {
-      #   gtk-application-prefer-dark-theme = 1;
-      # };
-      # gtk4.extraConfig = {
-      #   gtk-application-prefer-dark-theme = 1;
-      # };
     };
 
     programs.bat = mkIf (cfg.shell.enable) {
@@ -194,35 +235,41 @@ in {
       settings = {
         add_newline = true;
         directory.style = "cyan";
-        character = { success_symbol = "[❯](green)"; error_symbol = "[❯](red)"; };
-        git_branch = { style = "purple"; symbol = "󰘬 "; };
+        character = {
+          success_symbol = "[❯](green)";
+          error_symbol = "[❯](red)";
+        };
+        git_branch = {
+          style = "purple";
+          symbol = "󰘬 ";
+        };
         git_status.style = "purple";
         cmd_duration.disabled = false;
-        aws.symbol = "󰸏 "; 
-        bun.symbol = "󰟓 "; 
-        c.symbol = "󰙱 "; 
+        aws.symbol = "󰸏 ";
+        bun.symbol = "󰟓 ";
+        c.symbol = "󰙱 ";
         conda.symbol = "󱔎 ";
-        dart.symbol = "󰔶 "; 
-        docker_context.symbol = "󰡨 "; 
+        dart.symbol = "󰔶 ";
+        docker_context.symbol = "󰡨 ";
         elixir.symbol = "󰘉 ";
-        elm.symbol = "󰏚 "; 
+        elm.symbol = "󰏚 ";
         golang.symbol = "󰟓 ";
         haskell.symbol = "󰲒 ";
-        java.symbol = "󰬷 "; 
+        java.symbol = "󰬷 ";
         julia.symbol = "󱌞 ";
         kotlin.symbol = "󱈙 ";
-        lua.symbol = "󰢱 "; 
-        memory_usage.symbol = "󰍛 "; 
+        lua.symbol = "󰢱 ";
+        memory_usage.symbol = "󰍛 ";
         nim.symbol = "󰆥 ";
-        nix_shell.symbol = "󱄅 "; 
-        nodejs.symbol = "󰎙 "; 
+        nix_shell.symbol = "󱄅 ";
+        nodejs.symbol = "󰎙 ";
         package.symbol = "󰏗 ";
-        php.symbol = "󰌟 "; 
-        python.symbol = "󰌠 "; 
+        php.symbol = "󰌟 ";
+        python.symbol = "󰌠 ";
         ruby.symbol = "󰴭 ";
-        rust.symbol = "󱘗 "; 
-        scala.symbol = " "; 
-        swift.symbol = "󰛥 "; 
+        rust.symbol = "󱘗 ";
+        scala.symbol = " ";
+        swift.symbol = "󰛥 ";
         zig.symbol = "󱐋 ";
       };
     };
@@ -251,7 +298,7 @@ in {
         CLUTTER_BACKEND = "wayland";
         ELECTRON_OZONE_PLATFORM_HINT = "wayland";
         XDG_SESSION_TYPE = "wayland";
-        XDG_CURRENT_DESKTOP = "minima:KDE:${if cfg.wm == "swayfx" then "sway" else cfg.wm}"; 
+        XDG_CURRENT_DESKTOP = "minima:KDE:${if cfg.wm == "swayfx" then "sway" else cfg.wm}";
       }
       (mkIf cfg.theming.enable {
         XCURSOR_THEME = "BreezeX-RosePine-Linux";
@@ -288,15 +335,17 @@ in {
       chmod 644 $HOME/.config/minima/colors.json
     '';
 
-    home.activation.downloadVimSpellfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] (lib.optionalString (cfg.tex.spell != []) ''
-      mkdir -p $HOME/.local/share/nvim/site/spell
-      cd $HOME/.local/share/nvim/site/spell || exit 1
-      ${lib.concatMapStringsSep "\n" (lang: ''
-        if [[ ! -f "${lang}.utf-8.spl" ]]; then
-          ${pkgs.curl}/bin/curl -fsSL -O "https://ftp.nluug.nl/pub/vim/runtime/spell/${lang}.utf-8.spl"
-          ${pkgs.curl}/bin/curl -fsSL -O "https://ftp.nluug.nl/pub/vim/runtime/spell/${lang}.utf-8.sug"
-        fi
-      '') cfg.tex.spell}
-    '');
+    home.activation.downloadVimSpellfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] (
+      lib.optionalString (cfg.tex.spell != [ ]) ''
+        mkdir -p $HOME/.local/share/nvim/site/spell
+        cd $HOME/.local/share/nvim/site/spell || exit 1
+        ${lib.concatMapStringsSep "\n" (lang: ''
+          if [[ ! -f "${lang}.utf-8.spl" ]]; then
+            ${pkgs.curl}/bin/curl -fsSL -O "https://ftp.nluug.nl/pub/vim/runtime/spell/${lang}.utf-8.spl"
+            ${pkgs.curl}/bin/curl -fsSL -O "https://ftp.nluug.nl/pub/vim/runtime/spell/${lang}.utf-8.sug"
+          fi
+        '') cfg.tex.spell}
+      ''
+    );
   };
 }

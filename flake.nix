@@ -27,6 +27,7 @@
 
   outputs = { self, nixpkgs, home-manager, nixvim, stylix, scroll-flake, ... }@inputs: {
     homeModules.minima = { ... }: {
+      _module.args.minimaFlakeSrc = self;
       imports = [
         stylix.homeModules.stylix
         nixvim.homeModules.nixvim

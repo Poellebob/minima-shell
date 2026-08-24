@@ -104,9 +104,18 @@ with lib;
     };
   };
 
-  imports = [
-    ./nixvim/options.nix
-    ./nixvim/ui.nix
-    ./nixvim/lsp.nix
-  ];
+  imports =
+    [
+      ./nixvim/options.nix
+      ./nixvim/keymaps.nix
+      ./nixvim/autocommands.nix
+      ./nixvim/diagnostics.nix
+      ./nixvim/performance.nix
+    ]
+    ++ map (name: ./nixvim/plugins/${name}) (
+      lib.filter (name: lib.hasSuffix ".nix" name) (attrNames (builtins.readDir ./nixvim/plugins))
+    )
+    ++ map (name: ./nixvim/languages/${name}) (
+      lib.filter (name: lib.hasSuffix ".nix" name) (attrNames (builtins.readDir ./nixvim/languages))
+    );
 }
