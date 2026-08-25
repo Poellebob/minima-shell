@@ -25,8 +25,6 @@
       };
 
       globals = {
-        mapleader = " ";
-        maplocalleader = " ";
         vimtex_syntax_enabled = 1;
         loaded_ruby_provider = 0;
         loaded_perl_provider = 0;
