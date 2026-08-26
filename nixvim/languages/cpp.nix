@@ -13,7 +13,23 @@ with lib;
       ccls = {
         enable = true;
         package = pkgs.ccls;
-        filetypes = [ "c" "cpp" ];
+        {  
+          cmd = [
+            "ccls"
+          ];
+          filetypes = [
+            "c"
+            "cpp"
+            "h"
+            "hpp"
+          ];
+          root_markers = [
+            "compile_commands.json"
+            "compile_flags.txt"
+            ".git"
+          ];
+        }
+
         root_dir = mkRaw ''
           function(fname, bufnr)
             local util = require("lspconfig.util")
