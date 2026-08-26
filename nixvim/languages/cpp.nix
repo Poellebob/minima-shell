@@ -13,7 +13,6 @@ with lib;
       ccls = {
         enable = true;
         package = pkgs.ccls;
-        cmd = [ "ccls" ];
         filetypes = [ "c" "cpp" ];
         root_dir = mkRaw ''
           function(fname, bufnr)
