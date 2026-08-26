@@ -2,7 +2,7 @@
 with lib;
 {
   options.minima.vim = {
-    enable = lib.mkOption{
+    enable = lib.mkOption {
       description = "Nixvim editor";
       type = types.bool;
       default = true;
@@ -23,7 +23,7 @@ with lib;
     lsp = {
       servers = mkOption {
         type = types.attrsOf types.anything;
-        default = {};
+        default = { };
         description = ''
           Extra LSP servers to enable. Each key is a server name.
 
@@ -41,81 +41,84 @@ with lib;
       };
       formatter = mkOption {
         type = types.attrsOf types.anything;
-        default = {};
+        default = { };
         description = "Extra conform formatters by filetype";
       };
       formatterOpts = mkOption {
         type = types.attrsOf types.anything;
-        default = {};
+        default = { };
         description = "Formatter definitions (e.g. custom args for formatters)";
       };
     };
 
     keybinds = mkOption {
-      type = types.listOf (types.submodule {
-        options = {
-          mode = mkOption {
-            type = types.str;
-            default = "n";
+      type = types.listOf (
+        types.submodule {
+          options = {
+            mode = mkOption {
+              type = types.str;
+              default = "n";
+            };
+            key = mkOption {
+              type = types.str;
+            };
+            action = mkOption {
+              type = types.str;
+            };
+            desc = mkOption {
+              type = types.str;
+              default = "";
+            };
           };
-          key = mkOption {
-            type = types.str;
-          };
-          action = mkOption {
-            type = types.str;
-          };
-          desc = mkOption {
-            type = types.str;
-            default = "";
-          };
-        };
-      });
-      default = [];
+        }
+      );
+      default = [ ];
       description = "Extra keybindings";
     };
 
     autocmd = mkOption {
-      type = types.listOf (types.submodule {
-        options = {
-          event = mkOption {
-            type = types.either types.str (types.listOf types.str);
+      type = types.listOf (
+        types.submodule {
+          options = {
+            event = mkOption {
+              type = types.either types.str (types.listOf types.str);
+            };
+            pattern = mkOption {
+              type = types.either types.str (types.listOf types.str);
+              default = "*";
+            };
+            command = mkOption {
+              type = types.str;
+            };
+            desc = mkOption {
+              type = types.str;
+              default = "";
+            };
           };
-          pattern = mkOption {
-            type = types.either types.str (types.listOf types.str);
-            default = "*";
-          };
-          command = mkOption {
-            type = types.str;
-          };
-          desc = mkOption {
-            type = types.str;
-            default = "";
-          };
-        };
-      });
-      default = [];
+        }
+      );
+      default = [ ];
       description = "Extra autocommands";
     };
 
     plugins = mkOption {
       type = types.attrsOf types.anything;
-      default = {};
+      default = { };
       description = "Extra nixvim plugins";
     };
   };
 
-  imports =
-    [
-      ./nixvim/options.nix
-      ./nixvim/keymaps.nix
-      ./nixvim/autocommands.nix
-      ./nixvim/diagnostics.nix
-      ./nixvim/performance.nix
-    ]
-    ++ map (name: ./nixvim/plugins/${name}) (
-      lib.filter (name: lib.hasSuffix ".nix" name) (attrNames (builtins.readDir ./nixvim/plugins))
-    )
-    ++ map (name: ./nixvim/languages/${name}) (
-      lib.filter (name: lib.hasSuffix ".nix" name) (attrNames (builtins.readDir ./nixvim/languages))
-    );
+  imports = [
+    ./nixvim/options.nix
+    ./nixvim/keymaps.nix
+    ./nixvim/autocommands.nix
+    ./nixvim/diagnostics.nix
+    ./nixvim/performance.nix
+  ]
+  ++ map (name: ./nixvim/plugins/${name}) (
+    lib.filter (name: lib.hasSuffix ".nix" name) (attrNames (builtins.readDir ./nixvim/plugins))
+  )
+  ++ map (name: ./nixvim/languages/${name}) (
+    lib.filter (name: lib.hasSuffix ".nix" name) (attrNames (builtins.readDir ./nixvim/languages))
+  );
 }
