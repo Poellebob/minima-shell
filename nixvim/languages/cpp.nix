@@ -13,7 +13,7 @@ with lib;
       ccls = {
         enable = true;
         package = pkgs.ccls;
-        {  
+        config = {  
           cmd = [
             "ccls"
           ];
@@ -28,7 +28,7 @@ with lib;
             "compile_flags.txt"
             ".git"
           ];
-        }
+        };
 
         root_dir = mkRaw ''
           function(fname, bufnr)
