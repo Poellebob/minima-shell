@@ -76,6 +76,17 @@ PanelWindow {
     closeBarMenu()
   }
 
+  function openAudioMedia() {
+    openBarMenu(mediaContent)
+    mediaContent.open()
+    barMenu.showContent(audioContent)
+  }
+
+  function closeAudioMedia() {
+    barMenu.hideContent()
+    closeBarMenu()
+  }
+
   function openClipboard() {
     openBarMenu(clipboardContent)
     clipboardContent.open()
@@ -92,7 +103,9 @@ PanelWindow {
     height: barRow.height
     focus: true
     Keys.onEscapePressed: (event) => {
-      if (barMenu.visible) {
+      if (activeBarContent === mediaContent && barMenu.visible) {
+        closeAudioMedia()
+      } else if (barMenu.visible) {
         barMenu.hideContent()
         panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
       } else if (activeBarContent !== statusContent) {
@@ -160,17 +173,6 @@ PanelWindow {
                   }
                 }
               }
-
-              Media {
-                id: mediaWidget
-                Layout.alignment: Qt.AlignVCenter
-                Layout.fillWidth: true
-                onShowPlayerMenu: {
-                  if (!(screen.name == I3.focusedMonitor.name)) return
-                  playerSelectorContent.activePlayer = mediaWidget.player
-                  openBarContent(playerSelectorContent)
-                }
-              }
             }
           }
 
@@ -202,7 +204,7 @@ PanelWindow {
 
               Audio {
                 Layout.alignment: Qt.AlignVCenter
-                onAudioMenuTriggered: openBarContent(audioContent)
+                onAudioMenuTriggered: openAudioMedia()
               }
               Battery {
                 Layout.alignment: Qt.AlignVCenter
@@ -246,6 +248,13 @@ PanelWindow {
         anchors.fill: parent
         visible: false
         onClosed: panel.closeBarMenu()
+      }
+
+      Media {
+        id: mediaContent
+        anchors.fill: parent
+        visible: false
+        onClosed: panel.closeAudioMedia()
       }
 
       Item {
@@ -322,6 +331,8 @@ PanelWindow {
         anchors.fill: parent
         anchors.margins: Global.format.spacing_large
         visible: false
+        activePlayer: mediaContent.player
+        onPlayerSelected: (p) => mediaContent.player = p
       }
 
       BluetoothControl {
@@ -351,17 +362,6 @@ PanelWindow {
         anchors.fill: parent
         anchors.margins: Global.format.spacing_large
         visible: false
-      }
-
-      PlayerSelector {
-        id: playerSelectorContent
-        anchors.fill: parent
-        visible: false
-        onPlayerSelected: (player) => {
-          mediaWidget.player = player
-          barMenu.hideContent()
-          panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
-        }
       }
     }
   }
