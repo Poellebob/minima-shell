@@ -9,19 +9,20 @@ import qs.components.widget
 Item {
   id: root
 
-  implicitHeight: Global.format.module_height
-  implicitWidth: row.implicitWidth + Global.format.spacing_medium * 2
-
   property MprisPlayer player: null
-  property int playerCount: 0
 
-  signal showPlayerMenu()
+  signal closed
 
-  visible: player !== null
+  function open() {
+    _syncPlayer()
+  }
+
+  function close() {
+    closed()
+  }
 
   function _syncPlayer() {
     var players = Mpris.players.values
-    root.playerCount = players.length
     if (players.length === 0) {
       root.player = null
     } else if (root.player === null) {
@@ -67,30 +68,20 @@ Item {
 
   Component.onCompleted: root._syncPlayer()
 
+  StyledText {
+    anchors.centerIn: parent
+    text: "No media playing"
+    color: Global.colors.outline
+    visible: root.player === null
+  }
+
   RowLayout {
     id: row
-
     anchors.fill: parent
     anchors.leftMargin: Global.format.spacing_medium
     anchors.rightMargin: Global.format.spacing_medium
-
     spacing: Global.format.spacing_medium
-
-    MouseArea {
-      visible: root.playerCount > 1
-      implicitWidth: switchLabel.implicitWidth + Global.format.spacing_small
-      implicitHeight: parent.height
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-
-      StyledText {
-        id: switchLabel
-        anchors.centerIn: parent
-        text: ""
-      }
-
-      onClicked: root.showPlayerMenu()
-    }
+    visible: root.player !== null
 
     MouseArea {
       implicitWidth: shuffleLabel.implicitWidth + Global.format.spacing_small
