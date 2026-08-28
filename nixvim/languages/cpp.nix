@@ -1,34 +1,30 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
-
-with lib;
 {
   config = lib.mkIf config.minima.vim.enable {
-    programs.nixvim.lsp.servers = {
-      clang = {
-        enable = true;
-        config = {  
-          cmd = [
-            "clangd"
-            "--background-index"
-          ];
-          filetypes = [
-            "c"
-            "cpp"
-            "h"
-            "hpp"
-          ];
-          root_markers = [
-            "compile_commands.json"
-            "compile_flags.txt"
-            ".git"
-          ];
-        };
-      };
+    programs.nixvim.plugins.lsp.servers.clangd = {
+      enable = true;
+      cmd = [
+        "clangd"
+        "--background-index"
+        "-j=12"
+        "--query-driver=**"
+        "--clang-tidy"
+        "--all-scopes-completion"
+        "--cross-file-rename"
+        "--completion-style=detailed"
+        "--header-insertion-decorators"
+        "--header-insertion=iwyu"
+        "--pch-storage=memory"
+        "--suggest-missing-includes"
+      ];
+      filetypes = [
+        "c"
+        "cpp"
+      ];
     };
   };
 }
