@@ -9,12 +9,12 @@ with lib;
 {
   config = lib.mkIf config.minima.vim.enable {
     programs.nixvim.lsp.servers = {
-      ccls = {
+      clang = {
         enable = true;
-        package = pkgs.ccls;
         config = {  
           cmd = [
-            "ccls"
+            "clangd"
+            "--background-index"
           ];
           filetypes = [
             "c"
