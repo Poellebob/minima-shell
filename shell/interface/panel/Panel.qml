@@ -210,7 +210,7 @@ PanelWindow {
               anchors.right: parent.right
               anchors.rightMargin: Global.format.spacing_medium
               anchors.verticalCenter: parent.verticalCenter
-              spacing: Global.format.spacing_medium
+              spacing: 0
 
               Audio {
                 Layout.alignment: Qt.AlignVCenter
@@ -293,16 +293,16 @@ PanelWindow {
             Keys.onReturnPressed: wallpaperContent.selectCurrent()
             Keys.onEscapePressed: closeWallpapers()
             Keys.onPressed: event => {
-                              if (event.modifiers & Qt.ControlModifier) {
-                                if (event.key === Qt.Key_F) {
-                                  wallpaperContent.toggleFavoriteCurrent();
-                                  event.accepted = true;
-                                } else if (event.key === Qt.Key_R) {
-                                  wallpaperContent.reload();
-                                  event.accepted = true;
-                                }
-                              }
-                            }
+              if (event.modifiers & Qt.ControlModifier) {
+                if (event.key === Qt.Key_F) {
+                  wallpaperContent.toggleFavoriteCurrent();
+                  event.accepted = true;
+                } else if (event.key === Qt.Key_R) {
+                  wallpaperContent.reload();
+                  event.accepted = true;
+                }
+              }
+            }
           }
         }
       }

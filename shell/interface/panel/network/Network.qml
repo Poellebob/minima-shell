@@ -11,30 +11,9 @@ BarWidget {
 
   signal networkMenuTriggered
 
-  RowLayout {
-    id: row
-    anchors.centerIn: parent
-    spacing: Global.format.spacing_small
-
-    StyledText {
-      id: networkIcon
-      text: root.getNetworkIcon()
-      color: root.isConnected ? Global.colors.on_surface_variant :
-                                Global.colors.outline
-    }
-
-    StyledText {
-      id: networkText
-      text: root.displayText
-      visible: root.displayText !== ""
-    }
-  }
-
   property bool isConnected: false
   property string connectionType: "none"
-  property string networkName: ""
   property int signalStrength: 0
-  property string displayText: ""
 
   function getNetworkIcon() {
     if (!isConnected) {
@@ -56,23 +35,17 @@ BarWidget {
     }
   }
 
-  function updateDisplayText() {
-    if (!isConnected) {
-      displayText = "Disconnected";
-      return;
-    }
+  RowLayout {
+    id: row
+    anchors.centerIn: parent
+    spacing: Global.format.spacing_small
 
-    if (connectionType === "ethernet") {
-      displayText = "Ethernet";
-      return;
+    StyledText {
+      id: networkIcon
+      text: root.getNetworkIcon()
+      color: root.isConnected ? Global.colors.on_surface_variant :
+                                Global.colors.outline
     }
-
-    if (connectionType === "wifi" && networkName !== "") {
-      displayText = networkName;
-      return;
-    }
-
-    displayText = "Connected";
   }
 
   Process {
@@ -87,23 +60,15 @@ BarWidget {
 
         for (let line of lines) {
           const parts = line.split(':');
-          if (parts.length >= 3) {
-            const deviceType = parts[0];
-            const state = parts[1];
-            const connection = parts[2];
-
-            if (state === "connected") {
-              connected = true;
-              if (deviceType === "wifi") {
-                type = "wifi";
-                root.networkName = connection;
-                wifiSignalProcess.running = true;
-              } else if (deviceType === "ethernet") {
-                type = "ethernet";
-                root.networkName = connection;
-              }
-              break;
+          if (parts.length >= 3 && parts[1] === "connected") {
+            connected = true;
+            if (parts[0] === "wifi") {
+              type = "wifi";
+              wifiSignalProcess.running = true;
+            } else if (parts[0] === "ethernet") {
+              type = "ethernet";
             }
+            break;
           }
         }
 
@@ -111,11 +76,8 @@ BarWidget {
         root.connectionType = type;
 
         if (!connected) {
-          root.networkName = "";
           root.signalStrength = 0;
         }
-
-        root.updateDisplayText();
       }
     }
   }
@@ -127,12 +89,9 @@ BarWidget {
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
-        const lines = this.text.trim().split('\n');
-        if (lines.length > 0 && lines[0] !== "") {
-          const signal = parseInt(lines[0]);
-          if (!isNaN(signal)) {
-            root.signalStrength = signal;
-          }
+        const signal = parseInt(this.text.trim().split('\n')[0]);
+        if (!isNaN(signal)) {
+          root.signalStrength = signal;
         }
       }
     }
@@ -148,7 +107,6 @@ BarWidget {
         if (!root.isConnected && hasRoute) {
           root.isConnected = true;
           root.connectionType = "ethernet";
-          root.updateDisplayText();
         }
       }
     }
