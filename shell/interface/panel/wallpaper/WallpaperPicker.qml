@@ -369,7 +369,8 @@ Item {
     property bool skipAnimation: false
     property bool killEngineAfter: false
     property bool isBackgroundApply: false
-    command: skipAnimation ? ["awww", "img", wallpaperPath] : ["awww", "img",
+    command: skipAnimation ? ["awww", "img", wallpaperPath,
+                              "--transition-type", "none"] : ["awww", "img",
                                                                wallpaperPath,
                                                                "--transition-type",
                                                                "fade", "--transition-duration",
