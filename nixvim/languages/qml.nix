@@ -11,8 +11,14 @@
       lsp.servers.qmlls.enable = true;
 
       conform-nvim.settings.formatters_by_ft.qml = [ "qmlformat" ];
-      conform-nvim.settings.formatters.qmlformat.command =
-        "${pkgs.kdePackages.qtdeclarative}/bin/qmlformat";
+      conform-nvim.settings.formatters.qmlformat.command = [
+        "${pkgs.kdePackages.qtdeclarative}/bin/qmlformat"
+        "-i"
+        "--indent-width"
+        "2"
+        "--column-width"
+        "80"
+      ];
     };
 
     programs.nixvim.extraPackages = [ pkgs.kdePackages.qtdeclarative ];

@@ -14,19 +14,19 @@ Flow {
   spacing: 0
 
   onModelChanged: {
-    var vals = model.values
-    var groups = []
-    var sepCount = 0
+    var vals = model.values;
+    var groups = [];
+    var sepCount = 0;
     for (var i = 0; i < vals.length; i++) {
       if (vals[i].isSeparator)
-        sepCount++
-      groups.push(sepCount)
+        sepCount++;
+      groups.push(sepCount);
     }
-    groupIndices = groups
+    groupIndices = groups;
 
-    visible = false
-    itemRepeater.model = root.model
-    visible = true
+    visible = false;
+    itemRepeater.model = root.model;
+    visible = true;
   }
 
   Repeater {
@@ -37,7 +37,8 @@ Flow {
       required property QsMenuEntry modelData
       required property int index
       width: modelData.isSeparator ? root.width : Math.floor(root.width / 6)
-      height: modelData.isSeparator ? 1 : Global.format.module_height + Global.format.spacing_small
+      height: modelData.isSeparator ? 1 : Global.format.module_height
+                                      + Global.format.spacing_small
       entry: modelData
       groupIndex: root.groupIndices[index] ?? 0
       onTriggered: root.itemTriggered()

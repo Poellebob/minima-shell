@@ -17,9 +17,9 @@ Item {
 
   readonly property real _ratio: {
     if (to === from)
-      return 0
+      return 0;
 
-    return Math.max(0, Math.min(1, (value - from) / (to - from)))
+    return Math.max(0, Math.min(1, (value - from) / (to - from)));
   }
 
   Rectangle {
@@ -64,32 +64,44 @@ Item {
 
   MouseArea {
     anchors.fill: parent
-
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
+    preventStealing: true
+
+    property bool _pressedInside: false
 
     function updateValue(mouseX) {
-      const ratio = Math.max(0, Math.min(1, mouseX / width))
-      const newValue = from + ratio * (to - from)
-
-      root.value = Math.max(from, Math.min(to, newValue))
-      root.moved(root.value)
+      const ratio = Math.max(0, Math.min(1, mouseX / width));
+      const newValue = from + ratio * (to - from);
+      root.value = Math.max(from, Math.min(to, newValue));
+      root.moved(root.value);
     }
 
-    onClicked: (mouse) => {
-      updateValue(mouse.x)
-      root.doneMoving(root.value)
+    function _isInside(mouse) {
+      return mouse.x >= 0 && mouse.x <= width && mouse.y >= 0 && mouse.y
+          <= height;
     }
 
-    onPositionChanged: (mouse) => {
-      if (!pressed)
-        return
+    onPressed: mouse => {
+                 _pressedInside = _isInside(mouse);
+                 if (_pressedInside)
+                 updateValue(mouse.x);
+               }
 
-      updateValue(mouse.x)
-    }
+    onPositionChanged: mouse => {
+                         if (!pressed || !_pressedInside)
+                         return;
+                         updateValue(mouse.x);
+                       }
 
-    onReleased: {
-      root.doneMoving(root.value)
+    onReleased: mouse => {
+                  if (_pressedInside)
+                  root.doneMoving(root.value);
+                  _pressedInside = false;
+                }
+
+    onCanceled: {
+      _pressedInside = false;
     }
   }
 }

@@ -18,90 +18,108 @@ Item {
     {
       name: "Wallpapers",
       description: "Open wallpaper selector",
-      execute: function () { commandTriggered("Wallpapers") }
+      execute: function () {
+        commandTriggered("Wallpapers");
+      }
     },
     {
       name: "Clip",
       description: "Open clipboard manager",
-      execute: function () { commandTriggered("Clip") }
+      execute: function () {
+        commandTriggered("Clip");
+      }
     },
     {
       name: "Lock",
       description: "Lock the session",
-      execute: function () { Quickshell.execDetached(["hyprlock"]) }
+      execute: function () {
+        Quickshell.execDetached(["hyprlock"]);
+      }
     },
     {
       name: "Logout",
       description: "Terminate the current session",
-      execute: function () { Quickshell.execDetached(["loginctl", "terminate-session", Quickshell.env("XDG_SESSION_ID")]) }
+      execute: function () {
+        Quickshell.execDetached(["loginctl", "terminate-session", Quickshell.env(
+                                   "XDG_SESSION_ID")]);
+      }
     },
     {
       name: "Shutdown",
       description: "Power off the machine",
-      execute: function () { Quickshell.execDetached(["systemctl", "poweroff"]) }
+      execute: function () {
+        Quickshell.execDetached(["systemctl", "poweroff"]);
+      }
     },
     {
       name: "Reboot",
       description: "Restart the machine",
-      execute: function () { Quickshell.execDetached(["systemctl", "reboot"]) }
+      execute: function () {
+        Quickshell.execDetached(["systemctl", "reboot"]);
+      }
     },
     {
       name: "Suspend",
       description: "Suspend to RAM",
-      execute: function () { Quickshell.execDetached(["systemctl", "suspend"]) }
+      execute: function () {
+        Quickshell.execDetached(["systemctl", "suspend"]);
+      }
     },
     {
       name: "Hibernate",
       description: "Suspend to disk",
-      execute: function () { Quickshell.execDetached(["systemctl", "hibernate"]) }
+      execute: function () {
+        Quickshell.execDetached(["systemctl", "hibernate"]);
+      }
     }
   ]
 
   readonly property var filteredEntries: {
-    let all
+    let all;
     if (isCommand) {
-      all = commands
+      all = commands;
     } else {
-      all = DesktopEntries.applications.values
+      all = DesktopEntries.applications.values;
     }
-    if (searchText.trim() === "") return all
-    const term = isCommand
-      ? searchText.slice(1).trim().toLowerCase()
-      : searchText.toLowerCase()
-    return all.filter(e => e.name.toLowerCase().includes(term))
+    if (searchText.trim() === "")
+      return all;
+    const term = isCommand ? searchText.slice(1).trim().toLowerCase() :
+                             searchText.toLowerCase();
+    return all.filter(e => e.name.toLowerCase().includes(term));
   }
 
   signal closed
   signal commandTriggered(string name)
 
   function open() {
-    searchText = ""
-    currentIndex = 0
-    isExpr = false
-    mathRes = ""
-    searchInput.text = ""
-    searchInput.forceActiveFocus()
+    searchText = "";
+    currentIndex = 0;
+    isExpr = false;
+    mathRes = "";
+    searchInput.text = "";
+    searchInput.forceActiveFocus();
   }
 
   function close(skipSignal = false) {
-    searchInput.text = ""
-    isExpr = false
-    mathRes = ""
-    if (!skipSignal) closed()
+    searchInput.text = "";
+    isExpr = false;
+    mathRes = "";
+    if (!skipSignal)
+      closed();
   }
 
   function executeSelected() {
     if (currentIndex >= 0 && currentIndex < filteredEntries.length) {
-      const entry = filteredEntries[currentIndex]
-      close(isCommand)
-      entry.execute()
+      const entry = filteredEntries[currentIndex];
+      close(isCommand);
+      entry.execute();
     }
   }
 
   function copyResult() {
     if (mathRes !== "") {
-      Quickshell.execDetached(["wl-copy", mathRes])
-      close()
+      Quickshell.execDetached(["wl-copy", mathRes]);
+      close();
     }
   }
 
@@ -112,9 +130,10 @@ Item {
 
     stdout: StdioCollector {
       onStreamFinished: {
-        const lines = this.text.trim().split("\n")
-        if (lines.length === 0) return
-        launcherRoot.mathRes = lines[lines.length - 1]
+        const lines = this.text.trim().split("\n");
+        if (lines.length === 0)
+          return;
+        launcherRoot.mathRes = lines[lines.length - 1];
       }
     }
   }
@@ -142,36 +161,37 @@ Item {
         verticalAlignment: Text.AlignVCenter
 
         onTextChanged: {
-          const t = text
+          const t = text;
           if (t.length > 0 && t[0] === "=") {
-            launcherRoot.isExpr = true
-            launcherRoot.mathRes = ""
-            const expr = t.slice(1).trim()
+            launcherRoot.isExpr = true;
+            launcherRoot.mathRes = "";
+            const expr = t.slice(1).trim();
             if (expr.length > 0) {
-              mathProc.expr = expr
-              mathProc.running = true
+              mathProc.expr = expr;
+              mathProc.running = true;
             }
           } else {
-            launcherRoot.isExpr = false
-            launcherRoot.mathRes = ""
-            launcherRoot.searchText = t
-            launcherRoot.currentIndex = 0
+            launcherRoot.isExpr = false;
+            launcherRoot.mathRes = "";
+            launcherRoot.searchText = t;
+            launcherRoot.currentIndex = 0;
           }
         }
 
         Keys.onLeftPressed: {
           if (!launcherRoot.isExpr && launcherRoot.currentIndex > 0)
-            launcherRoot.currentIndex--
+            launcherRoot.currentIndex--;
         }
         Keys.onRightPressed: {
-          if (!launcherRoot.isExpr && launcherRoot.currentIndex < launcherRoot.filteredEntries.length - 1)
-            launcherRoot.currentIndex++
+          if (!launcherRoot.isExpr && launcherRoot.currentIndex
+              < launcherRoot.filteredEntries.length - 1)
+            launcherRoot.currentIndex++;
         }
         Keys.onReturnPressed: {
           if (launcherRoot.isExpr)
-            launcherRoot.copyResult()
+            launcherRoot.copyResult();
           else
-            launcherRoot.executeSelected()
+            launcherRoot.executeSelected();
         }
         Keys.onEscapePressed: launcherRoot.close()
       }
@@ -209,45 +229,36 @@ Item {
 
       model: launcherRoot.filteredEntries
 
-      delegate: Text {
+      delegate: ClickableText {
         required property var modelData
         required property int index
-        text: index === launcherRoot.currentIndex ? `[${modelData.name}]` : ` ${modelData.name} `
-        color: index === launcherRoot.currentIndex ? Global.colors.primary : Global.colors.on_surface_variant
-        font.family: "JetBrainsMono Nerd Font"
-        font.pixelSize: Global.format.text_size
+        text: index === launcherRoot.currentIndex ? `[${modelData.name}]` : ` 
+${modelData.name} `
+        baseColor: index === launcherRoot.currentIndex ? Global.colors.primary :
+                                                         Global.colors.on_surface_variant
         verticalAlignment: Text.AlignVCenter
         height: parent ? parent.height : 0
 
-        Behavior on color {
-          ColorAnimation { duration: 100 }
-        }
-
-        MouseArea {
-          id: mouseArea
-          anchors.fill: parent
-          cursorShape: Qt.PointingHandCursor
-          acceptedButtons: Qt.LeftButton
-          onClicked: launcherRoot.currentIndex = index
-          onDoubleClicked: {
-            if (launcherRoot.isCommand) {
-              launcherRoot.close()
-              launcherRoot.commandTriggered(modelData.name)
-            } else {
-              modelData.execute()
-              launcherRoot.close()
-            }
-          }
-          onWheel: (wheel) => {
-            if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
-              if (launcherRoot.currentIndex < launcherRoot.filteredEntries.length - 1)
-                launcherRoot.currentIndex++
-            } else {
-              if (launcherRoot.currentIndex > 0)
-                launcherRoot.currentIndex--
-            }
+        onClicked: launcherRoot.currentIndex = index
+        onDoubleClicked: {
+          if (launcherRoot.isCommand) {
+            launcherRoot.close();
+            launcherRoot.commandTriggered(modelData.name);
+          } else {
+            modelData.execute();
+            launcherRoot.close();
           }
         }
+        onWheel: wheel => {
+                   if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
+                     if (launcherRoot.currentIndex
+                         < launcherRoot.filteredEntries.length - 1)
+                     launcherRoot.currentIndex++;
+                   } else {
+                     if (launcherRoot.currentIndex > 0)
+                     launcherRoot.currentIndex--;
+                   }
+                 }
       }
     }
   }
