@@ -7,7 +7,9 @@ import qs.components.text
 import qs
 
 BarWidget {
-  id: networkRoot
+  id: root
+
+  signal networkMenuTriggered
 
   RowLayout {
     id: row
@@ -16,15 +18,15 @@ BarWidget {
 
     StyledText {
       id: networkIcon
-      text: networkRoot.getNetworkIcon()
-      color: networkRoot.isConnected ? Global.colors.on_surface_variant :
-                                       Global.colors.outline
+      text: root.getNetworkIcon()
+      color: root.isConnected ? Global.colors.on_surface_variant :
+                                Global.colors.outline
     }
 
     StyledText {
       id: networkText
-      text: networkRoot.displayText
-      visible: networkRoot.displayText !== ""
+      text: root.displayText
+      visible: root.displayText !== ""
     }
   }
 
@@ -94,26 +96,26 @@ BarWidget {
               connected = true;
               if (deviceType === "wifi") {
                 type = "wifi";
-                networkRoot.networkName = connection;
+                root.networkName = connection;
                 wifiSignalProcess.running = true;
               } else if (deviceType === "ethernet") {
                 type = "ethernet";
-                networkRoot.networkName = connection;
+                root.networkName = connection;
               }
               break;
             }
           }
         }
 
-        networkRoot.isConnected = connected;
-        networkRoot.connectionType = type;
+        root.isConnected = connected;
+        root.connectionType = type;
 
         if (!connected) {
-          networkRoot.networkName = "";
-          networkRoot.signalStrength = 0;
+          root.networkName = "";
+          root.signalStrength = 0;
         }
 
-        networkRoot.updateDisplayText();
+        root.updateDisplayText();
       }
     }
   }
@@ -129,7 +131,7 @@ BarWidget {
         if (lines.length > 0 && lines[0] !== "") {
           const signal = parseInt(lines[0]);
           if (!isNaN(signal)) {
-            networkRoot.signalStrength = signal;
+            root.signalStrength = signal;
           }
         }
       }
@@ -143,10 +145,10 @@ BarWidget {
     stdout: StdioCollector {
       onStreamFinished: {
         const hasRoute = this.text.includes("via") || this.text.includes("dev");
-        if (!networkRoot.isConnected && hasRoute) {
-          networkRoot.isConnected = true;
-          networkRoot.connectionType = "ethernet";
-          networkRoot.updateDisplayText();
+        if (!root.isConnected && hasRoute) {
+          root.isConnected = true;
+          root.connectionType = "ethernet";
+          root.updateDisplayText();
         }
       }
     }
@@ -167,7 +169,7 @@ BarWidget {
     interval: Global.format.interval_short
     running: false
     onTriggered: {
-      if (!networkRoot.isConnected) {
+      if (!root.isConnected) {
         ipRouteProcess.running = true;
       }
     }
@@ -175,8 +177,13 @@ BarWidget {
 
   Timer {
     interval: Global.format.interval_long
-    running: networkRoot.connectionType === "wifi" && networkRoot.isConnected
+    running: root.connectionType === "wifi" && root.isConnected
     repeat: true
     onTriggered: wifiSignalProcess.running = true
   }
+
+  onClicked: mouse => {
+               if (mouse.button === Qt.LeftButton)
+               networkMenuTriggered();
+             }
 }
