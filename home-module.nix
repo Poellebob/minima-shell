@@ -40,6 +40,7 @@ in
         wireplumber
         jq
         bc
+        fzf
         power-profiles-daemon
         brightnessctl
         libnotify
@@ -79,7 +80,6 @@ in
         kdePackages.kservice
       ]
       ++ optionals cfg.shell.enable [
-        fzf
         zoxide
         git
         afetch
@@ -191,21 +191,17 @@ in
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       initContent = ''
-        if [[ "$TERM" != "linux" ]]; then
-          eval "$(starship init zsh)"
-        else
-          git_prompt() {
-            git rev-parse --is-inside-work-tree &>/dev/null || return
+        git_prompt() {
+          git rev-parse --is-inside-work-tree &>/dev/null || return
 
-            local b s
-            b=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
-            s=$(git status --porcelain 2>/dev/null)
+          local b s
+          b=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+          s=$(git status --porcelain 2>/dev/null)
 
-            printf " %%{\e[35m%%}%s%s%%{\e[0m%%}" "$b" "$( [ -n "$s" ] && printf "*" )"
-          }
+          printf " %%{\e[35m%%}%s%s%%{\e[0m%%}" "$b" "$( [ -n "$s" ] && printf "*" )"
+        }
 
-          PS1='%{$( [ $? -ne 0 ] && printf "\e[31m%d\e[0m " $? )%}%{\e[36m%}%~%{\e[0m%}$(git_prompt) %{\e[90m%}›%{\e[0m%} '
-        fi
+        PS1='%{$( [ $? -ne 0 ] && printf "\e[31m%d\e[0m " $? )%}%{\e[36m%}%~%{\e[0m%}$(git_prompt) %{\e[90m%}›%{\e[0m%} '
 
         zv() { local prev="$PWD"; z "$1" || return; nvim .; cd "$prev"; }
         ziv() { local prev="$PWD"; zi || return; nvim .; cd "$prev"; }
@@ -217,8 +213,6 @@ in
         alias logout='loginctl terminate-session "$XDG_SESSION_ID"'
 
         alias cd=z
-        alias grep='rg'
-        alias find='fd'
         alias ls='eza'
         alias ll='eza -lh --git'
         alias la='eza -lah --git'
@@ -232,6 +226,7 @@ in
 
     programs.starship = mkIf cfg.shell.enable {
       enable = true;
+      enableZshIntegration = true;
       settings = {
         add_newline = true;
         directory.style = "cyan";

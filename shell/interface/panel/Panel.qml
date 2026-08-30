@@ -17,7 +17,7 @@ import qs.panel.launcher
 import qs.panel.clipboard
 import qs.panel.wallpaper
 import qs.panel.notification
-import qs.panel.media
+import qs.panel.audio
 
 PanelWindow {
   id: panel
@@ -28,7 +28,8 @@ PanelWindow {
     bottom: true
   }
 
-  implicitHeight: content.height + (barMenu.visible ? barMenu.implicitHeight : 0)
+  implicitHeight: content.height + (barMenu.visible ? barMenu.implicitHeight :
+                                                      0)
   exclusiveZone: height
   color: Global.colors.background
   aboveWindows: true
@@ -36,49 +37,62 @@ PanelWindow {
   property Item activeBarContent: statusContent
 
   function openBarMenu(barContent: Item) {
-    if (!(screen.name == I3.focusedMonitor.name)) return
-    activeBarContent.visible = false
-    activeBarContent = barContent
-    barContent.visible = true
-    content.forceActiveFocus()
-    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+    if (!(screen.name == I3.focusedMonitor.name))
+      return;
+    activeBarContent.visible = false;
+    activeBarContent = barContent;
+    barContent.visible = true;
+    content.forceActiveFocus();
+    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
   }
 
   function openBarContent(barContent: Item) {
-    if (!(screen.name == I3.focusedMonitor.name)) return
-    barMenu.showContent(barContent)
+    if (!(screen.name == I3.focusedMonitor.name))
+      return;
+    barMenu.showContent(barContent);
     if (barMenu.visible) {
-      content.forceActiveFocus()
-      panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+      content.forceActiveFocus();
+      panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
     } else {
-      panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
+      panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None;
     }
   }
 
   function closeBarMenu() {
-    activeBarContent.visible = false
-    activeBarContent = statusContent
-    statusContent.visible = true
-    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
+    activeBarContent.visible = false;
+    activeBarContent = statusContent;
+    statusContent.visible = true;
+    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None;
   }
 
   function openWallpapers() {
-    openBarMenu(wallpaperSearchContent)
-    wallpaperSearchInput.text = ""
-    wallpaperSearchInput.forceActiveFocus()
-    wallpaperContent.open()
-    barMenu.showContent(wallpaperContent)
+    openBarMenu(wallpaperSearchContent);
+    wallpaperSearchInput.text = "";
+    wallpaperSearchInput.forceActiveFocus();
+    wallpaperContent.open();
+    barMenu.showContent(wallpaperContent);
   }
 
   function closeWallpapers() {
-    barMenu.hideContent()
-    wallpaperContent.close()
-    closeBarMenu()
+    barMenu.hideContent();
+    wallpaperContent.close();
+    closeBarMenu();
+  }
+
+  function openAudioMedia() {
+    openBarMenu(mediaContent);
+    mediaContent.open();
+    barMenu.showContent(audioContent);
+  }
+
+  function closeAudioMedia() {
+    barMenu.hideContent();
+    closeBarMenu();
   }
 
   function openClipboard() {
-    openBarMenu(clipboardContent)
-    clipboardContent.open()
+    openBarMenu(clipboardContent);
+    clipboardContent.open();
   }
 
   Item {
@@ -91,16 +105,20 @@ PanelWindow {
     }
     height: barRow.height
     focus: true
-    Keys.onEscapePressed: (event) => {
-      if (barMenu.visible) {
-        barMenu.hideContent()
-        panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
-      } else if (activeBarContent !== statusContent) {
-        closeBarMenu()
-      } else {
-        event.accepted = false
-      }
-    }
+    Keys.onEscapePressed: event => {
+                            if (activeBarContent === mediaContent
+                                && barMenu.visible) {
+                              closeAudioMedia();
+                            } else if (barMenu.visible) {
+                              barMenu.hideContent();
+                              panel.WlrLayershell.keyboardFocus
+                              = WlrKeyboardFocus.None;
+                            } else if (activeBarContent !== statusContent) {
+                              closeBarMenu();
+                            } else {
+                              event.accepted = false;
+                            }
+                          }
 
     MouseArea {
       anchors.fill: parent
@@ -109,9 +127,11 @@ PanelWindow {
       acceptedButtons: Qt.NoButton
 
       onContainsMouseChanged: {
-        if (containsMouse && (barMenu.visible || activeBarContent !== statusContent) && activeBarContent !== wallpaperSearchContent) {
-          content.forceActiveFocus()
-          panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+        if (containsMouse && (barMenu.visible || activeBarContent
+                              !== statusContent) && activeBarContent
+            !== wallpaperSearchContent) {
+          content.forceActiveFocus();
+          panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
         }
       }
     }
@@ -148,28 +168,20 @@ PanelWindow {
               Systray {
                 id: systray
                 Layout.alignment: Qt.AlignVCenter
-                onShowMenu: (items) => {
-                  if (!(screen.name == I3.focusedMonitor.name)) return
-                  if (barMenu.isSameMenu(items)) {
-                    barMenu.hideContent()
-                    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
-                  } else {
-                    barMenu.showMenu(items)
-                    content.forceActiveFocus()
-                    panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
-                  }
-                }
-              }
-
-              Media {
-                id: mediaWidget
-                Layout.alignment: Qt.AlignVCenter
-                Layout.fillWidth: true
-                onShowPlayerMenu: {
-                  if (!(screen.name == I3.focusedMonitor.name)) return
-                  playerSelectorContent.activePlayer = mediaWidget.player
-                  openBarContent(playerSelectorContent)
-                }
+                onShowMenu: items => {
+                              if (!(screen.name == I3.focusedMonitor.name))
+                              return;
+                              if (barMenu.isSameMenu(items)) {
+                                barMenu.hideContent();
+                                panel.WlrLayershell.keyboardFocus
+                                = WlrKeyboardFocus.None;
+                              } else {
+                                barMenu.showMenu(items);
+                                content.forceActiveFocus();
+                                panel.WlrLayershell.keyboardFocus
+                                = WlrKeyboardFocus.Exclusive;
+                              }
+                            }
               }
             }
           }
@@ -198,21 +210,22 @@ PanelWindow {
               anchors.right: parent.right
               anchors.rightMargin: Global.format.spacing_medium
               anchors.verticalCenter: parent.verticalCenter
-              spacing: Global.format.spacing_medium
+              spacing: 0
 
               Audio {
                 Layout.alignment: Qt.AlignVCenter
-                onAudioMenuTriggered: openBarContent(audioContent)
+                onAudioMenuTriggered: openAudioMedia()
               }
               Battery {
                 Layout.alignment: Qt.AlignVCenter
               }
               Bluetooth {
                 Layout.alignment: Qt.AlignVCenter
-                onBluetoothMenuTriggered: openBarContent(btContent)
+                onBluetoothMenuTriggered: openBarContent(bluetoothContent)
               }
               Network {
                 Layout.alignment: Qt.AlignVCenter
+                onNetworkMenuTriggered: openBarContent(netContent)
               }
               Clock {
                 Layout.alignment: Qt.AlignVCenter
@@ -222,7 +235,6 @@ PanelWindow {
                 Layout.alignment: Qt.AlignVCenter
                 onNotificationMenuTriggered: openBarContent(notifContent)
               }
-
             }
           }
         }
@@ -233,12 +245,12 @@ PanelWindow {
         anchors.fill: parent
         visible: false
         onClosed: panel.closeBarMenu()
-        onCommandTriggered: (name) => {
-          if (name === "Wallpapers")
-            openWallpapers()
-          else if (name === "Clip")
-            openClipboard()
-        }
+        onCommandTriggered: name => {
+                              if (name === "Wallpapers")
+                              openWallpapers();
+                              else if (name === "Clip")
+                              openClipboard();
+                            }
       }
 
       Clipboard {
@@ -246,6 +258,13 @@ PanelWindow {
         anchors.fill: parent
         visible: false
         onClosed: panel.closeBarMenu()
+      }
+
+      Media {
+        id: mediaContent
+        anchors.fill: parent
+        visible: false
+        onClosed: panel.closeAudioMedia()
       }
 
       Item {
@@ -273,14 +292,14 @@ PanelWindow {
             Keys.onRightPressed: wallpaperContent.moveNext()
             Keys.onReturnPressed: wallpaperContent.selectCurrent()
             Keys.onEscapePressed: closeWallpapers()
-            Keys.onPressed: (event) => {
+            Keys.onPressed: event => {
               if (event.modifiers & Qt.ControlModifier) {
                 if (event.key === Qt.Key_F) {
-                  wallpaperContent.toggleFavoriteCurrent()
-                  event.accepted = true
+                  wallpaperContent.toggleFavoriteCurrent();
+                  event.accepted = true;
                 } else if (event.key === Qt.Key_R) {
-                  wallpaperContent.reload()
-                  event.accepted = true
+                  wallpaperContent.reload();
+                  event.accepted = true;
                 }
               }
             }
@@ -303,17 +322,17 @@ PanelWindow {
       Connections {
         target: Global
         function onOpenSystrayMenu(index: int) {
-          systray.triggerItem(index)
+          systray.triggerItem(index);
         }
         function onOpenLauncher() {
-          panel.openBarMenu(launcherContent)
-          launcherContent.open()
+          panel.openBarMenu(launcherContent);
+          launcherContent.open();
         }
         function onOpenClipboard() {
-          panel.openClipboard()
+          panel.openClipboard();
         }
         function onOpenNotifications() {
-          panel.openBarContent(notifContent)
+          panel.openBarContent(notifContent);
         }
       }
 
@@ -322,13 +341,8 @@ PanelWindow {
         anchors.fill: parent
         anchors.margins: Global.format.spacing_large
         visible: false
-      }
-
-      BluetoothControl {
-        id: btContent
-        anchors.fill: parent
-        anchors.margins: Global.format.spacing_large
-        visible: false
+        activePlayer: mediaContent.player
+        onPlayerSelected: p => mediaContent.player = p
       }
 
       NotificationControl {
@@ -346,22 +360,18 @@ PanelWindow {
         visible: false
       }
 
-      WallpaperPicker {
-        id: wallpaperContent
+      BluetoothControl {
+        id: bluetoothContent
         anchors.fill: parent
         anchors.margins: Global.format.spacing_large
         visible: false
       }
 
-      PlayerSelector {
-        id: playerSelectorContent
+      WallpaperPicker {
+        id: wallpaperContent
         anchors.fill: parent
+        anchors.margins: Global.format.spacing_large
         visible: false
-        onPlayerSelected: (player) => {
-          mediaWidget.player = player
-          barMenu.hideContent()
-          panel.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
-        }
       }
     }
   }

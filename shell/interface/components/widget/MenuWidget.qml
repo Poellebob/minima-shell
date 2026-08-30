@@ -8,7 +8,7 @@ Item {
   default property alias content: contentArea.data
   property real padding: Global.format.spacing_large
   property alias backgroundColor: background.color
-  signal closed()
+  signal closed
 
   implicitWidth: contentArea.implicitWidth + padding * 2
   implicitHeight: contentArea.implicitHeight + padding * 2

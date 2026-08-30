@@ -41,12 +41,6 @@
             width_preview = 65;
           };
         };
-        pick = {
-          mappings = {
-            move_down = "<c-j>";
-            move_up = "<c-k>";
-          };
-        };
         indentscope = {
           symbol = "▏";
           options = {
@@ -69,24 +63,6 @@
             action.__raw = "MiniFiles.open";
           }
         ]
-      ++
-        lib.optionals
-          (
-            config.programs.nixvim.plugins.mini.enable
-            && lib.hasAttr "pick" config.programs.nixvim.plugins.mini.modules
-          )
-          [
-            {
-              mode = "n";
-              key = "<leader>ff";
-              action = "<cmd>Pick files<cr>";
-            }
-            {
-              mode = "n";
-              key = "<leader>fw";
-              action = "<cmd>Pick grep_live<cr>";
-            }
-          ]
       ++
         lib.optionals
           (
@@ -157,16 +133,5 @@
         '';
       }
     ];
-
-    programs.nixvim.extraConfigLuaPost =
-      lib.mkIf
-        (
-          config.programs.nixvim.plugins.mini.enable
-          && lib.hasAttr "pick" config.programs.nixvim.plugins.mini.modules
-        )
-        ''
-          local MiniPick = require('mini.pick');
-          vim.ui.select = MiniPick.ui_select;
-        '';
   };
 }

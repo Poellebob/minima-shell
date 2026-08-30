@@ -41,6 +41,38 @@
           key = "<leader>gg";
           action = "<cmd>LazyGit<cr>";
         }
+      ]
+      ++ lib.optionals config.programs.nixvim.plugins.gitsigns.enable [
+        {
+          mode = "n";
+          key = "<leader>gs";
+          action = "<cmd>Gitsigns stage_hunk<CR>";
+          options.desc = "Stage hunk";
+        }
+        {
+          mode = "n";
+          key = "<leader>gr";
+          action = "<cmd>Gitsigns reset_hunk<CR>";
+          options.desc = "Reset hunk";
+        }
+        {
+          mode = "n";
+          key = "<leader>gp";
+          action = "<cmd>Gitsigns preview_hunk<CR>";
+          options.desc = "Preview hunk";
+        }
+        {
+          mode = "n";
+          key = "]h";
+          action = "<cmd>Gitsigns next_hunk<CR>";
+          options.desc = "Next hunk";
+        }
+        {
+          mode = "n";
+          key = "[h";
+          action = "<cmd>Gitsigns prev_hunk<CR>";
+          options.desc = "Prev hunk";
+        }
       ];
   };
 }

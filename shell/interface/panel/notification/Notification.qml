@@ -12,7 +12,8 @@ BarWidget {
   signal notificationMenuTriggered
 
   readonly property var notifServer: _notifServer
-  readonly property int notifCount: _notifServer.trackedNotifications.values.length
+  readonly property int notifCount:
+    _notifServer.trackedNotifications.values.length
 
   implicitWidth: text.implicitWidth
 
@@ -22,31 +23,34 @@ BarWidget {
     actionsSupported: true
     imageSupported: true
     bodySupported: true
-    onNotification: (notif) => {
-      notif.tracked = true
-      console.log("Notification received:")
-      console.log("  appName:", notif.appName)
-      console.log("  appIcon:", notif.appIcon)
-      console.log("  summary:", notif.summary)
-      console.log("  body:", notif.body)
-      console.log("  urgency:", notif.urgency)
-      console.log("  time:", notif.time)
-      console.log("  image:", notif.image)
-      console.log("  actions:", notif.actions)
-      console.log("  resident:", notif.resident)
-      console.log("  hasInlineReply:", notif.hasInlineReply)
-    }
+    onNotification: notif => {
+                      notif.tracked = true;
+                      console.log("Notification received:");
+                      console.log("  appName:", notif.appName);
+                      console.log("  appIcon:", notif.appIcon);
+                      console.log("  summary:", notif.summary);
+                      console.log("  body:", notif.body);
+                      console.log("  urgency:", notif.urgency);
+                      console.log("  time:", notif.time);
+                      console.log("  image:", notif.image);
+                      console.log("  actions:", notif.actions);
+                      console.log("  resident:", notif.resident);
+                      console.log("  hasInlineReply:", notif.hasInlineReply);
+                    }
   }
 
-  onClicked: (mouse) => {
-    if (mouse.button === Qt.LeftButton)
-      notificationMenuTriggered()
-  }
+  onClicked: mouse => {
+               if (mouse.button === Qt.LeftButton)
+               notificationMenuTriggered();
+             }
 
   StyledText {
     id: text
     anchors.centerIn: parent
-    text: "󰂚" + (root.notifCount == 0 ? "" : (root.notifCount > 99 ? " 99+" : " " + root.notifCount.toString()))
-    color: root.notifCount > 0 ? Global.colors.primary : Global.colors.on_surface_variant
+    text: "󰂚" + (root.notifCount == 0 ? "" : (root.notifCount > 99 ? " 99+" :
+                                                                     " " + root.notifCount.toString(
+                                                                       )))
+    color: root.notifCount > 0 ? Global.colors.primary :
+                                 Global.colors.on_surface_variant
   }
 }
