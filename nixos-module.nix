@@ -37,6 +37,10 @@ in {
         xwayland.enable = true;
       };
 
+      programs.hyprland = {
+        enable = true;
+      };
+
       environment.etc = {
         "sway/config" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
           source = cfg.swayConfigFile;
@@ -66,9 +70,13 @@ in {
 
             swayConfigFile    = mkDefault cfg.swayConfigFile;
             scrollConfigFile  = mkDefault cfg.scrollConfigFile;
+            hyprlandConfigFile = mkDefault cfg.hyprlandConfigFile;
             quickshellStoreDir = mkDefault cfg.quickshellStoreDir;
             matugenConfigFile = mkDefault cfg.matugenConfigFile;
             matugenTemplateFile = mkDefault cfg.matugenTemplateFile;
+            hyprland = {
+              layout = mkDefault cfg.hyprland.layout;
+            };
           };
         }
       ];

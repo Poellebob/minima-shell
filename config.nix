@@ -69,11 +69,13 @@ let
   '';
 
   mkWmConfig = import ./config/sway/config.nix { inherit cfg pkgs lib quickshellStoreDir setXftDpi; };
+  mkHyprlandConfig = import ./config/hyprland/config.nix { inherit cfg pkgs lib quickshellStoreDir setXftDpi; };
 
 in {
   config = mkIf cfg.enable {
     minima.swayConfigFile = mkWmConfig "sway";
     minima.scrollConfigFile = mkWmConfig "scroll";
+    minima.hyprlandConfigFile = mkHyprlandConfig;
 
     minima.quickshellStoreDir = quickshellStoreDir;
     minima.minimaConfigFile = "${minimaConfigJson}";

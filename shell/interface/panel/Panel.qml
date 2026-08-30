@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.I3
+import Quickshell.Hyprland
 import qs
 import qs.components.widget
 import qs.components.text
@@ -17,7 +18,6 @@ import qs.panel.launcher
 import qs.panel.clipboard
 import qs.panel.wallpaper
 import qs.panel.notification
-import qs.panel.audio
 
 PanelWindow {
   id: panel
@@ -36,8 +36,19 @@ PanelWindow {
 
   property Item activeBarContent: statusContent
 
+  property bool wmHyprland: Global.config.system.wm === "hyprland"
+
+  function isFocusedScreen(): bool {
+    if (wmHyprland) {
+      const focused = Hyprland.focusedMonitor;
+      return !focused || screen.name == focused.name;
+    }
+    const focused = I3.focusedMonitor;
+    return !focused || screen.name == focused.name;
+  }
+
   function openBarMenu(barContent: Item) {
-    if (!(screen.name == I3.focusedMonitor.name))
+    if (!panel.isFocusedScreen())
       return;
     activeBarContent.visible = false;
     activeBarContent = barContent;
@@ -47,7 +58,7 @@ PanelWindow {
   }
 
   function openBarContent(barContent: Item) {
-    if (!(screen.name == I3.focusedMonitor.name))
+    if (!panel.isFocusedScreen())
       return;
     barMenu.showContent(barContent);
     if (barMenu.visible) {
@@ -169,8 +180,8 @@ PanelWindow {
                 id: systray
                 Layout.alignment: Qt.AlignVCenter
                 onShowMenu: items => {
-                              if (!(screen.name == I3.focusedMonitor.name))
-                              return;
+            if (!panel.isFocusedScreen())
+              return;
                               if (barMenu.isSameMenu(items)) {
                                 barMenu.hideContent();
                                 panel.WlrLayershell.keyboardFocus
