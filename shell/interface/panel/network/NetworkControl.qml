@@ -101,7 +101,6 @@ Item {
       id: header
       Layout.fillWidth: true
       Layout.preferredHeight: Global.format.module_height
-                             + Global.format.spacing_small
 
       RowLayout {
         id: headerLeft
