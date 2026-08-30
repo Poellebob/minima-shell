@@ -11,8 +11,13 @@
       lsp.servers.qmlls.enable = true;
 
       conform-nvim.settings.formatters_by_ft.qml = [ "qmlformat" ];
-      conform-nvim.settings.formatters.qmlformat.command =
-        "${pkgs.kdePackages.qtdeclarative}/bin/qmlformat";
+      conform-nvim.settings.formatters.qmlformat.command = [
+        "${pkgs.kdePackages.qtdeclarative}/bin/qmlformat"
+        "-w"
+        "2"
+        "-W"
+        "80"
+      ];
     };
 
     programs.nixvim.extraPackages = [ pkgs.kdePackages.qtdeclarative ];
@@ -21,7 +26,7 @@
       {
         event = "FileType";
         pattern = "qml";
-        command = "set indentexpr=";
+        command = "set indentexpr=2";
         desc = "Disable broken treesitter indent for QML";
       }
     ];

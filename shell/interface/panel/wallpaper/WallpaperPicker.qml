@@ -23,165 +23,174 @@ Item {
   property bool wasEngineActive: false
 
   readonly property string homeDir: Quickshell.env("HOME")
-  readonly property string resolvedWorkshopPath: workshopPath.replace("~", homeDir)
+  readonly property string resolvedWorkshopPath: workshopPath.replace("~",
+                                                                      homeDir)
   readonly property string wallpapersDir: homeDir + "/Wallpapers"
-  readonly property string wallpaperConf: homeDir + "/.config/minima/wallpaper.conf"
-  readonly property string favoritesPath: homeDir + "/.config/minima/wallpaper-favorites.conf"
+  readonly property string wallpaperConf: homeDir
+                                          + "/.config/minima/wallpaper.conf"
+  readonly property string favoritesPath: homeDir
+                                          + "/.config/minima/wallpaper-favorites.conf"
 
-  readonly property bool   engineEnabled: Global.config.wallpaper.engineEnabled
-  readonly property string enginePath:    Global.config.wallpaper.enginePath
-  readonly property string workshopPath:  Global.config.wallpaper.workshopPath
-  readonly property int    engineFps:     Global.config.wallpaper.fps
-  readonly property bool   engineFill:    Global.config.wallpaper.fill
-  readonly property bool   matureContent: Global.config.wallpaper.matureContent
-  readonly property int    volume:        Global.config.wallpaper.volume
+  readonly property bool engineEnabled: Global.config.wallpaper.engineEnabled
+  readonly property string enginePath: Global.config.wallpaper.enginePath
+  readonly property string workshopPath: Global.config.wallpaper.workshopPath
+  readonly property int engineFps: Global.config.wallpaper.fps
+  readonly property bool engineFill: Global.config.wallpaper.fill
+  readonly property bool matureContent: Global.config.wallpaper.matureContent
+  readonly property int volume: Global.config.wallpaper.volume
 
   property var engineQueue: []
   property int engineQueueIndex: 0
 
   readonly property var filtered: {
-    if (searchText.trim() === "") return wallpapers
-    const q = searchText.toLowerCase()
-    return wallpapers.filter(w =>
-      w.name.toLowerCase().includes(q) ||
-      (w.folder ?? "").toLowerCase().includes(q)
-    )
+    if (searchText.trim() === "")
+      return wallpapers;
+    const q = searchText.toLowerCase();
+    return wallpapers.filter(w => w.name.toLowerCase().includes(q) || (w.folder
+                                                                       ?? "").toLowerCase(
+                               ).includes(q));
   }
 
   signal closed
 
   property alias currentIndex: list.currentIndex
 
-  onIDoneChanged: if (iDone && (eDone || !engineEnabled)) mergeAndSort()
-  onEDoneChanged: if (iDone && eDone) mergeAndSort()
+  onIDoneChanged: if (iDone && (eDone || !engineEnabled))
+                    mergeAndSort()
+  onEDoneChanged: if (iDone && eDone)
+                    mergeAndSort()
 
   function mergeAndSort() {
-    wallpapers = imageScanResults.concat(engineScanResults)
+    wallpapers = imageScanResults.concat(engineScanResults);
     wallpapers = wallpapers.slice().sort((a, b) => {
-      const aFav = favorites.indexOf(getWallpaperId(a)) !== -1
-      const bFav = favorites.indexOf(getWallpaperId(b)) !== -1
-      if (aFav !== bFav) return aFav ? -1 : 1
-      return a.name.localeCompare(b.name)
-    })
+                                           const aFav = favorites.indexOf(
+                                             getWallpaperId(a)) !== -1;
+                                           const bFav = favorites.indexOf(
+                                             getWallpaperId(b)) !== -1;
+                                           if (aFav !== bFav)
+                                           return aFav ? -1 : 1;
+                                           return a.name.localeCompare(b.name);
+                                         });
   }
 
   function getWallpaperId(w) {
-    return w.type === "engine" ? "engine:" + w.id : "image:" + w.path
+    return w.type === "engine" ? "engine:" + w.id : "image:" + w.path;
   }
 
   function isFavorite(w) {
-    return favorites.indexOf(getWallpaperId(w)) !== -1
+    return favorites.indexOf(getWallpaperId(w)) !== -1;
   }
 
   function toggleFavorite(w) {
-    const id  = getWallpaperId(w)
-    const idx = favorites.indexOf(id)
-    const next = favorites.slice()
+    const id = getWallpaperId(w);
+    const idx = favorites.indexOf(id);
+    const next = favorites.slice();
     if (idx !== -1)
-      next.splice(idx, 1)
+      next.splice(idx, 1);
     else
-      next.push(id)
-    favorites = next
-    favoritesFileView.setText(next.join('\n'))
+      next.push(id);
+    favorites = next;
+    favoritesFileView.setText(next.join('\n'));
   }
 
   function reload() {
-    imageScanResults = []
-    engineScanResults = []
-    iDone = false
-    eDone = false
-    scanImagesProc.running = true
+    imageScanResults = [];
+    engineScanResults = [];
+    iDone = false;
+    eDone = false;
+    scanImagesProc.running = true;
     if (engineEnabled)
-      scanEngineProc.running = true
+      scanEngineProc.running = true;
   }
 
   function open() {
-    searchText = ""
-    wallpapers = []
-    imageScanResults = []
-    engineScanResults = []
-    iDone = false
-    eDone = false
-    scanImagesProc.running = true
+    searchText = "";
+    wallpapers = [];
+    imageScanResults = [];
+    engineScanResults = [];
+    iDone = false;
+    eDone = false;
+    scanImagesProc.running = true;
     if (engineEnabled)
-      scanEngineProc.running = true
-    favoritesFileView.reload()
+      scanEngineProc.running = true;
+    favoritesFileView.reload();
   }
 
   function close() {
-    searchText = ""
-    list.currentIndex = 0
-    closed()
+    searchText = "";
+    list.currentIndex = 0;
+    closed();
   }
 
   function selectCurrent() {
     if (list.currentIndex >= 0 && list.currentIndex < filtered.length)
-      setWallpaper(filtered[list.currentIndex])
+      setWallpaper(filtered[list.currentIndex]);
   }
 
   function toggleFavoriteCurrent() {
     if (list.currentIndex >= 0 && list.currentIndex < filtered.length)
-      toggleFavorite(filtered[list.currentIndex])
+      toggleFavorite(filtered[list.currentIndex]);
   }
 
   function moveNext() {
     if (list.currentIndex < list.count - 1)
-      list.currentIndex++
+      list.currentIndex++;
   }
 
   function movePrev() {
     if (list.currentIndex > 0)
-      list.currentIndex--
+      list.currentIndex--;
   }
 
   function setWallpaper(w) {
     if (w.type === "engine")
-      setEngineWallpaper(w.id, w.previewPath, false)
+      setEngineWallpaper(w.id, w.previewPath, false);
     else
-      setImageWallpaper(w.path, false)
+      setImageWallpaper(w.path, false);
   }
 
   function setImageWallpaper(path, isBackgroundApply) {
-    const background = isBackgroundApply === true
-    setProc.wallpaperPath = path
-    setProc.previewPath = path
-    setProc.skipAnimation = background || root.wasEngineActive
-    setProc.killEngineAfter = root.wasEngineActive
-    setProc.isBackgroundApply = background
-    setProc.running = true
+    const background = isBackgroundApply === true;
+    setProc.wallpaperPath = path;
+    setProc.previewPath = path;
+    setProc.skipAnimation = background || root.wasEngineActive;
+    setProc.killEngineAfter = root.wasEngineActive;
+    setProc.isBackgroundApply = background;
+    setProc.running = true;
   }
 
   function setEngineWallpaper(folderId, previewPath, isBackgroundApply) {
-    engineProc.folderId = folderId
-    engineProc.previewPath = previewPath
-    engineProc.isBackgroundApply = isBackgroundApply === true
-    engineProc.running = true
+    engineProc.folderId = folderId;
+    engineProc.previewPath = previewPath;
+    engineProc.isBackgroundApply = isBackgroundApply === true;
+    engineProc.running = true;
   }
 
   function applyCurrentWallpaper() {
-    if (!savedWallpaper || savedWallpaper.trim() === "") return
+    if (!savedWallpaper || savedWallpaper.trim() === "")
+      return;
     if (savedWallpaper.indexOf("engine:") === 0) {
-      const folderId = savedWallpaper.substring("engine:".length)
-      setEngineWallpaper(folderId, "", true)
+      const folderId = savedWallpaper.substring("engine:".length);
+      setEngineWallpaper(folderId, "", true);
     } else {
-      setImageWallpaper(savedWallpaper, true)
+      setImageWallpaper(savedWallpaper, true);
     }
   }
 
   function startNextEngineProject() {
     if (engineQueueIndex >= engineQueue.length) {
-      eDone = true
-      return
+      eDone = true;
+      return;
     }
-    parseProjectProc.projectPath = engineQueue[engineQueueIndex]
-    parseProjectProc.running = true
+    parseProjectProc.projectPath = engineQueue[engineQueueIndex];
+    parseProjectProc.running = true;
   }
 
   Connections {
     target: Quickshell
     function onScreensChanged() {
       if (confFile.loaded)
-        root.applyCurrentWallpaper()
+        root.applyCurrentWallpaper();
     }
   }
 
@@ -190,22 +199,22 @@ Item {
     path: root.wallpaperConf
     blockLoading: true
     onLoaded: {
-      root.savedWallpaper = text().trim()
-      root.applyCurrentWallpaper()
+      root.savedWallpaper = text().trim();
+      root.applyCurrentWallpaper();
     }
     onSaved: {
       if (!confFile._skipMatugen) {
-        const matugenBin = Global.config.system.matugenBin
-        const matugenConfig = Global.config.system.matugenConfigPath
+        const matugenBin = Global.config.system.matugenBin;
+        const matugenConfig = Global.config.system.matugenConfigPath;
         if (matugenBin !== "" && matugenConfig !== "") {
-          Quickshell.execDetached([
-            "/bin/sh", "-c",
-            matugenBin + " -c " + matugenConfig + " -j hex image \"" + confFile._previewPath + "\" --source-color-index 0"
-          ])
+          Quickshell.execDetached(["/bin/sh", "-c", matugenBin + " -c "
+                                   + matugenConfig + " -j hex image \""
+                                   + confFile._previewPath
+                                   + "\" --source-color-index 0"]);
         }
       }
       if (!confFile._isBackgroundApply)
-        root.closed()
+        root.closed();
     }
     property bool _skipMatugen: false
     property bool _isBackgroundApply: false
@@ -216,66 +225,70 @@ Item {
     id: favoritesFileView
     path: root.favoritesPath
     onLoaded: {
-      const lines = text().trim().split('\n').filter(l => l.trim() !== "")
-      root.favorites = lines
+      const lines = text().trim().split('\n').filter(l => l.trim() !== "");
+      root.favorites = lines;
     }
   }
 
-  function writeConf(wallpaperValue, previewPath, skipMatugen, isBackgroundApply) {
-    confFile._skipMatugen = skipMatugen
-    confFile._previewPath = previewPath
-    confFile._isBackgroundApply = isBackgroundApply
-    confFile.setText(wallpaperValue)
+  function writeConf(wallpaperValue, previewPath, skipMatugen,
+                     isBackgroundApply) {
+    confFile._skipMatugen = skipMatugen;
+    confFile._previewPath = previewPath;
+    confFile._isBackgroundApply = isBackgroundApply;
+    confFile.setText(wallpaperValue);
   }
 
   Process {
     id: scanImagesProc
     property var buffer: []
-    command: [
-      "/bin/sh", "-c",
-      "find -L " + root.wallpapersDir +
-      " -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\)"
-    ]
+    command: ["/bin/sh", "-c", "find -L " + root.wallpapersDir
+      + " -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\)"]
     stdout: SplitParser {
-      onRead: (line) => scanImagesProc.buffer.push(line)
+      onRead: line => scanImagesProc.buffer.push(line)
     }
     onExited: (code, _) => {
-      if (code === 0) {
-        root.imageScanResults = scanImagesProc.buffer.map(path => {
-          const parts = path.split("/")
-          return {
-            type: "image",
-            name: parts[parts.length - 1],
-            folder: parts[parts.length - 2] ?? "",
-            path: path,
-            preview: "file://" + path
-          }
-        })
-      }
-      scanImagesProc.buffer = []
-      root.iDone = true
-    }
+                if (code === 0) {
+                  root.imageScanResults = scanImagesProc.buffer.map(path => {
+                                                                      const parts
+                                                                      = path.split(
+                                                                        "/");
+                                                                      return {
+                                                                        type: "image",
+                                                                        name: parts[parts.length
+                                                                          - 1],
+                                                                        folder: parts[parts.length
+                                                                          - 2] ?? "",
+                                                                        path: path,
+                                                                        preview: "file://"
+                                                                                 + path
+                                                                      };
+                                                                    });
+                }
+                scanImagesProc.buffer = [];
+                root.iDone = true;
+              }
   }
 
   Process {
     id: scanEngineProc
     property var buffer: []
-    command: ["/bin/sh", "-c", "find -L " + root.resolvedWorkshopPath + " -name 'project.json'"]
+    command: ["/bin/sh", "-c", "find -L " + root.resolvedWorkshopPath
+      + " -name 'project.json'"]
     stdout: SplitParser {
-      onRead: (line) => scanEngineProc.buffer.push(line)
+      onRead: line => scanEngineProc.buffer.push(line)
     }
     onExited: (code, _) => {
-      if (code === 0) {
-        root.engineQueue = scanEngineProc.buffer.slice()
-        root.engineQueueIndex = 0
-        scanEngineProc.buffer = []
-        if (root.engineQueue.length > 0) {
-          root.startNextEngineProject()
-          return
-        }
-      }
-      root.eDone = true
-    }
+                if (code === 0) {
+                  root.engineQueue = scanEngineProc.buffer.slice();
+                  root.engineQueueIndex = 0;
+                  scanEngineProc.buffer = [];
+                  if (root.engineQueue.length > 0) {
+                    root.startNextEngineProject();
+                    return;
+                  }
+                }
+                root.eDone = true;
+              }
   }
 
   Process {
@@ -285,35 +298,38 @@ Item {
     stdout: StdioCollector {
       onStreamFinished: {
         try {
-          const data = JSON.parse(this.text)
-          const rating = data.contentrating || ""
-          const isMature = rating === "Mature" || rating === "Questionable"
+          const data = JSON.parse(this.text);
+          const rating = data.contentrating || "";
+          const isMature = rating === "Mature" || rating === "Questionable";
 
           if (!isMature || root.matureContent) {
             if (data.preview) {
-              const dir = parseProjectProc.projectPath.substring(0, parseProjectProc.projectPath.lastIndexOf("/"))
-              const folderId = dir.substring(dir.lastIndexOf("/") + 1)
-              const alreadyQueued = root.engineScanResults.some(w => w.id === folderId)
+              const dir = parseProjectProc.projectPath.substring(0,
+                                                                 parseProjectProc.projectPath.lastIndexOf(
+                                                                   "/"));
+              const folderId = dir.substring(dir.lastIndexOf("/") + 1);
+              const alreadyQueued = root.engineScanResults.some(w => w.id
+                                                                === folderId);
               if (!alreadyQueued) {
-                const next = root.engineScanResults.slice()
+                const next = root.engineScanResults.slice();
                 next.push({
-                  type: "engine",
-                  name: data.title || folderId,
-                  folder: "WE: " + folderId,
-                  id: folderId,
-                  path: dir,
-                  preview: "file://" + dir + "/" + data.preview,
-                  previewPath: dir + "/" + data.preview
-                })
-                root.engineScanResults = next
+                            type: "engine",
+                            name: data.title || folderId,
+                            folder: "WE: " + folderId,
+                            id: folderId,
+                            path: dir,
+                            preview: "file://" + dir + "/" + data.preview,
+                            previewPath: dir + "/" + data.preview
+                          });
+                root.engineScanResults = next;
               }
             }
           }
         } catch (e) {
-          console.log("Failed to parse project.json:", e)
+          console.log("Failed to parse project.json:", e);
         }
-        root.engineQueueIndex++
-        root.startNextEngineProject()
+        root.engineQueueIndex++;
+        root.startNextEngineProject();
       }
     }
   }
@@ -325,18 +341,25 @@ Item {
     property bool isBackgroundApply: false
     command: ["killall", "-9", "linux-wallpaperengine"]
     onExited: (_, __) => {
-      let args = [root.enginePath, "--volume", root.volume]
-      if (root.engineFps > 0) args.push("--fps", root.engineFps)
-      for (let i in Quickshell.screens) {
-        const screen = Quickshell.screens[i]
-        args.push("--scaling", root.engineFill ? "fill" : "stretch")
-        args.push("--screen-root", screen.name)
-        args.push("--bg", root.resolvedWorkshopPath + folderId)
-      }
-      Quickshell.execDetached({ command: args, environment: ["XDG_SESSION_TYPE=wayland"] })
-      root.wasEngineActive = true
-      writeConf("engine:" + folderId, previewPath, engineProc.isBackgroundApply, engineProc.isBackgroundApply)
-    }
+                let args = [root.enginePath, "--volume", root.volume];
+                if (root.engineFps > 0)
+                args.push("--fps", root.engineFps);
+                for (let i in Quickshell.screens) {
+                  const screen = Quickshell.screens[i];
+                  args.push("--scaling", root.engineFill ? "fill" : "stretch");
+                  args.push("--screen-root", screen.name);
+                  args.push("--bg", root.resolvedWorkshopPath + folderId);
+                }
+                Quickshell.execDetached({
+                                          command: args,
+                                          environment:
+                                            ["XDG_SESSION_TYPE=wayland"]
+                                        });
+                root.wasEngineActive = true;
+                writeConf("engine:" + folderId, previewPath,
+                          engineProc.isBackgroundApply,
+                          engineProc.isBackgroundApply);
+              }
   }
 
   Process {
@@ -346,16 +369,21 @@ Item {
     property bool skipAnimation: false
     property bool killEngineAfter: false
     property bool isBackgroundApply: false
-    command: skipAnimation
-      ? ["awww", "img", wallpaperPath]
-      : ["awww", "img", wallpaperPath, "--transition-type", "fade", "--transition-duration", "1"]
+    command: skipAnimation ? ["awww", "img", wallpaperPath] : ["awww", "img",
+                                                               wallpaperPath,
+                                                               "--transition-type",
+                                                               "fade", "--transition-duration",
+                                                               "1"]
     onExited: (code, _) => {
-      if (code !== 0) return
-      if (setProc.killEngineAfter)
-        Quickshell.execDetached(["killall", "-9", "linux-wallpaperengine"])
-      root.wasEngineActive = false
-      writeConf(wallpaperPath, previewPath, setProc.isBackgroundApply, setProc.isBackgroundApply)
-    }
+                if (code !== 0)
+                return;
+                if (setProc.killEngineAfter)
+                Quickshell.execDetached(["killall", "-9",
+                                         "linux-wallpaperengine"]);
+                root.wasEngineActive = false;
+                writeConf(wallpaperPath, previewPath, setProc.isBackgroundApply,
+                          setProc.isBackgroundApply);
+              }
   }
 
   ListView {
@@ -369,14 +397,14 @@ Item {
 
     onCurrentIndexChanged: {
       if (currentIndex < 0)
-        return
+        return;
     }
 
     onModelChanged: {
-      currentIndex = Math.min(currentIndex, count - 1)
+      currentIndex = Math.min(currentIndex, count - 1);
 
       if (currentIndex >= 0)
-        positionViewAtIndex(currentIndex, ListView.Center)
+        positionViewAtIndex(currentIndex, ListView.Center);
     }
 
     model: root.filtered
@@ -458,15 +486,15 @@ Item {
         acceptedButtons: Qt.LeftButton
         onClicked: list.currentIndex = item.index
         onDoubleClicked: root.setWallpaper(item.modelData)
-        onWheel: (wheel) => {
-          if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
-            if (list.currentIndex < list.count - 1)
-              list.currentIndex++
-          } else {
-            if (list.currentIndex > 0)
-              list.currentIndex--
-          }
-        }
+        onWheel: wheel => {
+                   if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
+                     if (list.currentIndex < list.count - 1)
+                     list.currentIndex++;
+                   } else {
+                     if (list.currentIndex > 0)
+                     list.currentIndex--;
+                   }
+                 }
       }
     }
   }

@@ -9,11 +9,8 @@ ShellRoot {
   id: root
 
   Process {
-    command: [
-      "sh",
-      "-c",
-      "systemd-inhibit --who=\"minima shell\" --why=\"lock keybind\" --what=handle-power-key --mode=block sleep infinity"
-    ]
+    command: ["sh", "-c",
+      "systemd-inhibit --who=\"minima shell\" --why=\"lock keybind\" --what=handle-power-key --mode=block sleep infinity"]
     running: true
   }
 
@@ -28,28 +25,28 @@ ShellRoot {
   IpcHandler {
     target: "systray"
     function open(index: int): void {
-      Global.openSystrayMenu(index)
-    }
+    Global.openSystrayMenu(index);
+  }
   }
 
-  IpcHandler {
-    target: "launcher"
-    function open(): void {
-      Global.openLauncher()
+    IpcHandler {
+      target: "launcher"
+      function open(): void {
+      Global.openLauncher();
     }
-  }
+    }
 
-  IpcHandler {
-    target: "clipboard"
-    function open(): void {
-      Global.openClipboard()
-    }
-  }
+      IpcHandler {
+        target: "clipboard"
+        function open(): void {
+        Global.openClipboard();
+      }
+      }
 
-  IpcHandler {
-    target: "notifications"
-    function open(): void {
-      Global.openNotifications()
-    }
-  }
-}
+        IpcHandler {
+          target: "notifications"
+          function open(): void {
+          Global.openNotifications();
+        }
+        }
+        }
