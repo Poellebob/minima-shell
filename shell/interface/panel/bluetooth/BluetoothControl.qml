@@ -120,12 +120,6 @@ Item {
         anchors.margins: Global.format.spacing_small
         spacing: Global.format.spacing_small
 
-        StyledText {
-          text: "Devices"
-          font.bold: true
-          color: Global.colors.primary
-        }
-
         ListView {
           id: deviceList
           Layout.fillWidth: true
