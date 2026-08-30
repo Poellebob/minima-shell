@@ -102,6 +102,9 @@ in
       ]
       ++ lib.optionals (cfg.wm == "sway" || cfg.wm == "swayfx" || cfg.wm == "scroll") [
         pkgs.xdg-desktop-portal-wlr
+      ]
+      ++ lib.optionals (cfg.wm == "hyprland") [
+        pkgs.xdg-desktop-portal-hyprland
       ];
       config = {
         common.default = [
@@ -112,6 +115,11 @@ in
       // lib.optionalAttrs (cfg.wm == "sway" || cfg.wm == "swayfx" || cfg.wm == "scroll") {
         sway = {
           ScreenCast = [ "wlr" ];
+        };
+      }
+      // lib.optionalAttrs (cfg.wm == "hyprland") {
+        Hyprland = {
+          ScreenCast = [ "hyprland" ];
         };
       };
     };
@@ -293,7 +301,6 @@ in
         CLUTTER_BACKEND = "wayland";
         ELECTRON_OZONE_PLATFORM_HINT = "wayland";
         XDG_SESSION_TYPE = "wayland";
-        XDG_CURRENT_DESKTOP = "minima:KDE:${if cfg.wm == "swayfx" then "sway" else cfg.wm}";
       }
       (mkIf cfg.theming.enable {
         XCURSOR_THEME = "BreezeX-RosePine-Linux";
@@ -320,6 +327,16 @@ in
 
     home.file.".config/scroll/config" = mkIf (cfg.wm == "scroll") {
       text = "include ${cfg.scrollConfigFile}";
+    };
+
+    wayland.windowManager.hyprland = {
+      enable = true;
+      package = mkIf cfg.osModule null;
+      configType = "lua";
+      plugins = lib.optionals (cfg.hyprland.layout == "hy3") [
+        pkgs.hyprlandPlugins.hy3
+      ];
+      extraConfig = ''dofile("${cfg.hyprlandConfigFile}")'';
     };
 
     home.file.".config/qalculate/qalc.cfg".source = ./config/qalculate/qalc.cfg;

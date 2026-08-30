@@ -118,7 +118,7 @@ Item {
       baseColor: (player?.canPause || player?.canPlay)
                  ? Global.colors.on_surface_variant : Global.colors.outline
 
-      mouseEnabled: player?.canPause || player?.canPlay
+      mouseEnabled: (player?.canPause || player?.canPlay) ?? false
       Layout.preferredWidth: contentWidth + Global.format.spacing_small
       horizontalAlignment: Text.AlignHCenter
       verticalAlignment: Text.AlignVCenter

@@ -112,7 +112,6 @@ with lib;
     ./nixvim/options.nix
     ./nixvim/keymaps.nix
     ./nixvim/autocommands.nix
-    ./nixvim/diagnostics.nix
     ./nixvim/performance.nix
   ]
   ++ map (name: ./nixvim/plugins/${name}) (

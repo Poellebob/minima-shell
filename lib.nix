@@ -79,6 +79,12 @@ in
       internal = true;
     };
 
+    hyprlandConfigFile = mkOption {
+      type = types.nullOr types.package;
+      default = null;
+      internal = true;
+    };
+
     quickshellStoreDir = mkOption {
       type = types.nullOr types.package;
       default = null;
@@ -90,9 +96,23 @@ in
         "sway"
         "swayfx"
         "scroll"
+        "hyprland"
       ];
       default = "sway";
       internal = true;
+    };
+    hyprland = {
+      layout = mkOption {
+        type = types.enum [
+          "dwindle"
+          "master"
+          "scrolling"
+          "monocle"
+          "hy3"
+        ];
+        default = "dwindle";
+        description = "Hyprland layout engine; \"hy3\" provides i3/sway-style tiling via the hy3 plugin";
+      };
     };
     enableNvidia = mkOption {
       type = types.bool;
