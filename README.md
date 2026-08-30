@@ -2,22 +2,41 @@
 
 A NixOS/home-manager flake providing a Wayland-focused desktop environment with [Sway](https://swaywm.org/), [SwayFX](https://github.com/Ericmorgenta/swayfx), and [Scroll](https://github.com/dawsers/scroll/) support.
 
-**Warning:** This project is not done and is still **pre-alpha**; it will contain bugs.
+> [!WARNING]
+> This project is not done and is still **pre-alpha**; it will contain bugs.
 
 ---
 
 ## Table of Contents
 
+- [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
-- [Flake Usage](#flake-usage)
+- [Flake Outputs](#flake-outputs)
+- [Features](#features)
 - [Keybinds](#keybinds)
 - [Related Documentation](#related-documentation)
 
 ---
 
+## Prerequisites
+
+Minima is not a standalone program — it is a Home Manager module. **Home Manager is required**, regardless of how you use minima:
+
+- On a non-NixOS distro, minima runs as a standalone Home Manager configuration on top of an already-installed window manager.
+- On NixOS, minima is a NixOS module that installs the window manager
+and passes system-level options down to Home Manager, which actually manages
+all of your config files, the QuickShell panel, styling, and shell setup.
+
+You also need a window manager installed — either **Sway**, **SwayFX**,
+or **Scroll** — and `minima.wm` must match the one installed:
+if you use Sway set `wm = "sway"`, SwayFX → `"swayfx"`, Scroll → `"scroll"`.
+If they don't match, minima writes config for the wrong window manager and nothing will render.
+
+---
+
 ## Quick Start
 
-### Basic NixOS Configuration
+### Home Manager (standalone, any distro)
 
 ```nix
 {
@@ -32,21 +51,68 @@ A NixOS/home-manager flake providing a Wayland-focused desktop environment with 
   };
 
   outputs = { self, nixpkgs, home-manager, minima, ... }: {
-    homeConfigurations."your-username" = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
+    homeConfigurations."your-username" = home-manager.lib.homeManagerConfiguration {
+      pkgs = nixpkgs.legacyPackages.x86_64-linux;
       modules = [
-        home-manager.nixosModules.home-manager
-        minima.homeModules.minima
+        minima.homeModules.default
         {
+          home.stateVersion = "25.11";
           minima = {
             enable = true;
             wm = "sway";  # sway, swayfx, or scroll
+            shell.enable = true;
+            theming.enable = true;
+            enableBranding = true;
+            minimaConfig = {
+              darkTheme = true;
+              wallpaper.engineEnabled = true;
+              panel.alwaysVisible = true;
+            };
+            vim.enable = true;
           };
-          home-manager.users.<username> = {
-            home.stateVersion = "25.11";
-            imports = [ 
-              minima.homeModules.default 
+        }
+      ];
+    };
+  };
+}
+```
+
+> This expects a window manager (`sway`, `swayfx`, or `scroll`) to already be installed on your system, and `minima.wm` must match the one you installed. The NixOS module installs the window manager for you based on `minima.wm`.
+
+### NixOS
+
+```nix
+{
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  inputs.home-manager = {
+    url = "github:nix-community/home-manager";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+  inputs.minima = {
+    url = "github:Poellebob/minima-shell";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = { self, nixpkgs, home-manager, minima, ... }: {
+    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        home-manager.nixosModules.home-manager
+        minima.nixosModules.minima
+        {
+          # System-level: installs & wraps the window manager, passes options
+          # down to home-manager via sharedModules.
+          minima = {
+            enable = true;
+            wm = "sway";  # sway, swayfx, or scroll
+            enableNvidia = false;
+          };
+
+          home-manager.users."your-username" = {
+            imports = [
+              minima.homeModules.default
             ];
+            home.stateVersion = "25.11";
             minima = {
               enable = true;
               shell.enable = true;
@@ -57,27 +123,44 @@ A NixOS/home-manager flake providing a Wayland-focused desktop environment with 
                 wallpaper.engineEnabled = true;
                 panel.alwaysVisible = true;
               };
-
-              vim = {
-                enable = true;
-              };
+              vim.enable = true;
             };
           };
-        };
+        }
       ];
     };
   };
 }
 ```
 
-### Flake Outputs
+---
+
+## Flake Outputs
 
 ```nix
 outputs = { self, ... }: {
   homeModules.minima = ...;   # Home Manager module
+  homeModules.default  = ...; # alias for homeModules.minima
   nixosModules.minima = ...;  # NixOS module
+  nixosModules.default = ...; # alias for nixosModules.minima
 }
 ```
+
+All configuration options are documented in [OPTIONS.md](./OPTIONS.md).
+
+---
+
+## Features
+
+- **Sway / SwayFX / Scroll** — pick your window manager with `minima.wm`
+- **QuickShell panel & launcher** — animated bar, app launcher with qalc, clipboard manager, wallpaper engine support
+- **Material you theming** — matugen-rendered colors using a seed color, applied to the panel, launcher, and Sway
+- **KDE-style styling** — Breeze cursor/GTK/Qt theming, Papirus icons, `kdeglobals`
+- **Shell setup** — zsh, starship, eza, fzf, zoxide, bat, ripgrep, lazygit
+- **Neovim via NixVim** — batteries-included editor with LSP, completion, formatting, and linting
+- **Extra packages** — add anything with `minima.extraPackages`
+- **NVIDIA support** — flip on `minima.enableNvidia` for proprietary driver handling
+- **Desktop integration** — XDG portals, desktop menus, Dolphin-adjacent KDE packages
 
 ---
 
@@ -150,6 +233,9 @@ outputs = { self, ... }: {
 | `$mod + Shift + J` | Grow height 100px |
 
 ### Screenshots
+
+| Keybind | Action |
+|--------|--------|
 | `Shift + Print` | Screenshot fullscreen → clipboard |
 | `$mod + Print` | Screenshot selection → edit in swappy |
 | `$mod + Shift + Print` | Screenshot fullscreen → edit in swappy |
@@ -173,4 +259,3 @@ outputs = { self, ... }: {
 ## Related Documentation
 
 - [OPTIONS.md](./OPTIONS.md) - All configuration options and how to use them
-- [NONNIX.md](./NONNIX.md) - Manual setup guide without Nix (Arch Linux packages, copy to home, shell profiles)
