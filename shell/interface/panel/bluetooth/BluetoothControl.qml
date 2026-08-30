@@ -51,6 +51,7 @@ Item {
 
     RowLayout {
       Layout.fillWidth: true
+      Layout.preferredHeight: Global.format.module_height
       spacing: Global.format.spacing_medium
 
       StyledText {
