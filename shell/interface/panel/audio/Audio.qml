@@ -39,21 +39,26 @@ BarWidget {
   }
 
   onClicked: mouse => {
-               if (mouse.button === Qt.MiddleButton && defaultNode) {
-                 defaultNode.audio.muted = !defaultNode.audio.muted;
-               }
+    if (mouse.button === Qt.MiddleButton && defaultNode) {
+      defaultNode.audio.muted = !defaultNode.audio.muted;
+    }
 
-               if (mouse.button === Qt.LeftButton && defaultNode) {
-                 audioMenuTriggered();
-               }
-             }
+    if (mouse.button === Qt.LeftButton && defaultNode) {
+      audioMenuTriggered();
+    }
+  }
 
   onWheel: wheel => {
-             if (!defaultNode)
-             return;
-             const delta = wheel.angleDelta.y > 0 ? 0.05 : -0.05;
-             defaultNode.audio.volume = Math.max(0.0, Math.min(1.0,
-                                                               defaultNode.audio.volume
-                                                               + delta));
-           }
+    if (!defaultNode)
+    return;
+
+    const v100 = Math.round(defaultNode.audio.volume * 100);
+    const mod5 = v100 % 5;
+    const delta = wheel.angleDelta.y > 0
+        ? (mod5 === 0 ? 5 : 5 - mod5)
+        : (mod5 === 0 ? -5 : -mod5);
+
+    let newVolume = (v100 + delta) / 100;
+    defaultNode.audio.volume = Math.max(0.0, Math.min(1.0, newVolume));
+  }
 }
