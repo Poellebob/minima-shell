@@ -225,6 +225,7 @@ PanelWindow {
               }
               Network {
                 Layout.alignment: Qt.AlignVCenter
+                onNetworkMenuTriggered: openBarContent(netContent)
               }
               Clock {
                 Layout.alignment: Qt.AlignVCenter
