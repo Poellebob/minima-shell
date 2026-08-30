@@ -116,12 +116,6 @@
         }
         {
           mode = "n";
-          key = "<leader>c";
-          action = "<cmd>Bdelete<CR>";
-          options.desc = "Close buffer";
-        }
-        {
-          mode = "n";
           key = "]b";
           action = "<cmd>bnext<CR>";
           options.desc = "Next buffer";
@@ -134,45 +128,9 @@
         }
         {
           mode = "n";
-          key = ">b";
-          action = "<cmd>BufferLineMoveNext<CR>";
-          options.desc = "Move buffer right";
-        }
-        {
-          mode = "n";
-          key = "<b";
-          action = "<cmd>BufferLineMovePrev<CR>";
-          options.desc = "Move buffer left";
-        }
-        {
-          mode = "n";
-          key = "<leader>bc";
-          action = "<cmd>BufferLineCloseOthers<CR>";
-          options.desc = "Close other buffers";
-        }
-        {
-          mode = "n";
           key = "<leader>bC";
           action = "<cmd>bufdo bdelete<CR>";
           options.desc = "Close all buffers";
-        }
-        {
-          mode = "n";
-          key = "<leader>bp";
-          action = "<cmd>BufferLineCyclePrev<CR>";
-          options.desc = "Prev buffer";
-        }
-        {
-          mode = "n";
-          key = "<leader>bl";
-          action = "<cmd>BufferLineCloseLeft<CR>";
-          options.desc = "Close buffers left";
-        }
-        {
-          mode = "n";
-          key = "<leader>br";
-          action = "<cmd>BufferLineCloseRight<CR>";
-          options.desc = "Close buffers right";
         }
 
         # ── Tabs ──────────────────────────────────────────────────────────────
@@ -201,167 +159,6 @@
           key = "jk";
           action = "<Esc>";
           options.desc = "Escape";
-        }
-
-        # ── Telescope / finder ────────────────────────────────────────────────
-        {
-          mode = "n";
-          key = "<leader>ff";
-          action = "<cmd>Telescope find_files<CR>";
-          options.desc = "Find files";
-        }
-        {
-          mode = "n";
-          key = "<leader>fF";
-          action = "<cmd>Telescope find_files hidden=true<CR>";
-          options.desc = "Find files (hidden)";
-        }
-        {
-          mode = "n";
-          key = "<leader>fw";
-          action = "<cmd>Telescope live_grep<CR>";
-          options.desc = "Live grep";
-        }
-        {
-          mode = "n";
-          key = "<leader>fb";
-          action = "<cmd>Telescope buffers<CR>";
-          options.desc = "Find buffers";
-        }
-        {
-          mode = "n";
-          key = "<leader>fh";
-          action = "<cmd>Telescope help_tags<CR>";
-          options.desc = "Help tags";
-        }
-        {
-          mode = "n";
-          key = "<leader>fk";
-          action = "<cmd>Telescope keymaps<CR>";
-          options.desc = "Keymaps";
-        }
-        {
-          mode = "n";
-          key = "<leader>fo";
-          action = "<cmd>Telescope oldfiles<CR>";
-          options.desc = "Recent files";
-        }
-        {
-          mode = "n";
-          key = "<leader>fr";
-          action = "<cmd>Telescope registers<CR>";
-          options.desc = "Registers";
-        }
-        {
-          mode = "n";
-          key = "<leader>fC";
-          action = "<cmd>Telescope commands<CR>";
-          options.desc = "Commands";
-        }
-        {
-          mode = "n";
-          key = "<leader>fn";
-          action = "<cmd>lua require('telescope').extensions.notify.notify()<CR>";
-          options.desc = "Notifications";
-        }
-        {
-          mode = "n";
-          key = "<leader>f<CR>";
-          action = "<cmd>Telescope resume<CR>";
-          options.desc = "Resume search";
-        }
-
-        # ── Git (telescope pickers) ───────────────────────────────────────────
-        {
-          mode = "n";
-          key = "<leader>gb";
-          action = "<cmd>Telescope git_branches<CR>";
-          options.desc = "Git branches";
-        }
-        {
-          mode = "n";
-          key = "<leader>gc";
-          action = "<cmd>Telescope git_commits<CR>";
-          options.desc = "Git commits (repo)";
-        }
-        {
-          mode = "n";
-          key = "<leader>gC";
-          action = "<cmd>Telescope git_bcommits<CR>";
-          options.desc = "Git commits (file)";
-        }
-        {
-          mode = "n";
-          key = "<leader>gt";
-          action = "<cmd>Telescope git_status<CR>";
-          options.desc = "Git status";
-        }
-
-        # ── Git (gitsigns) ────────────────────────────────────────────────────
-        {
-          mode = "n";
-          key = "<leader>gs";
-          action = "<cmd>Gitsigns stage_hunk<CR>";
-          options.desc = "Stage hunk";
-        }
-        {
-          mode = "n";
-          key = "<leader>gr";
-          action = "<cmd>Gitsigns reset_hunk<CR>";
-          options.desc = "Reset hunk";
-        }
-        {
-          mode = "n";
-          key = "<leader>gp";
-          action = "<cmd>Gitsigns preview_hunk<CR>";
-          options.desc = "Preview hunk";
-        }
-        {
-          mode = "n";
-          key = "]h";
-          action = "<cmd>Gitsigns next_hunk<CR>";
-          options.desc = "Next hunk";
-        }
-        {
-          mode = "n";
-          key = "[h";
-          action = "<cmd>Gitsigns prev_hunk<CR>";
-          options.desc = "Prev hunk";
-        }
-
-        # ── Terminal (snacks) ─────────────────────────────────────────────────
-        {
-          mode = [
-            "n"
-            "t"
-          ];
-          key = "<C-'>";
-          action = "<cmd>lua Snacks.terminal.toggle()<CR>";
-          options.desc = "Toggle terminal";
-        }
-        {
-          mode = "n";
-          key = "<leader>tf";
-          action = "<cmd>lua Snacks.terminal.toggle(nil, { win = { style = 'float' } })<CR>";
-          options.desc = "Floating terminal";
-        }
-        {
-          mode = "n";
-          key = "<leader>th";
-          action = "<cmd>lua Snacks.terminal.toggle(nil, { win = { position = 'bottom' } })<CR>";
-          options.desc = "Horizontal terminal";
-        }
-        {
-          mode = "n";
-          key = "<leader>tv";
-          action = "<cmd>lua Snacks.terminal.toggle(nil, { win = { position = 'right' } })<CR>";
-          options.desc = "Vertical terminal";
-        }
-        {
-          mode = "n";
-          key = "<leader>tl";
-          action = "<cmd>lua Snacks.terminal.toggle('lazygit')<CR>";
-          options.desc = "Lazygit";
         }
 
         # ── Quickfix / location list ──────────────────────────────────────────
@@ -426,14 +223,6 @@
           options.desc = "First local list";
         }
 
-        # ── Undotree ──────────────────────────────────────────────────────────
-        {
-          mode = "n";
-          key = "<leader>fu";
-          action = "<cmd>UndotreeToggle<CR>";
-          options.desc = "Undo history";
-        }
-
         # ── UI toggles ────────────────────────────────────────────────────────
         {
           mode = "n";
@@ -465,28 +254,8 @@
           action = "<cmd>lua vim.o.background = vim.o.background == 'dark' and 'light' or 'dark'<CR>";
           options.desc = "Toggle background";
         }
-        {
-          mode = "n";
-          key = "<leader>uD";
-          action = "<cmd>lua Snacks.notifier.hide()<CR>";
-          options.desc = "Dismiss notifications";
-        }
-
-        # ── Commenting ────────────────────────────────────────────────────────
-        {
-          mode = "n";
-          key = "<leader>/";
-          action = "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>";
-          options.desc = "Toggle comment";
-        }
-        {
-          mode = "v";
-          key = "<leader>/";
-          action = "<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>";
-          options.desc = "Toggle comment";
-        }
       ]
-      ++ (map (k: {
+      ++ (lib.map (k: {
         mode = k.mode;
         key = k.key;
         action = k.action;
