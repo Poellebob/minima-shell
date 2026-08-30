@@ -232,8 +232,7 @@ Item {
       delegate: ClickableText {
         required property var modelData
         required property int index
-        text: index === launcherRoot.currentIndex ? `[${modelData.name}]` : ` 
-${modelData.name} `
+        text: index === launcherRoot.currentIndex ? `[${modelData.name}]` : ` ${modelData.name} `
         baseColor: index === launcherRoot.currentIndex ? Global.colors.primary :
                                                          Global.colors.on_surface_variant
         verticalAlignment: Text.AlignVCenter
