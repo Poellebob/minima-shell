@@ -18,20 +18,19 @@ MouseArea {
   Layout.fillHeight: true
   implicitWidth: trayItemWidth
 
-  onClicked: (event) => {
-    switch (event.button) {
-      case Qt.LeftButton:
-        item.activate();
-      break;
-
-      case Qt.RightButton:
-        if (item.hasMenu) {
-          showMenu(menuOpen.children)
-        }
-      break;
-    }
-    event.accepted = true;
-  }
+  onClicked: event => {
+               switch (event.button) {
+                 case Qt.LeftButton:
+                 item.activate();
+                 break;
+                 case Qt.RightButton:
+                 if (item.hasMenu) {
+                   showMenu(menuOpen.children);
+                 }
+                 break;
+               }
+               event.accepted = true;
+             }
 
   QsMenuOpener {
     id: menuOpen
@@ -40,7 +39,7 @@ MouseArea {
 
   function triggerMenu() {
     if (item.hasMenu) {
-      showMenu(menuOpen.children)
+      showMenu(menuOpen.children);
     }
   }
 

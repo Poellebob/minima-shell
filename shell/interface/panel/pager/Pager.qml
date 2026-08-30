@@ -46,7 +46,7 @@ Item {
         return [];
       }
 
-      delegate: Item {
+      delegate: ClickableText {
         property int wsId: {
           if (pagerRoot.hyprland) {
             return modelData.id;
@@ -68,7 +68,8 @@ Item {
             return modelData.active;
           }
           if (pagerRoot.i3) {
-            return modelData.focused && (wsOutput.toString() === pagerRoot.screen.name.toString());
+            return modelData.focused && (wsOutput.toString()
+                                         === pagerRoot.screen.name.toString());
           }
         }
         property string wsLabel: {
@@ -83,32 +84,27 @@ Item {
 
         property string displayLabel: wsActive ? `[${wsLabel}]` : ` ${wsLabel} `
 
-        visible: (wsId > 0 && wsOutput.toString() === pagerRoot.screen.name.toString()) || (wsId < 0 && pagerRoot.i3)
-        implicitWidth: wsText.implicitWidth
+        text: displayLabel
+        baseColor: wsActive ? Global.colors.primary : Global.colors.outline
+        verticalAlignment: Text.AlignVCenter
+
+        visible: (wsId > 0 && wsOutput.toString()
+                  === pagerRoot.screen.name.toString()) || (wsId < 0
+                                                            && pagerRoot.i3)
         Layout.fillWidth: false
         Layout.fillHeight: true
 
-        StyledText {
-          id: wsText
-          text: displayLabel
-          color: wsActive ? Global.colors.primary : Global.colors.outline
-          anchors.centerIn: parent
-        }
-
-        MouseArea {
-          anchors.fill: parent
-          cursorShape: Qt.PointingHandCursor
-          onClicked: {
-            if (pagerRoot.i3) {
-              if (wsId >= 0) {
-                I3.dispatch(`workspace ${wsLabel}`);
-              } else {
-                I3.dispatch(`[workspace=${wsLabel}] move workspace to output current; workspace ${wsLabel}`);
-              }
-              return;
+        onClicked: {
+          if (pagerRoot.i3) {
+            if (wsId >= 0) {
+              I3.dispatch(`workspace ${wsLabel}`);
+            } else {
+              I3.dispatch(`[workspace=${wsLabel}] move workspace to output current; workspace 
+${wsLabel}`);
             }
-            modelData.activate();
+            return;
           }
+          modelData.activate();
         }
       }
     }

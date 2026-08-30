@@ -4,6 +4,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Services.Notifications
+import qs.components.text
 import qs
 
 Item {
@@ -13,36 +14,43 @@ Item {
 
   required property NotificationServer notifServer
   readonly property var notifications: {
-    const arr = notifServer.trackedNotifications.values.slice()
-    arr.reverse()
-    return arr
+    const arr = notifServer.trackedNotifications.values.slice();
+    arr.reverse();
+    return arr;
   }
 
   function clearAll() {
-    for (let i = notifServer.trackedNotifications.values.length - 1; i >= 0; i--) {
-      notifServer.trackedNotifications[i].dismiss()
+    for (let i = notifServer.trackedNotifications.values.length - 1; i
+         >= 0; i--) {
+      notifServer.trackedNotifications[i].dismiss();
     }
   }
 
   function urgencyColor(notif): color {
     switch (notif.urgency) {
-      case NotificationUrgency.Critical: return Global.colors.error
-      case NotificationUrgency.Low: return Global.colors.outline
-      default: return Global.colors.primary
+    case NotificationUrgency.Critical:
+      return Global.colors.error;
+    case NotificationUrgency.Low:
+      return Global.colors.outline;
+    default:
+      return Global.colors.primary;
     }
   }
 
   function urgencyIcon(notif): string {
     switch (notif.urgency) {
-      case NotificationUrgency.Critical: return "󰀪"
-      case NotificationUrgency.Low: return "󰍡"
-      default: return "󰂚"
+    case NotificationUrgency.Critical:
+      return "󰀪";
+    case NotificationUrgency.Low:
+      return "󰍡";
+    default:
+      return "󰂚";
     }
   }
 
   function formatTime(timestamp): string {
-    let d = new Date(timestamp * 1000)
-    return Qt.formatDateTime(d, "HH:mm")
+    let d = new Date(timestamp * 1000);
+    return Qt.formatDateTime(d, "HH:mm");
   }
 
   ColumnLayout {
@@ -76,22 +84,17 @@ Item {
         font.pixelSize: Global.format.text_size
       }
 
-      Item { Layout.fillWidth: true }
+      Item {
+        Layout.fillWidth: true
+      }
 
-      Text {
+      ClickableText {
         visible: root.notifications.length > 0
         text: "Clear All"
-        color: clearMouse.containsMouse ? Global.colors.error : Global.colors.on_surface_variant
-        font.family: "JetBrainsMono Nerd Font"
-        font.pixelSize: Global.format.text_size
+        baseColor: Global.colors.on_surface_variant
+        hoverColor: Global.colors.error
 
-        MouseArea {
-          id: clearMouse
-          anchors.fill: parent
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          onClicked: root.clearAll()
-        }
+        onClicked: root.clearAll()
       }
     }
 
@@ -119,8 +122,9 @@ Item {
         model: root.notifications
 
         onModelChanged: {
-          currentIndex = Math.min(currentIndex, count - 1)
-          if (currentIndex >= 0) positionViewAtIndex(currentIndex, ListView.Center)
+          currentIndex = Math.min(currentIndex, count - 1);
+          if (currentIndex >= 0)
+            positionViewAtIndex(currentIndex, ListView.Center);
         }
 
         delegate: Item {
@@ -136,10 +140,10 @@ Item {
             anchors.fill: parent
             color: "transparent"
             border.color: notifList.currentIndex === notifItem.index
-              ? Global.colors.tertiary
-              : notifItemMouse.containsMouse
-                ? Global.colors.on_surface
-                : root.urgencyColor(modelData)
+                          ? Global.colors.tertiary :
+                            notifItemMouse.containsMouse
+                            ? Global.colors.on_surface : root.urgencyColor(
+                                modelData)
             border.width: 1
 
             MouseArea {
@@ -147,15 +151,15 @@ Item {
               anchors.fill: parent
               hoverEnabled: true
               propagateComposedEvents: true
-              onWheel: (wheel) => {
-                if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
-                  if (notifList.currentIndex < notifList.count - 1)
-                    notifList.currentIndex++
-                } else {
-                  if (notifList.currentIndex > 0)
-                    notifList.currentIndex--
-                }
-              }
+              onWheel: wheel => {
+                         if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
+                           if (notifList.currentIndex < notifList.count - 1)
+                           notifList.currentIndex++;
+                         } else {
+                           if (notifList.currentIndex > 0)
+                           notifList.currentIndex--;
+                         }
+                       }
             }
 
             ColumnLayout {
@@ -170,9 +174,9 @@ Item {
 
                 IconImage {
                   visible: modelData.image !== "" || modelData.appIcon !== ""
-                  source: modelData.image !== ""
-                    ? modelData.image
-                    : Quickshell.iconPath(modelData.appIcon)
+                  source: modelData.image !== "" ? modelData.image :
+                                                   Quickshell.iconPath(
+                                                     modelData.appIcon)
                   implicitWidth: Global.format.text_size
                   implicitHeight: Global.format.text_size
                 }
@@ -210,19 +214,12 @@ Item {
                   font.pixelSize: Global.format.text_size
                 }
 
-                Text {
+                ClickableText {
                   text: "󰅖"
-                  color: dismissMouse.containsMouse ? Global.colors.error : Global.colors.on_surface_variant
-                  font.family: "JetBrainsMono Nerd Font"
-                  font.pixelSize: Global.format.text_size
+                  baseColor: Global.colors.on_surface_variant
+                  hoverColor: Global.colors.error
 
-                  MouseArea {
-                    id: dismissMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: notifItem.modelData.dismiss()
-                  }
+                  onClicked: notifItem.modelData.dismiss()
                 }
               }
 
@@ -251,10 +248,13 @@ Item {
                 Layout.fillHeight: true
                 maximumLineCount: 4
                 elide: Text.ElideRight
-                textFormat: modelData.hints?.["urgency"] !== undefined ? Text.PlainText : Text.PlainText
+                textFormat: modelData.hints?.["urgency"] !== undefined
+                            ? Text.PlainText : Text.PlainText
               }
 
-              Item { Layout.fillHeight: true }
+              Item {
+                Layout.fillHeight: true
+              }
 
               // Actions
               Flow {
@@ -271,29 +271,33 @@ Item {
                     required property int index
 
                     color: "transparent"
-                    border.color: actionMouse.containsMouse ? Global.colors.primary : Global.colors.outline
+                    border.color: actionMouse.containsMouse
+                                  ? Global.colors.primary :
+                                    Global.colors.outline
                     border.width: 1
-                    implicitWidth: actionLabel.implicitWidth + Global.format.spacing_small * 2
-                    implicitHeight: actionLabel.implicitHeight + Global.format.spacing_small
+                    implicitWidth: actionLabel.implicitWidth
+                                   + Global.format.spacing_small * 2
+                    implicitHeight: actionLabel.implicitHeight
+                                    + Global.format.spacing_small
 
                     RowLayout {
                       anchors.centerIn: parent
                       spacing: 4
 
-                      Text {
+                      ClickableText {
                         visible: notifItem.modelData.hasActionIcons
                         text: actionButton.modelData.identifier
-                        font.family: "JetBrainsMono Nerd Font"
-                        font.pixelSize: Global.format.text_size
-                        color: actionMouse.containsMouse ? Global.colors.primary : Global.colors.on_surface_variant
+                        mouseEnabled: false
+                        hoverOverride: actionMouse.containsMouse
+                        hoverColor: Global.colors.primary
                       }
 
-                      Text {
+                      ClickableText {
                         id: actionLabel
                         text: actionButton.modelData.text
-                        color: actionMouse.containsMouse ? Global.colors.primary : Global.colors.on_surface_variant
-                        font.family: "JetBrainsMono Nerd Font"
-                        font.pixelSize: Global.format.text_size
+                        mouseEnabled: false
+                        hoverOverride: actionMouse.containsMouse
+                        hoverColor: Global.colors.primary
                       }
                     }
 
@@ -316,7 +320,8 @@ Item {
 
                 Rectangle {
                   Layout.fillWidth: true
-                  implicitHeight: replyInput.implicitHeight + Global.format.spacing_small
+                  implicitHeight: replyInput.implicitHeight
+                                  + Global.format.spacing_small
                   color: "transparent"
                   border.color: Global.colors.outline
                   border.width: 1
@@ -332,7 +337,8 @@ Item {
 
                     Text {
                       visible: replyInput.text === ""
-                      text: notifItem.modelData.inlineReplyPlaceholder || "Reply..."
+                      text: notifItem.modelData.inlineReplyPlaceholder
+                            || "Reply..."
                       color: Global.colors.outline
                       font.family: "JetBrainsMono Nerd Font"
                       font.pixelSize: Global.format.text_size
@@ -340,29 +346,22 @@ Item {
 
                     onAccepted: {
                       if (text !== "") {
-                        notifItem.modelData.sendInlineReply(text)
-                        text = ""
+                        notifItem.modelData.sendInlineReply(text);
+                        text = "";
                       }
                     }
                   }
                 }
 
-                Text {
+                ClickableText {
                   text: "󰒊"
-                  color: sendMouse.containsMouse ? Global.colors.primary : Global.colors.on_surface_variant
-                  font.family: "JetBrainsMono Nerd Font"
-                  font.pixelSize: Global.format.text_size
+                  baseColor: Global.colors.on_surface_variant
+                  hoverColor: Global.colors.primary
 
-                  MouseArea {
-                    id: sendMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                      if (replyInput.text !== "") {
-                        notifItem.modelData.sendInlineReply(replyInput.text)
-                        replyInput.text = ""
-                      }
+                  onClicked: {
+                    if (replyInput.text !== "") {
+                      notifItem.modelData.sendInlineReply(replyInput.text);
+                      replyInput.text = "";
                     }
                   }
                 }

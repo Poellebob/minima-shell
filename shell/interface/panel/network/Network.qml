@@ -17,7 +17,8 @@ BarWidget {
     StyledText {
       id: networkIcon
       text: networkRoot.getNetworkIcon()
-      color: networkRoot.isConnected ? Global.colors.on_surface_variant : Global.colors.outline
+      color: networkRoot.isConnected ? Global.colors.on_surface_variant :
+                                       Global.colors.outline
     }
 
     StyledText {
@@ -35,41 +36,41 @@ BarWidget {
 
   function getNetworkIcon() {
     if (!isConnected) {
-      return "󰤭"
+      return "󰤭";
     }
 
     if (connectionType === "ethernet") {
-      return "󰈀"
+      return "󰈀";
     }
 
     if (signalStrength >= 75) {
-      return "󰤨"
+      return "󰤨";
     } else if (signalStrength >= 50) {
-      return "󰤥"
+      return "󰤥";
     } else if (signalStrength >= 25) {
-      return "󰤢"
+      return "󰤢";
     } else {
-      return "󰤟"
+      return "󰤟";
     }
   }
 
   function updateDisplayText() {
     if (!isConnected) {
-      displayText = "Disconnected"
-      return
+      displayText = "Disconnected";
+      return;
     }
 
     if (connectionType === "ethernet") {
-      displayText = "Ethernet"
-      return
+      displayText = "Ethernet";
+      return;
     }
 
     if (connectionType === "wifi" && networkName !== "") {
-      displayText = networkName
-      return
+      displayText = networkName;
+      return;
     }
 
-    displayText = "Connected"
+    displayText = "Connected";
   }
 
   Process {
@@ -78,56 +79,57 @@ BarWidget {
     running: true
     stdout: StdioCollector {
       onStreamFinished: {
-        const lines = this.text.trim().split('\n')
-        let connected = false
-        let type = "none"
+        const lines = this.text.trim().split('\n');
+        let connected = false;
+        let type = "none";
 
         for (let line of lines) {
-          const parts = line.split(':')
+          const parts = line.split(':');
           if (parts.length >= 3) {
-            const deviceType = parts[0]
-            const state = parts[1]
-            const connection = parts[2]
+            const deviceType = parts[0];
+            const state = parts[1];
+            const connection = parts[2];
 
             if (state === "connected") {
-              connected = true
+              connected = true;
               if (deviceType === "wifi") {
-                type = "wifi"
-                networkRoot.networkName = connection
-                wifiSignalProcess.running = true
+                type = "wifi";
+                networkRoot.networkName = connection;
+                wifiSignalProcess.running = true;
               } else if (deviceType === "ethernet") {
-                type = "ethernet"
-                networkRoot.networkName = connection
+                type = "ethernet";
+                networkRoot.networkName = connection;
               }
-              break
+              break;
             }
           }
         }
 
-        networkRoot.isConnected = connected
-        networkRoot.connectionType = type
+        networkRoot.isConnected = connected;
+        networkRoot.connectionType = type;
 
         if (!connected) {
-          networkRoot.networkName = ""
-          networkRoot.signalStrength = 0
+          networkRoot.networkName = "";
+          networkRoot.signalStrength = 0;
         }
 
-        networkRoot.updateDisplayText()
+        networkRoot.updateDisplayText();
       }
     }
   }
 
   Process {
     id: wifiSignalProcess
-    command: ["nmcli", "-t", "-f", "SIGNAL", "device", "wifi", "list", "--rescan", "no"]
+    command: ["nmcli", "-t", "-f", "SIGNAL", "device", "wifi", "list",
+      "--rescan", "no"]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
-        const lines = this.text.trim().split('\n')
+        const lines = this.text.trim().split('\n');
         if (lines.length > 0 && lines[0] !== "") {
-          const signal = parseInt(lines[0])
+          const signal = parseInt(lines[0]);
           if (!isNaN(signal)) {
-            networkRoot.signalStrength = signal
+            networkRoot.signalStrength = signal;
           }
         }
       }
@@ -140,11 +142,11 @@ BarWidget {
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
-        const hasRoute = this.text.includes("via") || this.text.includes("dev")
+        const hasRoute = this.text.includes("via") || this.text.includes("dev");
         if (!networkRoot.isConnected && hasRoute) {
-          networkRoot.isConnected = true
-          networkRoot.connectionType = "ethernet"
-          networkRoot.updateDisplayText()
+          networkRoot.isConnected = true;
+          networkRoot.connectionType = "ethernet";
+          networkRoot.updateDisplayText();
         }
       }
     }
@@ -155,8 +157,8 @@ BarWidget {
     running: true
     repeat: true
     onTriggered: {
-      networkProcess.running = true
-      fallbackTimer.start()
+      networkProcess.running = true;
+      fallbackTimer.start();
     }
   }
 
@@ -166,7 +168,7 @@ BarWidget {
     running: false
     onTriggered: {
       if (!networkRoot.isConnected) {
-        ipRouteProcess.running = true
+        ipRouteProcess.running = true;
       }
     }
   }

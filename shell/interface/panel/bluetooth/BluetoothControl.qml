@@ -2,419 +2,223 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Bluetooth
+import qs.components.widget
 import qs.components.text
 import qs
 
 Item {
-    id: root
+  id: root
+  implicitWidth: 360
 
-    implicitHeight: 250
+  readonly property var adapter: Bluetooth.defaultAdapter
+  readonly property bool powered: adapter?.state
+                                  === BluetoothAdapterState.Enabled
 
-    property int adapterIndex: 0
-    property BluetoothAdapter currentAdapter: Bluetooth.adapters.values[adapterIndex] ?? Bluetooth.defaultAdapter
+  function stateText(dev): string {
+    if (dev.pairing)
+      return "Pairing";
+    switch (dev.state) {
+    case BluetoothDeviceState.Connected:
+      return "Connected";
+    case BluetoothDeviceState.Connecting:
+      return "Connecting";
+    case BluetoothDeviceState.Disconnecting:
+      return "Disconnecting";
+    default:
+      return dev.paired ? "Paired" : "Not paired";
+    }
+  }
 
-    readonly property var devices: {
-        const adapter = currentAdapter;
-        if (!adapter)
-            return [];
-        const devs = [];
-        for (const key in adapter.devices.values) {
-            const dev = adapter.devices.values[key];
-            if (dev && dev.name)
-                devs.push(dev);
-        }
-        return devs;
+  function stateColor(dev): color {
+    if (dev.pairing)
+      return Global.colors.on_surface;
+    if (dev.connected)
+      return Global.colors.primary;
+    switch (dev.state) {
+    case BluetoothDeviceState.Connecting:
+    case BluetoothDeviceState.Disconnecting:
+      return Global.colors.on_surface;
+    default:
+      return dev.paired ? Global.colors.on_surface_variant :
+                          Global.colors.outline;
+    }
+  }
+
+  ColumnLayout {
+    id: contentCol
+    anchors.fill: parent
+    spacing: Global.format.spacing_large
+
+    RowLayout {
+      Layout.fillWidth: true
+      spacing: Global.format.spacing_medium
+
+      StyledText {
+        text: root.powered ? "󰂯" : "󰂲"
+        color: root.powered ? Global.colors.primary : Global.colors.outline
+      }
+
+      StyledText {
+        Layout.fillWidth: true
+        text: root.adapter ? (root.adapter.name || root.adapter.adapterId) :
+                             "No adapter"
+
+        color: Global.colors.on_surface_variant
+        font.bold: true
+        elide: Text.ElideRight
+      }
+
+      StyledText {
+        visible: root.adapter && root.adapter.state
+                 !== BluetoothAdapterState.Enabled && root.adapter.state
+                 !== BluetoothAdapterState.Disabled
+        text: root.adapter ? BluetoothAdapterState.toString(root.adapter.state) :
+                             ""
+        color: root.adapter?.state === BluetoothAdapterState.Blocked
+               ? Global.colors.error : Global.colors.outline
+      }
+
+      ClickableText {
+        visible: root.powered
+        text: root.adapter?.discovering ? "Scanning" : "Scan"
+        baseColor: root.adapter?.discovering ? Global.colors.primary :
+                                               Global.colors.on_surface_variant
+        hoverColor: Global.colors.on_background
+
+        onClicked: root.adapter.discovering = !root.adapter.discovering
+      }
+
+      ClickableText {
+        visible: root.powered
+        text: root.adapter?.discoverable ? "Visible" : "Hidden"
+        baseColor: root.adapter?.discoverable ? Global.colors.primary :
+                                                Global.colors.on_surface_variant
+        hoverColor: Global.colors.on_background
+
+        onClicked: root.adapter.discoverable = !root.adapter.discoverable
+      }
+
+      ClickableText {
+        visible: root.adapter
+        text: root.powered ? "On" : "Off"
+        baseColor: root.powered ? Global.colors.primary : Global.colors.outline
+        hoverColor: Global.colors.error
+
+        onClicked: root.adapter.enabled = !root.powered
+      }
     }
 
-    readonly property var sortedDevices: {
-        return devices.slice().sort((a, b) => {
-            const aConnected = a.state === BluetoothDeviceState.Connected;
-            const bConnected = b.state === BluetoothDeviceState.Connected;
-            if (aConnected !== bConnected)
-                return aConnected ? -1 : 1;
+    Rectangle {
+      Layout.fillWidth: true
+      Layout.preferredHeight: 200
+      color: "transparent"
+      border.color: Global.colors.outline
+      border.width: 1
 
-            if (a.paired !== b.paired)
-                return a.paired ? -1 : 1;
-
-            return (a.name || a.address).localeCompare(b.name || b.address);
-        });
-    }
-
-    function adapterStateText(): string {
-        if (!currentAdapter)
-            return "";
-        switch (currentAdapter.state) {
-        case BluetoothAdapterState.Enabled:
-            return "On";
-        case BluetoothAdapterState.Disabled:
-            return "Off";
-        case BluetoothAdapterState.Enabling:
-            return "Enabling…";
-        case BluetoothAdapterState.Disabling:
-            return "Disabling…";
-        case BluetoothAdapterState.Blocked:
-            return "Blocked";
-        default:
-            return "";
-        }
-    }
-
-    function adapterStateColor(): color {
-        if (!currentAdapter)
-            return Global.colors.outline;
-        switch (currentAdapter.state) {
-        case BluetoothAdapterState.Enabled:
-            return Global.colors.primary;
-        case BluetoothAdapterState.Disabled:
-            return Global.colors.outline;
-        case BluetoothAdapterState.Enabling:
-        case BluetoothAdapterState.Disabling:
-            return Global.colors.secondary;
-        case BluetoothAdapterState.Blocked:
-            return Global.colors.error;
-        default:
-            return Global.colors.outline;
-        }
-    }
-
-    function deviceStateIcon(dev): string {
-        if (!dev)
-            return "";
-        if (dev.blocked)
-            return "󱘖";
-        switch (dev.state) {
-        case BluetoothDeviceState.Connected:
-            return "󰂱";
-        case BluetoothDeviceState.Connecting:
-            return "󰂴";
-        case BluetoothDeviceState.Disconnecting:
-            return "󰂴";
-        default:
-            return dev.paired ? "󰂲" : "󰂳";
-        }
-    }
-
-    function deviceActionText(dev): string {
-        if (!dev)
-            return "";
-        if (dev.state === BluetoothDeviceState.Connecting)
-            return "Connecting…";
-        if (dev.state === BluetoothDeviceState.Disconnecting)
-            return "Disconnecting…";
-        return dev.state === BluetoothDeviceState.Connected ? "Disconnect" : "Connect";
-    }
-
-    // Only the things the icon/buttons elsewhere in the row can't already tell you:
-    // connection state is the icon, trusted/blocked are their own toggle buttons.
-    function deviceMiddleInfo(dev): string {
-        if (!dev)
-            return "";
-        let parts = [];
-        if (dev.batteryAvailable)
-            parts.push("Battery " + Math.round(dev.battery * 100) + "%");
-        if (dev.bonded)
-            parts.push("Bonded");
-        return parts.join(" · ") || "—";
-    }
-
-    function emptyStateText(): string {
-        if (!currentAdapter)
-            return "No adapter";
-        switch (currentAdapter.state) {
-        case BluetoothAdapterState.Blocked:
-            return "Adapter blocked by rfkill";
-        case BluetoothAdapterState.Enabling:
-            return "Enabling adapter…";
-        case BluetoothAdapterState.Disabling:
-            return "Disabling adapter…";
-        }
-        if (!currentAdapter.enabled)
-            return "Bluetooth is off";
-        if (currentAdapter.discovering)
-            return "Scanning for devices…";
-        return "No devices found";
-    }
-
-    ColumnLayout {
+      ColumnLayout {
         anchors.fill: parent
-        spacing: Global.format.spacing_medium
+        anchors.margins: Global.format.spacing_small
+        spacing: Global.format.spacing_small
 
-        // Adapter header row
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: Global.format.spacing_medium
-
-            Row {
-                spacing: Global.format.spacing_small
-
-                Repeater {
-                    model: Bluetooth.adapters
-                    delegate: Text {
-                        required property var modelData
-                        required property int index
-                        text: modelData.name + " " + modelData.adapterId
-                        color: root.adapterIndex === index ? Global.colors.primary : Global.colors.on_surface_variant
-                        font.family: "JetBrainsMono Nerd Font"
-                        font.pixelSize: Global.format.text_size
-                        font.bold: root.adapterIndex === index
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.adapterIndex = index
-                        }
-                    }
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-            }
-
-            Text {
-                visible: root.currentAdapter?.enabled
-                text: root.currentAdapter?.discoverable ? "  Discoverable" : "  Undiscoverable"
-                color: root.currentAdapter?.discoverable ? Global.colors.primary : Global.colors.on_surface_variant
-                font.family: "JetBrainsMono Nerd Font"
-                font.pixelSize: Global.format.text_size
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (root.currentAdapter)
-                            root.currentAdapter.discoverable = !root.currentAdapter.discoverable;
-                    }
-                }
-            }
-
-            Text {
-                visible: root.currentAdapter?.enabled
-                text: root.currentAdapter?.pairable ? "  Pairable" : "  Unpairable"
-                color: root.currentAdapter?.pairable ? Global.colors.primary : Global.colors.on_surface_variant
-                font.family: "JetBrainsMono Nerd Font"
-                font.pixelSize: Global.format.text_size
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (root.currentAdapter)
-                            root.currentAdapter.pairable = !root.currentAdapter.pairable;
-                    }
-                }
-            }
-
-            Text {
-                visible: root.currentAdapter?.enabled
-                text: root.currentAdapter?.discovering ? "  Scanning…" : "  Scan"
-                color: root.currentAdapter?.discovering ? Global.colors.primary : Global.colors.on_surface_variant
-                font.family: "JetBrainsMono Nerd Font"
-                font.pixelSize: Global.format.text_size
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (root.currentAdapter)
-                            root.currentAdapter.discovering = !root.currentAdapter.discovering;
-                    }
-                }
-            }
-
-            Text {
-                text: root.adapterStateText()
-                color: root.adapterStateColor()
-                font.family: "JetBrainsMono Nerd Font"
-                font.pixelSize: Global.format.text_size
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (root.currentAdapter)
-                            root.currentAdapter.enabled = !root.currentAdapter.enabled;
-                    }
-                }
-            }
+        StyledText {
+          text: "Devices"
+          font.bold: true
+          color: Global.colors.primary
         }
 
-        // Device card
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            color: "transparent"
-            border.color: Global.colors.outline
-            border.width: 1
+        ListView {
+          id: deviceList
+          Layout.fillWidth: true
+          Layout.fillHeight: true
+          clip: true
+          spacing: Global.format.spacing_tiny
 
-            ColumnLayout {
+          model: root.adapter?.devices
+
+          StyledText {
+            anchors.centerIn: parent
+            text: root.adapter?.discovering ? "Scanning..." : "No devices"
+            color: Global.colors.outline
+            visible: deviceList.count <= 0
+          }
+
+          delegate: Item {
+            id: deviceItem
+            required property BluetoothDevice modelData
+            width: deviceList.width
+            height: Global.format.module_height + Global.format.spacing_small
+
+            MouseArea {
+              id: deviceRowMouse
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              propagateComposedEvents: true
+
+              onClicked: {
+                if (deviceItem.modelData.pairing)
+                  deviceItem.modelData.cancelPair();
+                else if (!deviceItem.modelData.paired)
+                  deviceItem.modelData.pair();
+                else
+                  deviceItem.modelData.connected =
+                      !deviceItem.modelData.connected;
+              }
+
+              RowLayout {
                 anchors.fill: parent
-                anchors.margins: Global.format.spacing_small
                 spacing: Global.format.spacing_small
 
-                Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    StyledText {
-                        anchors.centerIn: parent
-                        visible: deviceList.count === 0
-                        text: root.emptyStateText()
-                        color: Global.colors.outline
-                    }
-
-                    ListView {
-                        id: deviceList
-                        anchors.fill: parent
-                        clip: true
-                        spacing: Global.format.spacing_tiny
-                        model: root.sortedDevices
-
-                        delegate: Item {
-                            id: row
-                            required property BluetoothDevice modelData
-                            width: deviceList.width
-                            height: Global.format.module_height + Global.format.spacing_small
-
-                            property bool isTransitioning: modelData.state === BluetoothDeviceState.Connecting || modelData.state === BluetoothDeviceState.Disconnecting
-
-                            RowLayout {
-                                anchors.fill: parent
-                                spacing: Global.format.spacing_small
-
-                                // Name (left)
-                                RowLayout {
-                                    Layout.preferredWidth: parent.width * 0.35
-                                    spacing: Global.format.spacing_small
-
-                                    Text {
-                                        text: root.deviceStateIcon(row.modelData)
-                                        color: row.modelData.state === BluetoothDeviceState.Connected ? Global.colors.primary : row.modelData.blocked ? Global.colors.error : Global.colors.outline
-                                        font.family: "JetBrainsMono Nerd Font"
-                                        font.pixelSize: Global.format.text_size
-                                    }
-
-                                    StyledText {
-                                        Layout.fillWidth: true
-                                        text: row.modelData.name || row.modelData.address
-                                        color: row.modelData.state === BluetoothDeviceState.Connected ? Global.colors.primary : Global.colors.on_surface_variant
-                                        font.bold: row.modelData.state === BluetoothDeviceState.Connected
-                                        elide: Text.ElideRight
-                                    }
-                                }
-
-                                // Light info (middle) — whatever the icon/buttons can't tell you
-                                StyledText {
-                                    Layout.fillWidth: true
-                                    text: root.deviceMiddleInfo(row.modelData)
-                                    color: Global.colors.outline
-                                    font.pixelSize: Global.format.font_size_small
-                                    horizontalAlignment: Text.AlignHCenter
-                                    elide: Text.ElideRight
-                                }
-
-                                // Controls (right)
-                                RowLayout {
-                                    spacing: Global.format.spacing_medium
-
-                                    Text {
-                                        text: root.deviceActionText(row.modelData)
-                                        color: row.isTransitioning ? Global.colors.outline : (connectMouse.containsMouse ? (row.modelData.state === BluetoothDeviceState.Connected ? Global.colors.error : Global.colors.primary) : (row.modelData.state === BluetoothDeviceState.Connected ? Global.colors.error : Global.colors.on_surface_variant))
-                                        font.family: "JetBrainsMono Nerd Font"
-                                        font.pixelSize: Global.format.text_size
-                                        MouseArea {
-                                            id: connectMouse
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            enabled: !row.isTransitioning
-                                            onClicked: {
-                                                if (row.modelData.state === BluetoothDeviceState.Connected)
-                                                    row.modelData.disconnect();
-                                                else
-                                                    row.modelData.connect();
-                                            }
-                                        }
-                                    }
-
-                                    Text {
-                                        visible: !row.modelData.trusted
-                                        text: "Trust"
-                                        color: trustMouse.containsMouse ? Global.colors.primary : Global.colors.on_surface_variant
-                                        font.family: "JetBrainsMono Nerd Font"
-                                        font.pixelSize: Global.format.text_size
-                                        MouseArea {
-                                            id: trustMouse
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: row.modelData.trusted = true
-                                        }
-                                    }
-
-                                    Text {
-                                        visible: row.modelData.trusted
-                                        text: "Untrust"
-                                        color: trustMouse2.containsMouse ? Global.colors.primary : Global.colors.on_surface_variant
-                                        font.family: "JetBrainsMono Nerd Font"
-                                        font.pixelSize: Global.format.text_size
-                                        MouseArea {
-                                            id: trustMouse2
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: row.modelData.trusted = false
-                                        }
-                                    }
-
-                                    Text {
-                                        // forget() is the only way to unpair a device (Quickshell docs:
-                                        // pair() pairs, but you must forget() to undo it).
-                                        visible: row.modelData.paired
-                                        text: "Forget"
-                                        color: forgetMouse.containsMouse ? Global.colors.error : Global.colors.on_surface_variant
-                                        font.family: "JetBrainsMono Nerd Font"
-                                        font.pixelSize: Global.format.text_size
-                                        MouseArea {
-                                            id: forgetMouse
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: row.modelData.forget()
-                                        }
-                                    }
-
-                                    Text {
-                                        visible: !row.modelData.blocked
-                                        text: "Block"
-                                        color: blockMouse.containsMouse ? Global.colors.error : Global.colors.on_surface_variant
-                                        font.family: "JetBrainsMono Nerd Font"
-                                        font.pixelSize: Global.format.text_size
-                                        MouseArea {
-                                            id: blockMouse
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: row.modelData.blocked = true
-                                        }
-                                    }
-
-                                    Text {
-                                        visible: row.modelData.blocked
-                                        text: "Unblock"
-                                        color: blockMouse2.containsMouse ? Global.colors.error : Global.colors.on_surface_variant
-                                        font.family: "JetBrainsMono Nerd Font"
-                                        font.pixelSize: Global.format.text_size
-                                        MouseArea {
-                                            id: blockMouse2
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: row.modelData.blocked = false
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                ClickableText {
+                  Layout.fillWidth: true
+                  text: "󰂱 " + (deviceItem.modelData.name
+                                || deviceItem.modelData.address)
+                  baseColor: deviceItem.modelData.connected
+                             ? Global.colors.primary :
+                               Global.colors.on_surface_variant
+                  elide: Text.ElideRight
+                  mouseEnabled: false
+                  hoverOverride: deviceRowMouse.containsMouse
                 }
+
+                StyledText {
+                  visible: deviceItem.modelData.batteryAvailable
+                  text: "󰁹 " + Math.round(deviceItem.modelData.battery * 100)
+                        + "%"
+                  color: Global.colors.on_surface_variant
+                }
+
+                StyledText {
+                  text: root.stateText(deviceItem.modelData)
+                  color: root.stateColor(deviceItem.modelData)
+                }
+
+                ClickableText {
+                  visible: deviceItem.modelData.paired
+                  text: deviceItem.modelData.trusted ? "Trusted" : "Trust"
+                  baseColor: deviceItem.modelData.trusted
+                             ? Global.colors.primary : Global.colors.outline
+                  hoverColor: Global.colors.on_background
+
+                  onClicked: deviceItem.modelData.trusted =
+                             !deviceItem.modelData.trusted
+                }
+
+                ClickableText {
+                  visible: deviceItem.modelData.paired
+                  text: "󰅖"
+                  baseColor: Global.colors.on_surface_variant
+                  hoverColor: Global.colors.error
+
+                  onClicked: deviceItem.modelData.forget()
+                }
+              }
             }
+          }
         }
+      }
     }
+  }
+
+  implicitHeight: contentCol.implicitHeight
 }

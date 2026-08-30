@@ -16,7 +16,7 @@ Item {
 
   function triggerItem(index: int) {
     if (index >= 0 && index < trayItems.length) {
-      trayItems[index].triggerMenu()
+      trayItems[index].triggerMenu();
     }
   }
 
@@ -33,10 +33,11 @@ Item {
         item: modelData
         Component.onCompleted: systray.trayItems.push(this)
         Component.onDestruction: {
-          const idx = systray.trayItems.indexOf(this)
-          if (idx >= 0) systray.trayItems.splice(idx, 1)
+          const idx = systray.trayItems.indexOf(this);
+          if (idx >= 0)
+            systray.trayItems.splice(idx, 1);
         }
-        onShowMenu: (items) => systray.showMenu(items)
+        onShowMenu: items => systray.showMenu(items)
       }
     }
   }

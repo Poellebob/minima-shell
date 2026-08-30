@@ -23,7 +23,7 @@ Singleton {
   readonly property var config: configAdapter.config
 
   signal openSystrayMenu(index: int)
-  signal openLauncher()
-  signal openClipboard()
-  signal openNotifications()
+  signal openLauncher
+  signal openClipboard
+  signal openNotifications
 }

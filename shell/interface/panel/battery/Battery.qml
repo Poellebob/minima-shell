@@ -40,46 +40,51 @@ BarWidget {
   property bool p5: false
 
   function displayInfo() {
-    if (!UPower.displayDevice.ready) return
+    if (!UPower.displayDevice.ready)
+      return;
+    percentageText.text = Math.round(UPower.displayDevice.percentage * 100)
+        + "%";
 
-    percentageText.text = Math.round(UPower.displayDevice.percentage * 100) + "%"
-
-    if (UPower.displayDevice.percentage * 100 < 10 && !p10 && !(UPower.displayDevice.percentage == 0)) {
-      p10 = true
-      Quickshell.execDetached(["sh", "-c", "notify-send -u critical battery low"])
+    if (UPower.displayDevice.percentage * 100 < 10 && !p10 && !(
+          UPower.displayDevice.percentage == 0)) {
+      p10 = true;
+      Quickshell.execDetached(["sh", "-c",
+                               "notify-send -u critical battery low"]);
     }
-    if (UPower.displayDevice.percentage * 100 < 5 && !p5 && !(UPower.displayDevice.percentage == 0)) {
-      p5 = true
-      Quickshell.execDetached(["sh", "-c", "notify-send -u critical battery low"])
+    if (UPower.displayDevice.percentage * 100 < 5 && !p5 && !(
+          UPower.displayDevice.percentage == 0)) {
+      p5 = true;
+      Quickshell.execDetached(["sh", "-c",
+                               "notify-send -u critical battery low"]);
     }
     if (UPower.displayDevice.percentage * 100 > 10) {
-      p5 = false
-      p10 = false
+      p5 = false;
+      p10 = false;
     }
 
-    batteryIcon.text = getBatteryIcon(UPower.displayDevice.iconName)
+    batteryIcon.text = getBatteryIcon(UPower.displayDevice.iconName);
   }
 
   function getBatteryIcon(name) {
     switch (name) {
     case "battery-empty-symbolic":
-      return "󰂎"
+      return "󰂎";
     case "battery-caution-symbolic":
-      return "󰂃"
+      return "󰂃";
     case "battery-low-symbolic":
-      return "󱊡"
+      return "󱊡";
     case "battery-good-symbolic":
-      return "󱊢"
+      return "󱊢";
     case "battery-full-symbolic":
-      return "󱊣"
+      return "󱊣";
     case "battery-full-charging-symbolic":
-      return "󰂄"
+      return "󰂄";
     case "battery-charging-symbolic":
-      return "󰂄"
+      return "󰂄";
     case "battery-low-charging-symbolic":
-      return "󰂄"
+      return "󰂄";
     default:
-      return "󰁹"
+      return "󰁹";
     }
   }
 }

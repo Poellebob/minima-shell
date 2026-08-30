@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import qs.components.text
 import qs
 
 Item {
@@ -12,48 +13,52 @@ Item {
   property var clipboardEntries: []
 
   readonly property var filteredEntries: {
-    if (searchText.trim() === "") return clipboardEntries
-    const search = searchText.toLowerCase()
+    if (searchText.trim() === "")
+      return clipboardEntries;
+    const search = searchText.toLowerCase();
     return clipboardEntries.filter(entry => {
-      const content = entry.replace(/^\d+\t/, "").toLowerCase()
-      return content.includes(search)
-    })
+                                     const content = entry.replace(/^\d+\t/,
+                                                                   "").toLowerCase(
+                                       );
+                                     return content.includes(search);
+                                   });
   }
 
   signal closed
 
   function open() {
-    searchText = ""
-    currentIndex = 0
-    searchInput.text = ""
-    refresh()
-    searchInput.forceActiveFocus()
+    searchText = "";
+    currentIndex = 0;
+    searchInput.text = "";
+    refresh();
+    searchInput.forceActiveFocus();
   }
 
   function close() {
-    searchInput.text = ""
-    closed()
+    searchInput.text = "";
+    closed();
   }
 
   function refresh() {
-    readProc.running = true
+    readProc.running = true;
   }
 
   function selectEntry(entry) {
-    Quickshell.execDetached(["bash", "-c", "echo \"" + entry + "\" | cliphist decode | wl-copy"])
+    Quickshell.execDetached(["bash", "-c", "echo \"" + entry
+                             + "\" | cliphist decode | wl-copy"]);
   }
 
   function deleteEntry(entry) {
-    deleteProc.entry = entry
-    deleteProc.running = true
+    deleteProc.entry = entry;
+    deleteProc.running = true;
   }
 
   function wipeAll() {
-    wipeProc.running = true
+    wipeProc.running = true;
   }
 
   function isImageEntry(entry) {
-    return /^\d+\t\[\[.*binary data.*\d+x\d+.*\]\]$/.test(entry)
+    return /^\d+\t\[\[.*binary data.*\d+x\d+.*\]\]$/.test(entry);
   }
 
   Process {
@@ -61,14 +66,14 @@ Item {
     property var buffer: []
     command: ["cliphist", "list"]
     stdout: SplitParser {
-      onRead: (line) => readProc.buffer.push(line)
+      onRead: line => readProc.buffer.push(line)
     }
     onExited: (exitCode, _) => {
-      if (exitCode === 0) {
-        clipboardRoot.clipboardEntries = readProc.buffer
-        readProc.buffer = []
-      }
-    }
+                if (exitCode === 0) {
+                  clipboardRoot.clipboardEntries = readProc.buffer;
+                  readProc.buffer = [];
+                }
+              }
   }
 
   Process {
@@ -106,36 +111,41 @@ Item {
         verticalAlignment: Text.AlignVCenter
 
         onTextChanged: {
-          clipboardRoot.searchText = text
-          clipboardRoot.currentIndex = 0
+          clipboardRoot.searchText = text;
+          clipboardRoot.currentIndex = 0;
         }
 
         Keys.onLeftPressed: {
           if (clipboardRoot.currentIndex > 0)
-            clipboardRoot.currentIndex--
+            clipboardRoot.currentIndex--;
         }
         Keys.onRightPressed: {
-          if (clipboardRoot.currentIndex < clipboardRoot.filteredEntries.length - 1)
-            clipboardRoot.currentIndex++
+          if (clipboardRoot.currentIndex < clipboardRoot.filteredEntries.length
+              - 1)
+            clipboardRoot.currentIndex++;
         }
         Keys.onReturnPressed: {
           if (clipboardRoot.filteredEntries.length > 0) {
-            clipboardRoot.selectEntry(clipboardRoot.filteredEntries[clipboardRoot.currentIndex])
-            clipboardRoot.close()
+            clipboardRoot.selectEntry(
+                  clipboardRoot.filteredEntries[clipboardRoot.currentIndex]);
+            clipboardRoot.close();
           }
         }
         Keys.onEscapePressed: clipboardRoot.close()
         Keys.onDeletePressed: {
           if (clipboardRoot.filteredEntries.length > 0)
-            clipboardRoot.deleteEntry(clipboardRoot.filteredEntries[clipboardRoot.currentIndex])
+            clipboardRoot.deleteEntry(
+                  clipboardRoot.filteredEntries[clipboardRoot.currentIndex]);
         }
-        Keys.onPressed: (event) => {
-          if (event.modifiers & Qt.ControlModifier && event.key === Qt.Key_D) {
-            if (clipboardRoot.filteredEntries.length > 0)
-              clipboardRoot.deleteEntry(clipboardRoot.filteredEntries[clipboardRoot.currentIndex])
-            event.accepted = true
-          }
-        }
+        Keys.onPressed: event => {
+                          if (event.modifiers & Qt.ControlModifier && event.key
+                              === Qt.Key_D) {
+                            if (clipboardRoot.filteredEntries.length > 0)
+                            clipboardRoot.deleteEntry(
+                              clipboardRoot.filteredEntries[clipboardRoot.currentIndex]);
+                            event.accepted = true;
+                          }
+                        }
       }
     }
 
@@ -149,7 +159,8 @@ Item {
 
     Text {
       visible: clipboardRoot.filteredEntries.length === 0
-      text: clipboardRoot.searchText ? "No matching entries" : "Clipboard is empty"
+      text: clipboardRoot.searchText ? "No matching entries" :
+                                       "Clipboard is empty"
       color: Global.colors.outline
       font.family: "JetBrainsMono Nerd Font"
       font.pixelSize: Global.format.text_size
@@ -178,54 +189,45 @@ Item {
         height: clipList.height
 
         property string displayText: modelData.replace(/^\d+\t/, "")
-        property string truncated: displayText.length > 40 ? displayText.substring(0, 40) + "…" : displayText
+        property string truncated: displayText.length > 40
+                                   ? displayText.substring(0, 40) + "…" :
+                                     displayText
 
-        Text {
+        ClickableText {
           anchors.verticalCenter: parent.verticalCenter
-          text: index === clipboardRoot.currentIndex
-            ? "[" + parent.truncated + "]"
-            : " " + parent.truncated + " "
-          color: index === clipboardRoot.currentIndex ? Global.colors.primary : Global.colors.on_surface_variant
-          font.family: "JetBrainsMono Nerd Font"
-          font.pixelSize: Global.format.text_size
+          text: index === clipboardRoot.currentIndex ? "[" + parent.truncated
+                                                       + "]" : " "
+                                                       + parent.truncated + " "
+          baseColor: index === clipboardRoot.currentIndex
+                     ? Global.colors.primary : Global.colors.on_surface_variant
           verticalAlignment: Text.AlignVCenter
 
-          MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            acceptedButtons: Qt.LeftButton
-            onClicked: clipboardRoot.currentIndex = index
-            onDoubleClicked: {
-              clipboardRoot.selectEntry(modelData)
-              clipboardRoot.close()
-            }
-            onWheel: (wheel) => {
-              if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
-                if (clipboardRoot.currentIndex < clipboardRoot.filteredEntries.length - 1)
-                  clipboardRoot.currentIndex++
-              } else {
-                if (clipboardRoot.currentIndex > 0)
-                  clipboardRoot.currentIndex--
-              }
-            }
+          onClicked: clipboardRoot.currentIndex = index
+          onDoubleClicked: {
+            clipboardRoot.selectEntry(modelData);
+            clipboardRoot.close();
           }
+          onWheel: wheel => {
+                     if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
+                       if (clipboardRoot.currentIndex
+                           < clipboardRoot.filteredEntries.length - 1)
+                       clipboardRoot.currentIndex++;
+                     } else {
+                       if (clipboardRoot.currentIndex > 0)
+                       clipboardRoot.currentIndex--;
+                     }
+                   }
         }
 
-        Text {
+        ClickableText {
           anchors.verticalCenter: parent.verticalCenter
           text: "󰩺"
-          color: delMouse.containsMouse ? Global.colors.error : Global.colors.outline
-          font.family: "JetBrainsMono Nerd Font"
+          baseColor: Global.colors.outline
+          hoverColor: Global.colors.error
           font.pixelSize: Global.format.font_size_small
           verticalAlignment: Text.AlignVCenter
 
-          MouseArea {
-            id: delMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: clipboardRoot.deleteEntry(modelData)
-          }
+          onClicked: clipboardRoot.deleteEntry(modelData)
         }
       }
     }
@@ -238,23 +240,15 @@ Item {
       Layout.alignment: Qt.AlignVCenter
     }
 
-    Text {
-      id: wipeBtn
+    ClickableText {
       Layout.fillHeight: true
       Layout.preferredWidth: implicitWidth + Global.format.spacing_medium * 2
       text: "  󰩺 Clear  "
-      color: wipeMouse.containsMouse ? Global.colors.error : Global.colors.on_surface_variant
-      font.family: "JetBrainsMono Nerd Font"
-      font.pixelSize: Global.format.text_size
+      baseColor: Global.colors.on_surface_variant
+      hoverColor: Global.colors.error
       verticalAlignment: Text.AlignVCenter
 
-      MouseArea {
-        id: wipeMouse
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: clipboardRoot.wipeAll()
-      }
+      onClicked: clipboardRoot.wipeAll()
     }
   }
 }
