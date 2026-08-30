@@ -2,8 +2,6 @@
 
 This document details all configuration options available in minima.
 
-For non-Nix manual setup, see [NONNIX.md](./NONNIX.md).
-
 ---
 
 ## Table of Contents
