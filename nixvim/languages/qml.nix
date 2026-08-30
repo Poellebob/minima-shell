@@ -13,9 +13,10 @@
       conform-nvim.settings.formatters_by_ft.qml = [ "qmlformat" ];
       conform-nvim.settings.formatters.qmlformat.command = [
         "${pkgs.kdePackages.qtdeclarative}/bin/qmlformat"
-        "-w"
+        "-i"
+        "--indent-width"
         "2"
-        "-W"
+        "--column-width"
         "80"
       ];
     };
@@ -26,7 +27,7 @@
       {
         event = "FileType";
         pattern = "qml";
-        command = "set indentexpr=2";
+        command = "set indentexpr=";
         desc = "Disable broken treesitter indent for QML";
       }
     ];
