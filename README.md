@@ -1,6 +1,6 @@
 # minima-shell
 
-A NixOS/home-manager flake providing a Wayland-focused desktop environment with [Sway](https://swaywm.org/), [SwayFX](https://github.com/Ericmorgenta/swayfx), [Scroll](https://github.com/dawsers/scroll/), and [Hyprland](https://hyprland.org/) support.
+A NixOS/home-manager flake providing a Wayland-focused desktop environment with [Hyprland](https://hyprland.org/), [Sway](https://swaywm.org/), [SwayFX](https://github.com/Ericmorgenta/swayfx), and [Scroll](https://github.com/dawsers/scroll/) support.
 
 > [!WARNING]
 > This project is not done and is still **pre-alpha**; it will contain bugs.
@@ -27,21 +27,12 @@ Minima is not a standalone program — it is a Home Manager module. **Home Manag
 and passes system-level options down to Home Manager, which actually manages
 all of your config files, the QuickShell panel, styling, and shell setup.
 
-You also need a window manager installed — either **Sway**, **SwayFX**,
-**Scroll**, or **Hyprland** — and `minima.wm` must match the one installed:
-if you use Sway set `wm = "sway"`, SwayFX → `"swayfx"`, Scroll → `"scroll"`,
-Hyprland → `"hyprland"`.
-If they don't match, minima writes config for the wrong window manager and nothing will render.
-
-> [!NOTE]
-> Hyprland is configured through its Lua config (`hyprland.lua`). The layout
-> engine is selectable with `minima.hyprland.layout`: `dwindle`, `master`,
-> `scrolling`, `monocle`, or `hy3` (i3/Sway-style tiling via the
-> [hy3](https://github.com/outfoxxed/hy3) plugin, loaded automatically).
-> While Hyprland support is in active development, it is **always enabled**:
-> its config is generated per-user through home-manager's Hyprland module
-> (`wayland.windowManager.hyprland`) and it is installed regardless of
-> `minima.wm`, so it can be tested alongside Sway/SwayFX/Scroll.
+You also need a window manager — **Hyprland** (the default), **Sway**,
+**SwayFX**, or **Scroll**. Select it with `minima.hyprland.enable`
+(default `true`), `minima.sway.enable` (`minima.sway.fx = true` for
+SwayFX), or `minima.scroll.enable`. Enabling sway or scroll automatically
+disables Hyprland unless you set `minima.hyprland.enable` explicitly; at
+most one window manager may be enabled at a time.
 
 ---
 
@@ -70,7 +61,7 @@ If they don't match, minima writes config for the wrong window manager and nothi
           home.stateVersion = "25.11";
           minima = {
             enable = true;
-            wm = "sway";  # sway, swayfx, scroll, or hyprland
+            hyprland.enable = true;  # default; or sway.enable / scroll.enable
             shell.enable = true;
             theming.enable = true;
             minimaConfig = {
@@ -87,7 +78,7 @@ If they don't match, minima writes config for the wrong window manager and nothi
 }
 ```
 
-> This expects a window manager (`sway`, `swayfx`, `scroll`, or `hyprland`) to already be installed on your system, and `minima.wm` must match the one you installed. The NixOS module installs the window manager for you based on `minima.wm`.
+> This expects the selected window manager to already be installed on your system (Hyprland works out of the box as the default). The NixOS module installs the window manager for you based on which one is enabled.
 
 ### NixOS
 
@@ -114,7 +105,7 @@ If they don't match, minima writes config for the wrong window manager and nothi
           # down to home-manager via sharedModules.
           minima = {
             enable = true;
-            wm = "sway";  # sway, swayfx, scroll, or hyprland
+            sway.enable = true;  # or hyprland.enable (default) / scroll.enable
             enableNvidia = false;
           };
 
@@ -161,8 +152,7 @@ All configuration options are documented in [OPTIONS.md](./OPTIONS.md).
 
 ## Features
 
-- **Sway / SwayFX / Scroll / Hyprland** — pick your window manager with `minima.wm`
-- **Hyprland layouts** — `dwindle`, `master`, `scrolling`, `monocle`, or i3-style `hy3` via `minima.hyprland.layout`
+- **Hyprland / Sway / SwayFX / Scroll** — pick your window manager with `minima.hyprland.enable`, `minima.sway.enable` (+ `minima.sway.fx`), or `minima.scroll.enable`
 - **QuickShell panel & launcher** — animated bar, app launcher with qalc, clipboard manager, wallpaper engine support
 - **Material you theming** — matugen-rendered colors using a seed color, applied to the panel, launcher, and Sway
 - **KDE-style styling** — Breeze cursor/GTK/Qt theming, Papirus icons, `kdeglobals`
@@ -189,7 +179,7 @@ All configuration options are documented in [OPTIONS.md](./OPTIONS.md).
 | `$mod + Space` | Toggle floating | Toggle floating |
 | `$mod + f` | Toggle fullscreen | Toggle fullscreen |
 | `$mod + Shift + s` | Toggle sticky | Toggle sticky |
-| `$mod + Alt + Delete` | Lock screen (hyprlock) | Lock screen (hyprlock) |
+| `$mod + Alt + Delete` | Lock screen (swaylock) | Lock screen (swaylock) |
 | `$mod + v` | Open clipboard manager | Open clipboard manager |
 | `$mod + d` | Open app launcher | Open app launcher |
 | `$mod + Shift + c` | Reload config | Reload config |

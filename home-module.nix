@@ -24,7 +24,7 @@ in
         matugen
         wiremix
         bluetui
-        hyprlock
+        swaylock
         bluez
         bluez-tools
         upower
@@ -96,32 +96,25 @@ in
 
     xdg.portal = mkIf cfg.desktop.xdgPortal {
       enable = true;
-      extraPortals = [
-        pkgs.xdg-desktop-portal-gtk
-        pkgs.kdePackages.xdg-desktop-portal-kde
-      ]
-      ++ lib.optionals (cfg.wm == "sway" || cfg.wm == "swayfx" || cfg.wm == "scroll") [
-        pkgs.xdg-desktop-portal-wlr
-      ]
-      ++ lib.optionals (cfg.wm == "hyprland") [
-        pkgs.xdg-desktop-portal-hyprland
-      ];
-      config = {
-        common.default = [
-          "kde"
-          "gtk"
+      extraPortals =
+        [
+          pkgs.xdg-desktop-portal-gtk
+          pkgs.kdePackages.xdg-desktop-portal-kde
+        ]
+        ++ optionals (cfg.sway.enable || cfg.scroll.enable) [
+          pkgs.xdg-desktop-portal-wlr
         ];
-      }
-      // lib.optionalAttrs (cfg.wm == "sway" || cfg.wm == "swayfx" || cfg.wm == "scroll") {
-        sway = {
-          ScreenCast = [ "wlr" ];
+      config = { common.default = [ "kde" "gtk" ]; }
+        // lib.optionalAttrs (cfg.sway.enable || cfg.scroll.enable) {
+          sway = {
+            ScreenCast = [ "wlr" ];
+          };
+        }
+        // lib.optionalAttrs cfg.hyprland.enable {
+          hyprland = {
+            ScreenCast = [ "hyprland" ];
+          };
         };
-      }
-      // lib.optionalAttrs (cfg.wm == "hyprland") {
-        Hyprland = {
-          ScreenCast = [ "hyprland" ];
-        };
-      };
     };
 
     qt = mkIf cfg.theming.enable {
@@ -213,7 +206,7 @@ in
 
         zv() { local prev="$PWD"; z "$1" || return; nvim .; cd "$prev"; }
         ziv() { local prev="$PWD"; zi || return; nvim .; cd "$prev"; }
-        alias lock='hyprlock'
+        alias lock='swaylock'
         alias hibernate='systemctl hibernate'
         alias suspend='systemctl suspend'
         alias reboot='systemctl reboot'
@@ -321,22 +314,20 @@ in
       text = cfg.kdeglobals;
     };
 
-    home.file.".config/sway/config" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
+    home.file.".config/sway/config" = mkIf cfg.sway.enable {
       text = "include ${cfg.swayConfigFile}";
     };
 
-    home.file.".config/scroll/config" = mkIf (cfg.wm == "scroll") {
+    home.file.".config/scroll/config" = mkIf cfg.scroll.enable {
       text = "include ${cfg.scrollConfigFile}";
     };
 
-    wayland.windowManager.hyprland = {
+    wayland.windowManager.hyprland = mkIf cfg.hyprland.enable {
       enable = true;
       package = mkIf cfg.osModule null;
       configType = "lua";
-      plugins = lib.optionals (cfg.hyprland.layout == "hy3") [
-        pkgs.hyprlandPlugins.hy3
-      ];
-      extraConfig = ''dofile("${cfg.hyprlandConfigFile}")'';
+      extraConfig = cfg.hyprlandLua;
+      plugins = cfg.hyprland.plugins;
     };
 
     home.file.".config/qalculate/qalc.cfg".source = ./config/qalculate/qalc.cfg;
