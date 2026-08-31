@@ -16,13 +16,9 @@ let
 
   setXftDpi = pkgs.writeShellScript "set-xft-dpi.sh" (builtins.readFile ./set-xft-dpi.sh);
 
-  autostart = ''
-
-  '';
-
   minimaConfigJson = pkgs.writeText "minima-config.json" (builtins.toJSON {
     system = {
-      wm = cfg.wm;
+      wm = if wm == null then "sway" else wm;
       matugenConfigPath = "${matugenConfigFile}";
       matugenBin = "${cfg.matugen.package}/bin/matugen";
     };
@@ -68,15 +64,33 @@ let
     scheme = "${cfg.matugen.scheme}"
   '';
 
+  wm =
+    if cfg.hyprland.enable then "hyprland"
+    else if cfg.sway.enable then (if cfg.sway.fx then "swayfx" else "sway")
+    else if cfg.scroll.enable then "scroll"
+    else null;
+
+  enabledWmCount = count (x: x) [
+    cfg.hyprland.enable
+    cfg.sway.enable
+    cfg.scroll.enable
+  ];
+
   mkWmConfig = import ./config/sway/config.nix { inherit cfg pkgs lib quickshellStoreDir setXftDpi; };
   mkHyprlandConfig = import ./config/hyprland/config.nix { inherit cfg pkgs lib quickshellStoreDir setXftDpi; };
-
 in {
   config = mkIf cfg.enable {
-    minima.swayConfigFile = mkWmConfig "sway";
-    minima.scrollConfigFile = mkWmConfig "scroll";
-    minima.hyprlandConfigFile = mkHyprlandConfig;
+    assertions = [{
+      assertion = enabledWmCount <= 1;
+      message = "minima: at most one window manager may be enabled (minima.hyprland.enable, minima.sway.enable, minima.scroll.enable)";
+    }];
 
+    minima.hyprland.enable = mkIf (cfg.sway.enable || cfg.scroll.enable) (mkDefault false);
+    minima.sway.enable = mkIf cfg.sway.fx (mkDefault true);
+
+    minima.swayConfigFile = mkIf cfg.sway.enable (mkWmConfig (if cfg.sway.fx then "swayfx" else "sway") cfg.sway.extraConfig);
+    minima.scrollConfigFile = mkIf cfg.scroll.enable (mkWmConfig "scroll" cfg.scroll.extraConfig);
+    minima.hyprlandLua = mkIf cfg.hyprland.enable mkHyprlandConfig;
     minima.quickshellStoreDir = quickshellStoreDir;
     minima.minimaConfigFile = "${minimaConfigJson}";
     minima.matugenConfigFile = matugenConfigFile;

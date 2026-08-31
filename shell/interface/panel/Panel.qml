@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.I3
-import Quickshell.Hyprland
 import qs
 import qs.components.widget
 import qs.components.text
@@ -36,15 +34,9 @@ PanelWindow {
 
   property Item activeBarContent: statusContent
 
-  property bool wmHyprland: Global.config.system.wm === "hyprland"
-
   function isFocusedScreen(): bool {
-    if (wmHyprland) {
-      const focused = Hyprland.focusedMonitor;
-      return !focused || screen.name == focused.name;
-    }
-    const focused = I3.focusedMonitor;
-    return !focused || screen.name == focused.name;
+    const focused = Wm.focusedMonitorName;
+    return !focused || screen.name == focused;
   }
 
   function openBarMenu(barContent: Item) {

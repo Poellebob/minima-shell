@@ -11,7 +11,7 @@ in ''
   bindsym $mod+space floating toggle
   bindsym $mod+f fullscreen toggle
   bindsym $mod+Shift+s sticky toggle
-  bindsym $mod+Mod1+Delete exec hyprlock
+  bindsym $mod+Mod1+Delete exec swaylock
   bindsym $mod+Shift+c exec ${msgCmd} reload
   bindsym $mod+v exec qs -c $qs_path ipc call clipboard open
   bindsym $mod+d exec qs -c $qs_path ipc call launcher open

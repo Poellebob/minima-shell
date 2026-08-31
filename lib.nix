@@ -30,6 +30,11 @@ let
         type = types.nullOr (types.either types.int types.str);
         default = null;
       };
+      primary = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Mark this display as the primary monitor (mouse spawns here)";
+      };
     };
   };
 
@@ -55,6 +60,75 @@ in
   options.minima = {
     enable = mkEnableOption "Minima shell";
 
+    hyprland = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable Hyprland as the window manager. Automatically disabled when sway or scroll is enabled, unless set explicitly.";
+      };
+      modifier = mkOption {
+        type = types.str;
+        default = "SUPER";
+        description = "Hyprland modifier key";
+      };
+      layout = mkOption {
+        type = types.enum [ "dwindle" "master" "scrolling" ];
+        default = "dwindle";
+        description = "Hyprland layout";
+      };
+      extraLua = mkOption {
+        type = types.lines;
+        default = "";
+        description = "Extra Lua appended to the generated Hyprland config";
+      };
+      plugins = mkOption {
+        type = types.listOf (types.either types.package (types.strMatching "/.*"));
+        default = [ ];
+        description = "Hyprland plugins (packages or absolute paths)";
+      };
+    };
+
+    sway = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable Sway as the window manager";
+      };
+      modifier = mkOption {
+        type = types.str;
+        default = "Mod4";
+        description = "Sway modifier key";
+      };
+      fx = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Use swayfx (blur, shadows)";
+      };
+      extraConfig = mkOption {
+        type = types.lines;
+        default = "";
+        description = "Extra sway config appended to the generated config";
+      };
+    };
+
+    scroll = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable Scroll as the window manager";
+      };
+      modifier = mkOption {
+        type = types.str;
+        default = "Mod4";
+        description = "Scroll modifier key";
+      };
+      extraConfig = mkOption {
+        type = types.lines;
+        default = "";
+        description = "Extra scroll config appended to the generated config";
+      };
+    };
+
     osModule = mkOption {
       type = types.bool;
       default = false;
@@ -79,49 +153,21 @@ in
       internal = true;
     };
 
-    hyprlandConfigFile = mkOption {
-      type = types.nullOr types.package;
-      default = null;
-      internal = true;
-    };
-
     quickshellStoreDir = mkOption {
       type = types.nullOr types.package;
       default = null;
       internal = true;
     };
 
-    wm = mkOption {
-      type = types.enum [
-        "sway"
-        "swayfx"
-        "scroll"
-        "hyprland"
-      ];
-      default = "sway";
+    hyprlandLua = mkOption {
+      type = types.nullOr types.str;
+      default = null;
       internal = true;
     };
-    hyprland = {
-      layout = mkOption {
-        type = types.enum [
-          "dwindle"
-          "master"
-          "scrolling"
-          "monocle"
-          "hy3"
-        ];
-        default = "dwindle";
-        description = "Hyprland layout engine; \"hy3\" provides i3/sway-style tiling via the hy3 plugin";
-      };
-    };
+
     enableNvidia = mkOption {
       type = types.bool;
       default = false;
-      internal = true;
-    };
-    modifier = mkOption {
-      type = types.str;
-      default = "Mod4";
       internal = true;
     };
     programs = {

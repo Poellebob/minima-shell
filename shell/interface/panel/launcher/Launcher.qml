@@ -33,7 +33,7 @@ Item {
       name: "Lock",
       description: "Lock the session",
       execute: function () {
-        Quickshell.execDetached(["hyprlock"]);
+        Quickshell.execDetached(["swaylock"]);
       }
     },
     {

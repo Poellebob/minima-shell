@@ -10,7 +10,7 @@ let
         scale ${toString d.scale}
       }'';
 
-  swaySpecialWs = name: ws:
+  swaySpecialWs = wm: name: ws:
     let
       ruleStrings = lib.mapAttrsToList (k: vs: ''${k}="${lib.concatStringsSep "|" vs}"'') ws.rule;
       assigns = lib.concatMapStringsSep "\n      " (r: "assign [${r}] workspace $ws_${name}") ruleStrings;
@@ -19,8 +19,8 @@ let
       set $ws_${name} "${name}"
       ${optionalString ws.autostart "exec ${ws.startCommand}"}
       ${assigns}
-      ${optionalString (cfg.wm == "scroll") setSize}
-      bindsym ${cfg.modifier}+${ws.key} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}
+      ${optionalString (wm == "scroll") setSize}
+      bindsym ${cfg.sway.modifier}+${ws.key} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}
     '';
 
   swayfxConfig = ''
@@ -35,8 +35,8 @@ let
     for_window [class=".*"] blur enable
   '';
 
-  swayConfText = ''
-    set $mod ${cfg.modifier}
+  swayConfText = wm: ''
+      set $mod ${cfg.sway.modifier}
     set $fileManager ${cfg.programs.fileManager.name}
     set $browser ${cfg.programs.browser.name}
     set $terminal ${cfg.programs.terminal.name}
@@ -48,15 +48,15 @@ let
 
     ${concatMapStringsSep "\n" (a: "exec ${a}") cfg.autostart}
 
-    ${concatMapStringsSep "\n" (x: swaySpecialWs x.name x.value) (mapAttrsToList (n: v: { name = n; value = v; }) cfg.specialWorkspaces)}
+    ${concatMapStringsSep "\n" (x: swaySpecialWs wm x.name x.value) (mapAttrsToList (n: v: { name = n; value = v; }) cfg.specialWorkspaces)}
 
-    ${optionalString (cfg.wm == "swayfx") swayfxConfig}
+    ${optionalString (wm == "swayfx") swayfxConfig}
   '';
 in
-  wm: let
+  wm: extraConfig: let
     msgCmd = if wm == "scroll" then "scrollmsg" else "swaymsg";
   in pkgs.writeText "${wm}-config" ''
-    ${swayConfText}
+    ${swayConfText wm}
 
     ${import ./config.d/keybinds.nix { inherit wm pkgs; }}
     ${builtins.readFile ./config.d/workspace}
@@ -73,4 +73,6 @@ in
     exec wl-paste --watch cliphist store
 
     exec_always --no-startup-id sh -c '${msgCmd} input type:keyboard xkb_layout "$(localectl status | sed -n "s/^\s*X11 Layout:\s*//p")"'
+
+    ${extraConfig}
   ''

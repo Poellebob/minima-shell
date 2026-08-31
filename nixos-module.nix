@@ -11,11 +11,15 @@ in {
   ];
 
   config = mkMerge [
-    (mkIf (cfg.enable && cfg.wm != null) {
-      programs.sway = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
+    (mkIf cfg.enable {
+      programs.hyprland = mkIf cfg.hyprland.enable {
+        enable = true;
+      };
+
+      programs.sway = mkIf cfg.sway.enable {
         enable = true;
         wrapperFeatures.gtk = true;
-        package = pkgs.${cfg.wm}.overrideAttrs (old: {
+        package = (if cfg.sway.fx then pkgs.swayfx else pkgs.sway).overrideAttrs (old: {
           buildCommand = ''
             ${old.buildCommand or ""}
             wrapProgram $out/bin/sway \
@@ -25,10 +29,10 @@ in {
         xwayland.enable = true;
       };
 
-      programs.scroll = mkIf (cfg.enable && cfg.wm == "scroll") {
+      programs.scroll = mkIf cfg.scroll.enable {
         enable = true;
         wrapperFeatures.gtk = true;
-        package = pkgs.scroll.overrideAttrs (old: {
+        package = scroll-flake.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
           buildCommand = ''
             ${old.buildCommand or ""}
             wrapProgram $out/bin/scroll
@@ -37,26 +41,13 @@ in {
         xwayland.enable = true;
       };
 
-      programs.hyprland = {
-        enable = true;
-      };
 
-      environment.etc = {
-        "sway/config" = mkIf (cfg.wm == "sway" || cfg.wm == "swayfx") {
-          source = cfg.swayConfigFile;
-        };
-        "scroll/config" = mkIf (cfg.wm == "scroll") {
-          source = cfg.scrollConfigFile;
-        };
-      };
 
       home-manager.sharedModules = [
         {
           minima = {
-            wm                = mkDefault cfg.wm;
             osModule          = true;
             enableNvidia      = mkDefault cfg.enableNvidia;
-            modifier          = mkDefault cfg.modifier;
             programs          = mkDefault cfg.programs;
             theming           = mkDefault cfg.theming;
             shell             = mkDefault cfg.shell;
@@ -68,15 +59,30 @@ in {
             tex               = mkDefault cfg.tex;
             desktop           = mkDefault cfg.desktop;
 
+            hyprland = {
+              enable = cfg.hyprland.enable;
+              modifier = mkDefault cfg.hyprland.modifier;
+              layout = mkDefault cfg.hyprland.layout;
+              extraLua = mkDefault cfg.hyprland.extraLua;
+              plugins = mkDefault cfg.hyprland.plugins;
+            };
+            sway = {
+              enable = cfg.sway.enable;
+              modifier = mkDefault cfg.sway.modifier;
+              fx = mkDefault cfg.sway.fx;
+              extraConfig = mkDefault cfg.sway.extraConfig;
+            };
+            scroll = {
+              enable = cfg.scroll.enable;
+              modifier = mkDefault cfg.scroll.modifier;
+              extraConfig = mkDefault cfg.scroll.extraConfig;
+            };
+
             swayConfigFile    = mkDefault cfg.swayConfigFile;
             scrollConfigFile  = mkDefault cfg.scrollConfigFile;
-            hyprlandConfigFile = mkDefault cfg.hyprlandConfigFile;
             quickshellStoreDir = mkDefault cfg.quickshellStoreDir;
             matugenConfigFile = mkDefault cfg.matugenConfigFile;
             matugenTemplateFile = mkDefault cfg.matugenTemplateFile;
-            hyprland = {
-              layout = mkDefault cfg.hyprland.layout;
-            };
           };
         }
       ];

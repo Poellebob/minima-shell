@@ -7,7 +7,7 @@ This document details all configuration options available in minima.
 ## Table of Contents
 
 - [Core Options](#core-options)
-- [Hyprland](#hyprland)
+- [Window Managers](#window-managers)
 - [Program Options](#program-options)
 - [Display & Workspaces](#display--workspaces)
 - [Desktop Integration](#desktop-integration)
@@ -22,10 +22,7 @@ This document details all configuration options available in minima.
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `minima.enable` | bool | `false` | Enable Minima shell |
-| `minima.wm` | enum | `"sway"` | Window manager: `"sway"`, `"swayfx"`, `"scroll"`, `"hyprland"` |
-| `minima.hyprland.layout` | enum | `"dwindle"` | Hyprland layout engine (see [Hyprland](#hyprland)) |
 | `minima.enableNvidia` | bool | `false` | Enable NVIDIA GPU support |
-| `minima.modifier` | string | `"Mod4"` | Window manager modifier key (Hyprland always uses `SUPER`/Mod4) |
 | `minima.theming.enable` | bool | `true` | Enable Breeze/Papirus/Rose-Pine styling |
 | `minima.shell.enable` | bool | `true` | Enable zsh, fzf, starship, etc. |
 | `minima.extraPackages` | list | `[]` | Extra packages to install |
@@ -36,9 +33,7 @@ This document details all configuration options available in minima.
 {
   minima = {
     enable = true;
-    wm = "sway";
     enableNvidia = true;
-    modifier = "Mod4";
     theming.enable = true;
     extraPackages = with pkgs; [ git curl ];
   };
@@ -47,56 +42,33 @@ This document details all configuration options available in minima.
 
 ---
 
-## Hyprland
+## Window Managers
 
-Minima generates a Hyprland Lua config (`hyprland.lua`, the `hl.*` API) equivalent
-to the Sway config: same keybinds, autostart, monitors, special workspaces,
-gaps (3/3), 2px borders, no rounding, blur and shadows (SwayFX parity), and a
-`localectl` keyboard-layout sync on start/reload.
-
-> [!NOTE]
-> While Hyprland support is in active development it is **always enabled**:
-> the config is generated per-user through home-manager's
-> `wayland.windowManager.hyprland` module (`configType = "lua"`, minima's
-> config pulled in via `extraConfig`), and Hyprland is installed regardless of
-> `minima.wm` — system-wide via `programs.hyprland` on NixOS, or into the home
-> profile on standalone Home Manager. Session variables, the hyprland-session
-> systemd target, the hy3 plugin load, and config auto-reload are handled by
-> the home-manager module.
-
-### Layout Options
+Select exactly one window manager. **Hyprland is the default**; enabling sway
+or scroll automatically disables Hyprland unless you set
+`minima.hyprland.enable` explicitly. Enabling more than one is an evaluation
+error.
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `minima.hyprland.layout` | enum | `"dwindle"` | `"dwindle"`, `"master"`, `"scrolling"`, `"monocle"`, `"hy3"` |
+| `minima.hyprland.enable` | bool | `true` | Use Hyprland (auto-disabled if sway/scroll enabled, unless set explicitly) |
+| `minima.hyprland.modifier` | string | `"SUPER"` | Hyprland modifier key |
+| `minima.hyprland.layout` | enum | `"dwindle"` | Hyprland layout: `"dwindle"`, `"master"`, `"scrolling"` |
+| `minima.hyprland.extraLua` | lines | `""` | Extra Lua appended to the generated `hyprland.lua` |
+| `minima.hyprland.plugins` | list | `[]` | Hyprland plugins (packages or absolute paths) |
+| `minima.sway.enable` | bool | `false` | Use Sway |
+| `minima.sway.modifier` | string | `"Mod4"` | Sway modifier key |
+| `minima.sway.fx` | bool | `false` | Use swayfx (blur, shadows); implies `sway.enable` |
+| `minima.sway.extraConfig` | lines | `""` | Extra sway config appended to the generated config |
+| `minima.scroll.enable` | bool | `false` | Use Scroll |
+| `minima.scroll.modifier` | string | `"Mod4"` | Scroll modifier key |
+| `minima.scroll.extraConfig` | lines | `""` | Extra scroll config appended to the generated config |
 
-- **dwindle** — spiral/bsp-style auto tiling; splits are preserved and toggleable
-- **master** — one master window with stacked slaves; orientation cycles with `$mod+a`
-- **scrolling** — ScrollWM-style full-height columns; mirrors the Scroll keybinds (`colresize`, `consume_or_expel`) and its animation profile
-- **monocle** — single window at a time
-- **hy3** — i3/Sway-style manual tiling (splits, tabbed/stacked groups, focus parent/child) via the [hy3](https://github.com/outfoxxed/hy3) plugin (`pkgs.hyprlandPlugins.hy3`), loaded automatically through home-manager's `plugins` option. If the plugin fails to load, the config falls back to `dwindle` and shows a notification.
-
-### Layout-Specific Keybinds
-
-Common binds (focus/move/resize, floating, fullscreen, pin, scratchpad,
-screenshots, media, workspaces 1–10, mouse drag/resize) work in every layout.
-The Sway layout/split binds map per layout:
-
-| Keybind | dwindle | master | scrolling | monocle | hy3 |
-|---------|---------|--------|-----------|---------|-----|
-| `$mod + a` | toggle split | cycle orientation | – | – | toggle split h/v |
-| `$mod + Alt + j` | split v (preselect) | – | move into column left | – | split v |
-| `$mod + Alt + k` | split h (preselect) | – | move into column right | – | split h |
-| `$mod + Alt + h` | – | – | column width 50% | – | stacked group |
-| `$mod + Alt + l` | tabbed group | tabbed group | column width 100% | tabbed group | tabbed group |
-| `$mod + Escape` | – | – | – | – | untab (default layout) |
-| `$mod + Ctrl + a` | – | – | – | – | focus child |
-| `$mod + Shift + a` | – | – | – | – | focus parent |
-
-With `hy3`, focus/move follows i3 semantics (`hy3.move_focus` / `hy3.move_window`,
-whole-group workspace moves, `$mod+q` kills the entire node), and special
-workspaces plus the scratchpad (`special:scratchpad`) are shared with the
-other layouts.
+Hyprland is configured declaratively through Home Manager
+(`wayland.windowManager.hyprland` with `configType = "lua"`), so plugins,
+systemd session integration, and xwayland handling come for free. The NixOS
+module enables `programs.hyprland` for system-level setup (session entry,
+portals).
 
 ### Example
 
@@ -104,8 +76,27 @@ other layouts.
 {
   minima = {
     enable = true;
-    wm = "hyprland";
-    hyprland.layout = "hy3";  # dwindle, master, scrolling, monocle, or hy3
+    hyprland = {
+      enable = true;      # default
+      layout = "master";
+      extraLua = ''
+        hl.window_rule({ match = { class = "kitty" }, opacity = "0.9" })
+      '';
+      plugins = [ pkgs.hyprlandPlugins.hyprbars ];
+    };
+  };
+}
+```
+
+```nix
+{
+  minima = {
+    enable = true;
+    sway = {
+      enable = true;      # hyprland auto-disables
+      fx = true;          # swayfx
+      extraConfig = "output * max_render_time 4";
+    };
   };
 }
 ```

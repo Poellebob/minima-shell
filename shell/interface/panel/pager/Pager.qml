@@ -1,33 +1,16 @@
 import QtQuick
-import Quickshell
 import QtQuick.Layouts
-import Quickshell.Hyprland
-import Quickshell.I3
+import Quickshell
+import qs
 import qs.components.widget
 import qs.components.text
-import qs
 
 Item {
   id: pagerRoot
   required property var screen
-  property bool hyprland: false
-  property bool i3: false
 
   implicitHeight: Global.format.module_height
   implicitWidth: row.implicitWidth + Global.format.spacing_medium
-
-  Component.onCompleted: {
-    switch (Global.config.system.wm) {
-    case "hyprland":
-      pagerRoot.hyprland = true;
-      break;
-    case "sway":
-    case "swayfx":
-    case "scroll":
-      pagerRoot.i3 = true;
-      break;
-    }
-  }
 
   RowLayout {
     id: row
@@ -36,51 +19,21 @@ Item {
     spacing: 0
 
     Repeater {
-      model: {
-        if (pagerRoot.hyprland) {
-          return Hyprland.workspaces;
-        }
-        if (pagerRoot.i3) {
-          return I3.workspaces;
-        }
-        return [];
-      }
+      model: Wm.workspaces
 
       delegate: ClickableText {
-        property int wsId: {
-          if (pagerRoot.hyprland) {
-            return modelData.id;
-          }
-          if (pagerRoot.i3) {
-            return modelData.number;
-          }
-        }
+        property int wsId: Wm.hyprland ? modelData.id : modelData.number
         property string wsOutput: {
-          if (pagerRoot.hyprland) {
-            return modelData.monitor.name;
-          }
-          if (pagerRoot.i3) {
-            return modelData.monitor.name;
-          }
+          const m = modelData.monitor;
+          return m ? m.name.toString() : "";
         }
-        property bool wsActive: {
-          if (pagerRoot.hyprland) {
-            return modelData.active;
-          }
-          if (pagerRoot.i3) {
-            return modelData.focused && (wsOutput.toString()
-                                         === pagerRoot.screen.name.toString());
-          }
-        }
-        property string wsLabel: {
-          if (pagerRoot.hyprland) {
-            return wsId.toString();
-          }
-          if (pagerRoot.i3) {
-            return modelData.name;
-          }
-          return "";
-        }
+        property bool wsSpecial: Wm.hyprland && modelData.id < 0 && modelData.name.startsWith("special:")
+        property bool wsActive: Wm.hyprland
+          ? (modelData.active && (!modelData.monitor || modelData.monitor.name.toString() === pagerRoot.screen.name.toString()))
+          : (modelData.focused && wsOutput === pagerRoot.screen.name.toString())
+        property string wsLabel: Wm.hyprland
+          ? (wsSpecial ? modelData.name.slice(8) : modelData.id.toString())
+          : modelData.name
 
         property string displayLabel: wsActive ? `[${wsLabel}]` : ` ${wsLabel} `
 
@@ -88,23 +41,17 @@ Item {
         baseColor: wsActive ? Global.colors.primary : Global.colors.outline
         verticalAlignment: Text.AlignVCenter
 
-        visible: (wsId > 0 && wsOutput.toString()
-                  === pagerRoot.screen.name.toString()) || (wsId < 0
-                                                            && pagerRoot.i3)
+        visible: wsSpecial
+          || (Wm.hyprland && wsOutput === pagerRoot.screen.name.toString())
+          || (!Wm.hyprland && ((wsId > 0 && wsOutput === pagerRoot.screen.name.toString()) || wsId < 0))
         Layout.fillWidth: false
         Layout.fillHeight: true
 
         onClicked: {
-          if (pagerRoot.i3) {
-            if (wsId >= 0) {
-              I3.dispatch(`workspace ${wsLabel}`);
-            } else {
-              I3.dispatch(`[workspace=${wsLabel}] move workspace to output current; workspace 
-${wsLabel}`);
-            }
-            return;
-          }
-          modelData.activate();
+          if (wsSpecial)
+            Wm.toggleSpecial(modelData.name.slice(8));
+          else
+            Wm.activateWs(modelData);
         }
       }
     }
