@@ -72,7 +72,7 @@ in
         description = "Hyprland modifier key";
       };
       layout = mkOption {
-        type = types.enum [ "dwindle" "master" "scrolling" ];
+        type = types.enum [ "dwindle" "master" "scrolling" "hy3" ];
         default = "dwindle";
         description = "Hyprland layout";
       };

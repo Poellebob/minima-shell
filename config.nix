@@ -77,7 +77,7 @@ let
   ];
 
   mkWmConfig = import ./config/sway/config.nix { inherit cfg pkgs lib quickshellStoreDir setXftDpi; };
-  mkHyprlandConfig = import ./config/hyprland/config.nix { inherit cfg pkgs lib quickshellStoreDir setXftDpi; };
+  mkHyprlandConfig = import ./config/hyprland/hyprland.nix { inherit cfg pkgs lib quickshellStoreDir setXftDpi; };
 in {
   config = mkIf cfg.enable {
     assertions = [{
@@ -91,6 +91,8 @@ in {
     minima.swayConfigFile = mkIf cfg.sway.enable (mkWmConfig (if cfg.sway.fx then "swayfx" else "sway") cfg.sway.extraConfig);
     minima.scrollConfigFile = mkIf cfg.scroll.enable (mkWmConfig "scroll" cfg.scroll.extraConfig);
     minima.hyprlandLua = mkIf cfg.hyprland.enable mkHyprlandConfig;
+    minima.hyprland.plugins = mkIf (cfg.hyprland.enable && cfg.hyprland.layout == "hy3") [ pkgs.hyprlandPlugins.hy3 ];
+
     minima.quickshellStoreDir = quickshellStoreDir;
     minima.minimaConfigFile = "${minimaConfigJson}";
     minima.matugenConfigFile = matugenConfigFile;
