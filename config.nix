@@ -70,21 +70,10 @@ let
     else if cfg.scroll.enable then "scroll"
     else null;
 
-  enabledWmCount = count (x: x) [
-    cfg.hyprland.enable
-    cfg.sway.enable
-    cfg.scroll.enable
-  ];
-
   mkWmConfig = import ./config/sway/config.nix { inherit cfg pkgs lib quickshellStoreDir setXftDpi; };
   mkHyprlandConfig = import ./config/hyprland/hyprland.nix { inherit cfg pkgs lib quickshellStoreDir setXftDpi; };
 in {
   config = mkIf cfg.enable {
-    assertions = [{
-      assertion = enabledWmCount <= 1;
-      message = "minima: at most one window manager may be enabled (minima.hyprland.enable, minima.sway.enable, minima.scroll.enable)";
-    }];
-
     minima.hyprland.enable = mkIf (cfg.sway.enable || cfg.scroll.enable) (mkDefault false);
     minima.sway.enable = mkIf cfg.sway.fx (mkDefault true);
 
