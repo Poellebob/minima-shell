@@ -38,7 +38,7 @@ Item {
 
     Text {
       text: dateRoot.currentTime
-      font.family: "CommitMono Nerd Font Mono"
+      font.family: "JetBrainsMono Nerd Font"
       font.pixelSize: 30
       font.bold: true
       color: Global.colors.on_surface_variant
@@ -60,7 +60,7 @@ Item {
 
       Text {
         text: dateRoot.currentDay
-        font.family: "CommitMono Nerd Font Mono"
+        font.family: "JetBrainsMono Nerd Font"
         font.pixelSize: Global.format.font_size_medium
         font.bold: true
         color: Global.colors.on_surface_variant
@@ -68,7 +68,7 @@ Item {
 
       Text {
         text: dateRoot.currentDate
-        font.family: "CommitMono Nerd Font Mono"
+        font.family: "JetBrainsMono Nerd Font"
         font.pixelSize: Global.format.font_size_medium
         font.bold: true
         color: Global.colors.on_surface_variant

@@ -10,9 +10,6 @@ with lib;
 let
   luaStr = s: "\"" + lib.escape [ "\\" "\"" ] s + "\"";
 
-  colorsJson = builtins.fromJSON (builtins.readFile ../../colors.json);
-  colors = colorsJson.colors.${if cfg.minimaConfig.darkTheme then "dark" else "light"};
-
   mainMod = cfg.hyprland.modifier;
 
   monitorMode = d: if d.hz != null && hasInfix "x" d.res then "${d.res}@${toString d.hz}" else d.res;
@@ -75,24 +72,28 @@ in
 
   ${concatStringsSep "\n" (filter (x: x != "") (mapAttrsToList hyprWorkspaceRule cfg.displays))}
 
-  ${builtins.readFile ./config.d/application-style.lua}
+  ${builtins.readFile ./config.d/colors.lua}
 
-  ${import ./config.d/decorations.nix {
-    inherit lib colors;
-  }}
+  ${builtins.readFile ./config.d/animations.lua}
 
-  ${import ./config.d/application-behavior.nix {
+  ${import ./config.d/decorations.nix}
+
+  ${import ./config.d/layout.nix {
     layout = cfg.hyprland.layout;
   }}
 
-  ${builtins.readFile ./config.d/input.lua}
+  ${import ./config.d/window-rules.nix}
+
+  ${import ./config.d/gestures.nix}
+
+  ${import ./config.d/input.nix}
+
+  ${import ./config.d/misc.nix}
 
   ${import ./config.d/keybinds.nix {
     inherit lib pkgs;
     layout = cfg.hyprland.layout;
   }}
-
-  ${builtins.readFile ./config.d/workspace.lua}
 
   ${concatStringsSep "\n" (mapAttrsToList hyprSpecialWs cfg.specialWorkspaces)}
 

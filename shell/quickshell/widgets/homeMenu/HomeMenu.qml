@@ -97,7 +97,7 @@ Item {
               Text {
                 anchors.centerIn: parent
                 text: "󰍃"
-                font.family: "CommitMono Nerd Font Mono"
+                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: Global.format.font_size_large
                 font.bold: true
                 color: Global.colors.on_surface_variant
@@ -125,7 +125,7 @@ Item {
               Text {
                 anchors.centerIn: parent
                 text: "󰐥"
-                font.family: "CommitMono Nerd Font Mono"
+                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: Global.format.font_size_large
                 font.bold: true
                 color: Global.colors.on_surface_variant
@@ -153,7 +153,7 @@ Item {
               Text {
                 anchors.centerIn: parent
                 text: "󰜉"
-                font.family: "CommitMono Nerd Font Mono"
+                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: Global.format.font_size_large
                 font.bold: true
                 color: Global.colors.on_surface_variant
@@ -181,7 +181,7 @@ Item {
               Text {
                 anchors.centerIn: parent
                 text: "󰒲"
-                font.family: "CommitMono Nerd Font Mono"
+                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: Global.format.font_size_large
                 font.bold: true
                 color: Global.colors.on_surface_variant
@@ -209,7 +209,7 @@ Item {
               Text {
                 anchors.centerIn: parent
                 text: "󰌾"
-                font.family: "CommitMono Nerd Font Mono"
+                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: Global.format.font_size_large
                 font.bold: true
                 color: Global.colors.on_surface_variant
@@ -237,7 +237,7 @@ Item {
               Text {
                 anchors.centerIn: parent
                 text: "󰤄"
-                font.family: "CommitMono Nerd Font Mono"
+                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: Global.format.font_size_large
                 font.bold: true
                 color: Global.colors.on_surface_variant
