@@ -210,7 +210,7 @@ Item {
           Quickshell.execDetached(["/bin/sh", "-c", matugenBin + " -c "
                                    + matugenConfig + " -j hex image \""
                                    + confFile._previewPath
-                                   + "\" --source-color-index 0"]);
+                                   + "\" --source-color-index 0 && hyprctl reload"]);
         }
       }
       if (!confFile._isBackgroundApply)

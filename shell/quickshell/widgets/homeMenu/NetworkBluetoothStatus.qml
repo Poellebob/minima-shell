@@ -55,7 +55,7 @@ Item {
           
           Text {
             text: "󰖩"
-            font.family: "CommitMono Nerd Font Mono"
+            font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: Global.format.font_size_large
             font.bold: true
             color: Global.colors.primary
@@ -63,7 +63,7 @@ Item {
           
           Text {
             text: "Network"
-            font.family: "CommitMono Nerd Font Mono"
+            font.family: "JetBrainsMono Nerd Font"
             font.bold: true
             font.pixelSize: Global.format.font_size_medium
             color: Global.colors.on_surface_variant
@@ -92,7 +92,7 @@ Item {
             if (activeConnections.length === 0) return "Disconnected"
             return activeConnections.slice(0, 2).join('\n')
           }
-          font.family: "CommitMono Nerd Font Mono"
+          font.family: "JetBrainsMono Nerd Font"
           font.pixelSize: Global.format.font_size_small
           color: Global.colors.on_surface_variant
           wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -159,7 +159,7 @@ Item {
           
           Text {
             text: "󰂯"
-            font.family: "CommitMono Nerd Font Mono"
+            font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: Global.format.font_size_large
             font.bold: true
             color: Global.colors.secondary
@@ -167,7 +167,7 @@ Item {
           
           Text {
             text: "Bluetooth"
-            font.family: "CommitMono Nerd Font Mono"
+            font.family: "JetBrainsMono Nerd Font"
             font.bold: true
             font.pixelSize: Global.format.font_size_medium
             color: Global.colors.on_surface_variant
@@ -197,7 +197,7 @@ Item {
             if (connectedDevices.length === 0) return "No Connected Devices"
             return connectedDevices.slice(0, 2).join('\n')
           }
-          font.family: "CommitMono Nerd Font Mono"
+          font.family: "JetBrainsMono Nerd Font"
           font.pixelSize: Global.format.font_size_small
           color: Global.colors.on_surface_variant
           wrapMode: Text.WrapAtWordBoundaryOrAnywhere

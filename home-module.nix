@@ -44,7 +44,6 @@ in
         power-profiles-daemon
         brightnessctl
         libnotify
-        inotify-tools
         nerd-fonts.jetbrains-mono
         lazygit
         papirus-icon-theme

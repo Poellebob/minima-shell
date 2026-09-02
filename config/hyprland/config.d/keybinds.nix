@@ -129,6 +129,15 @@ in
   hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"))
   hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"))
 
+  for i = 1, 10 do
+      local key = i % 10
+      hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
+      hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
+  end
+
+  hl.bind(mainMod .. " + CTRL + RIGHT", hl.dsp.focus({ workspace = "e+1" }))
+  hl.bind(mainMod .. " + CTRL + LEFT", hl.dsp.focus({ workspace = "e-1" }))
+
   hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
   hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
   ${lib.optionalString (layout == "hy3") ''
