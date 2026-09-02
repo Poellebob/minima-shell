@@ -3,7 +3,7 @@
 A NixOS/home-manager flake providing a Wayland-focused desktop environment with [Hyprland](https://hyprland.org/), [Sway](https://swaywm.org/), [SwayFX](https://github.com/Ericmorgenta/swayfx), and [Scroll](https://github.com/dawsers/scroll/) support.
 
 > [!WARNING]
-> This project is not done and is still **pre-alpha**; it will contain bugs.
+> This project is not done and is still **alpha**; it will contain bugs.
 
 ---
 
@@ -20,7 +20,7 @@ A NixOS/home-manager flake providing a Wayland-focused desktop environment with 
 
 ## Prerequisites
 
-Minima is not a standalone program — it is a Home Manager module. **Home Manager is required**, regardless of how you use minima:
+Minima is a Home Manager module. **Home Manager is required**, regardless of how you use minima:
 
 - On a non-NixOS distro, minima runs as a standalone Home Manager configuration on top of an already-installed window manager.
 - On NixOS, minima is a NixOS module that installs the window manager
