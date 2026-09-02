@@ -10,6 +10,16 @@ let
         scale ${toString d.scale}
       }'';
 
+  swayKeybind = kb:
+    if kb.raw then
+      ''
+        ${kb.type} ${concatStringsSep "+" kb.bind} ${kb.exec}
+      ''
+    else
+      ''
+        ${kb.type} ${concatStringsSep "+" kb.bind} exec ${kb.exec}
+      '';
+
   swaySpecialWs = wm: name: ws:
     let
       ruleStrings = lib.mapAttrsToList (k: vs: ''${k}="${lib.concatStringsSep "|" vs}"'') ws.rule;
@@ -20,7 +30,7 @@ let
       ${optionalString ws.autostart "exec ${ws.startCommand}"}
       ${assigns}
       ${optionalString (wm == "scroll") setSize}
-      bindsym ${cfg.sway.modifier}+${ws.key} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}
+      bindsym ${concatStringsSep "+" ws.keybind} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}
     '';
 
   swayfxConfig = ''
@@ -37,9 +47,6 @@ let
 
   swayConfText = wm: ''
       set $mod ${cfg.sway.modifier}
-    set $fileManager ${cfg.programs.fileManager.name}
-    set $browser ${cfg.programs.browser.name}
-    set $terminal ${cfg.programs.terminal.name}
     set $qs_path ${quickshellStoreDir}
 
     ${concatMapStringsSep "\n" (x: swayOutputBlock x.name x.value) (mapAttrsToList (n: v: { name = n; value = v; }) cfg.displays)}
@@ -47,6 +54,8 @@ let
     ${concatMapStringsSep "\n" (x: "workspace ${toString x.value.workspace} output ${x.name}") (mapAttrsToList (n: v: { name = n; value = v; }) (filterAttrs (n: v: v.workspace != null) cfg.displays))}
 
     ${concatMapStringsSep "\n" (a: "exec ${a}") cfg.autostart}
+
+    ${concatStringsSep "\n" (map swayKeybind (filter (kb: kb.bind != [ ]) cfg.keybinds))}
 
     ${concatMapStringsSep "\n" (x: swaySpecialWs wm x.name x.value) (mapAttrsToList (n: v: { name = n; value = v; }) cfg.specialWorkspaces)}
 

@@ -40,7 +40,10 @@ let
 
   specialWorkspaceType = types.submodule {
     options = {
-      key = mkOption { type = types.str; };
+      keybind = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+      };
       rule = mkOption {
         type = types.attrsOf (types.listOf types.str);
         default = { };
@@ -52,6 +55,26 @@ let
       startCommand = mkOption {
         type = types.str;
         default = "";
+      };
+    };
+  };
+
+  keybindType = types.submodule {
+    options = {
+      exec = mkOption { type = types.str; };
+      bind = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+      };
+      type = mkOption {
+        type = types.str;
+        default = "bindsym";
+        description = "Bind command type (only used by sway/scroll)";
+      };
+      raw = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Emit exec verbatim: raw Lua for hyprland, raw sway command for sway/scroll (skips exec_cmd / exec wrapping)";
       };
     };
   };
@@ -170,38 +193,17 @@ in
       default = false;
       internal = true;
     };
-    programs = {
-      terminal = {
-        name = mkOption {
-          type = types.str;
-          default = "kitty";
-        };
-        package = mkOption {
-          type = types.package;
-          default = pkgs.kitty;
-        };
-      };
+    keybinds = mkOption {
+      type = types.listOf keybindType;
+      default = [ ];
+      description = "Global keybindings. List of bindings that execute programs/commands.";
+    };
 
-      fileManager = {
-        name = mkOption {
-          type = types.str;
-          default = "dolphin";
-        };
-        package = mkOption {
-          type = types.package;
-          default = pkgs.kdePackages.dolphin;
-        };
-      };
-
-      browser = {
-        name = mkOption {
-          type = types.str;
-          default = "firefox";
-        };
-        package = mkOption {
-          type = types.package;
-          default = pkgs.firefox;
-        };
+    kitty = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable kitty terminal config";
       };
     };
 

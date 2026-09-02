@@ -48,7 +48,8 @@ in {
           minima = {
             osModule          = true;
             enableNvidia      = mkDefault cfg.enableNvidia;
-            programs          = mkDefault cfg.programs;
+            keybinds          = mkDefault cfg.keybinds;
+            kitty             = mkDefault cfg.kitty;
             theming           = mkDefault cfg.theming;
             shell             = mkDefault cfg.shell;
             extraPackages     = mkDefault cfg.extraPackages;

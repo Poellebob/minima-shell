@@ -8,7 +8,7 @@ This document details all configuration options available in minima.
 
 - [Core Options](#core-options)
 - [Window Managers](#window-managers)
-- [Program Options](#program-options)
+- [Keybinds](#keybinds)
 - [Display & Workspaces](#display--workspaces)
 - [Desktop Integration](#desktop-integration)
 - [TeX/LaTeX](#texlatex)
@@ -103,37 +103,42 @@ portals).
 
 ---
 
-## Program Options
+## Keybinds
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `minima.programs.terminal.name` | string | `"kitty"` | Terminal emulator name |
-| `minima.programs.terminal.package` | package | `pkgs.kitty` | Terminal package |
-| `minima.programs.fileManager.name` | string | `"dolphin"` | File manager name |
-| `minima.programs.fileManager.package` | package | `pkgs.kdePackages.dolphin` | File manager package |
-| `minima.programs.browser.name` | string | `"firefox"` | Browser name |
-| `minima.programs.browser.package` | package | `pkgs.firefox` | Browser package |
+Keybindings launch programs or run commands. They are rendered directly into
+the window manager config: as `hl.bind(...)` Lua calls for Hyprland, and as
+`bindsym` lines for sway/scroll. The modifier base is handled per-WM via
+`minima.hyprland.modifier` / `minima.sway.modifier` (referenced as `mainMod`
+in Hyprland keybinds and `$mod` in sway/scroll keybinds).
+
+WM-internal keybindings (window focus/move/resize, layout switching,
+screenshots, media keys, workspace switching, mouse binds) are hardcoded and
+not configurable via this option.
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `minima.keybinds` | list | List of keybindings |
+| `minima.keybinds[].exec` | string | Command to execute, or raw Lua/sway text when `raw = true` |
+| `minima.keybinds[].bind` | list | Keys / modifiers, joined with `+` (e.g. `["mainMod" "RETURN"]`, `["$mod" "K"]`) |
+| `minima.keybinds[].type` | string | Bind command type (default `"bindsym"`, only used by sway/scroll) |
+| `minima.keybinds[].raw` | bool | `false` — emit `exec` verbatim instead of wrapping in `exec_cmd` (Hyprland) / `exec` (sway/scroll). Allows arbitrary Lua or sway commands |
 
 ### Example
 
 ```nix
 {
-  minima.programs = {
-    terminal = {
-      name = "kitty";
-      package = pkgs.kitty;
-    };
-    fileManager = {
-      name = "dolphin";
-      package = pkgs.kdePackages.dolphin;
-    };
-    browser = {
-      name = "firefox";
-      package = pkgs.firefox;
-    };
-  };
+  minima.keybinds = [
+    { exec = "kitty";   bind = [ "mainMod" "RETURN" ]; }
+    { exec = "firefox"; bind = [ "mainMod" "B" ]; }
+    { exec = "dolphin"; bind = [ "mainMod" "E" ]; }
+    { exec = "qs -c $qs_path ipc call launcher open";  bind = [ "mainMod" "D" ]; }
+    { exec = "qs -c $qs_path ipc call clipboard open"; bind = [ "mainMod" "V" ]; }
+  ];
 }
 ```
+
+For sway/scroll, `bind` entries like `"$mod"` refer to the sway `$mod`
+variable; for Hyprland, `"mainMod"` refers to the generated `mainMod` local.
 
 ---
 
@@ -162,7 +167,7 @@ portals).
 | Option | Type | Description |
 |--------|------|-------------|
 | `minima.specialWorkspaces` | attrs | `{}` | Attribute set of special workspace definitions |
-| `minima.specialWorkspaces.<name>.key` | string | Key binding |
+| `minima.specialWorkspaces.<name>.keybind` | list | Keys / modifiers to toggle the special workspace (e.g. `["mainMod" "M"]`) |
 | `minima.specialWorkspaces.<name>.rule` | attrs | Window rules (e.g., `{ app_id = ["discord"]; class = ["Spotify"]; }`) |
 | `minima.specialWorkspaces.<name>.autostart` | bool | Autostart app |
 | `minima.specialWorkspaces.<name>.startCommand` | string | Command to run |
@@ -195,7 +200,7 @@ portals).
 
   minima.specialWorkspaces = {
     discord = {
-      key = "m";
+      keybind = [ "mainMod" "M" ];
       rule = {
         app_id = [ "discord" "WebCord" ];
         class = [ "discord" ];
@@ -204,7 +209,7 @@ portals).
       startCommand = "discord";
     };
     spotify = {
-      key = "s";
+      keybind = [ "mainMod" "S" ];
       rule = {
         class = [ "Spotify" ];
       };
