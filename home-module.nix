@@ -59,24 +59,6 @@ in
         kdePackages.breeze
         kdePackages.breeze-gtk
         kdePackages.breeze-icons
-        cfg.programs.terminal.package
-        cfg.programs.fileManager.package
-        cfg.programs.browser.package
-      ]
-      ++ optionals (cfg.programs.fileManager.package == pkgs.kdePackages.dolphin) [
-        kdePackages.ark
-        kdePackages.plasma-workspace
-        kdePackages.kio
-        kdePackages.kdf
-        kdePackages.kio-fuse
-        kdePackages.kio-extras
-        kdePackages.kio-admin
-        kdePackages.qtwayland
-        kdePackages.plasma-integration
-        kdePackages.kdegraphics-thumbnailers
-        kdePackages.breeze-icons
-        kdePackages.qtsvg
-        kdePackages.kservice
       ]
       ++ optionals cfg.shell.enable [
         zoxide
@@ -269,7 +251,7 @@ in
       };
     };
 
-    programs.kitty = mkIf (cfg.programs.terminal.name == "kitty") {
+    programs.kitty = mkIf cfg.kitty.enable {
       enable = true;
       settings = {
         clear_all_shortcuts = true;

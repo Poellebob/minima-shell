@@ -4,9 +4,6 @@ let
   logoutTarget = if wm == "scroll" then "minimaLogout" else "minimaHome";
 in ''
   # Main binds
-  bindsym $mod+Return exec $terminal
-  bindsym $mod+b exec $browser
-  bindsym $mod+e exec $fileManager
   bindsym $mod+q kill
   bindsym $mod+space floating toggle
   bindsym $mod+f fullscreen toggle

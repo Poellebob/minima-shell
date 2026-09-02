@@ -11,9 +11,6 @@ let
   wlCopy = "${pkgs.wl-clipboard}/bin/wl-copy";
 in
 ''
-  hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
-  hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
-  hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
   ${lib.optionalString (layout == "hy3") ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3

@@ -42,11 +42,21 @@ let
     else
       k;
 
+  hyprBindExpr = binds:
+    concatStringsSep " .. \" + \" .. "
+      (map (b: if b == "mainMod" then "mainMod" else luaStr b) binds);
+
+  hyprKeybind = kb:
+    if kb.raw then
+      "hl.bind(${hyprBindExpr kb.bind}, ${kb.exec})"
+    else
+      "hl.bind(${hyprBindExpr kb.bind}, hl.dsp.exec_cmd(${luaStr kb.exec}))";
+
   hyprSpecialWs =
     name: ws:
     concatStringsSep "\n" (
       [
-        "hl.bind(${luaStr (mainMod + " + " + ws.key)}, hl.dsp.workspace.toggle_special(${luaStr name}))"
+        "hl.bind(${hyprBindExpr ws.keybind}, hl.dsp.workspace.toggle_special(${luaStr name}))"
       ]
       ++ mapAttrsToList (k: vs: ''
         hl.window_rule({
@@ -63,9 +73,6 @@ let
 in
 ''
   local mainMod = ${luaStr mainMod}
-  local terminal = ${luaStr cfg.programs.terminal.name}
-  local fileManager = ${luaStr cfg.programs.fileManager.name}
-  local browser = ${luaStr cfg.programs.browser.name}
   local qsPath = ${luaStr "${quickshellStoreDir}"}
 
   ${concatStringsSep "\n" (mapAttrsToList hyprMonitor cfg.displays)}
@@ -94,6 +101,8 @@ in
     inherit lib pkgs;
     layout = cfg.hyprland.layout;
   }}
+
+  ${concatStringsSep "\n" (map hyprKeybind (filter (kb: kb.bind != [ ]) cfg.keybinds))}
 
   ${concatStringsSep "\n" (mapAttrsToList hyprSpecialWs cfg.specialWorkspaces)}
 
