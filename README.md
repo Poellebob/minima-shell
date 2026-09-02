@@ -78,7 +78,8 @@ most one window manager may be enabled at a time.
 }
 ```
 
-> This expects the selected window manager to already be installed on your system (Hyprland works out of the box as the default). The NixOS module installs the window manager for you based on which one is enabled.
+> This expects the selected window manager to already be installed on your system.
+> The NixOS module installs the window manager for you based on which one is enabled.
 
 ### NixOS
 
@@ -165,8 +166,6 @@ All configuration options are documented in [OPTIONS.md](./OPTIONS.md).
 ---
 
 ## Keybinds
-
-> **Note:** Scroll has a few unique keybinds not available in Sway, and vice versa.
 
 ### General
 
