@@ -1,7 +1,0 @@
-# Input Configuration
-input type:touchpad {
-  natural_scroll enabled
-  tap enabled
-  click_method clickfinger
-  dwt enabled
-}

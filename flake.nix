@@ -1,86 +1,50 @@
-
 {
-  description = "minima-shell - userspace shell + Hyprland config";
+  description = "minima home-manager and nixos module";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      #inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    scroll-flake = {
+      url = "github:Diax170/scroll-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-outputs = { self, nixpkgs, flake-utils }:
-  flake-utils.lib.eachDefaultSystem (system:
-    let
-      pkgs = import nixpkgs { inherit system; };
-    in
-    {
-      devShell = pkgs.mkShell {
-        name = "minima-shell-dev";
+  outputs = { self, nixpkgs, home-manager, nixvim, stylix, scroll-flake, ... }@inputs: {
+    homeModules.minima = { ... }: {
+      _module.args.minimaFlakeSrc = self;
+      imports = [
+        stylix.homeModules.stylix
+        nixvim.homeModules.nixvim
+        ./home-module.nix
+      ];
+    };
+    homeModules.default = self.homeModules.minima;
 
-        buildInputs = with pkgs; [
-          wireplumber
-          libgtop
-          bluez
-          bluezUtils
-          btop
-          networkmanager
-          dart-sass
-          wl-clipboard
-          brightnessctl
-          swww
-          python310
-          upower
-          pacman-contrib
-          power-profiles-daemon
-          gvfs
-          cliphist
-          hyprland
-          hyprlock
-          hypridle
-          kitty
-          qt5.qtwayland
-          qt6.qtwayland
-          ttfJetBrainsMonoNerd
-          grim
-          slurp
-          swappy
-          jq
-          bc
-          fzf
-          zoxide
-          git
-          zsh
-        ];
-
-        shellHook = ''
-          echo "minima-shell" 
-        '';
+    nixosModules.minima = { ... }: {
+      imports = [
+        scroll-flake.nixosModules.default
+        ./nixos-module.nix
+      ];
+      _module.args = {
+        inherit scroll-flake;
       };
-
-      packages = {
-        minima-shell = pkgs.stdenv.mkDerivation {
-          pname = "minima-shell";
-          version = "0.1.0";
-
-          src = ./.;
-
-          buildInputs = with pkgs; [
-            git
-            zsh
-            kitty
-          ];
-
-          installPhase = ''
-            mkdir -p $out
-            cp -r * $out/
-          '';
-
-          meta = with pkgs.lib; {
-            description = "Minima-shell: userspace shell and Hyprland config";
-            license = licenses.mit;
-            maintainers = with maintainers; [ self ];
-          };
-        };
-      };
-    }
-  );
+    };
+    nixosModules.default = self.nixosModules.minima;
+  };
 }
