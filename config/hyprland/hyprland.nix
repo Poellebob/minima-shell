@@ -42,11 +42,12 @@ let
     else
       k;
 
-  hyprBindExpr = binds:
-    concatStringsSep " .. \" + \" .. "
-      (map (b: if b == "mainMod" then "mainMod" else luaStr b) binds);
+  hyprBindExpr =
+    binds:
+    concatStringsSep " .. \" + \" .. " (map (b: if b == "mainMod" then "mainMod" else luaStr b) binds);
 
-  hyprKeybind = kb:
+  hyprKeybind =
+    kb:
     if kb.raw then
       "hl.bind(${hyprBindExpr kb.bind}, ${kb.exec})"
     else
@@ -77,14 +78,38 @@ let
 
   specialWorkspaceAutostarts = mapAttrsToList (
     name: ws:
-    optionalString (ws.autostart && ws.startCommand != "") "hl.exec_cmd(${luaStr (dropCaps ws.startCommand)})"
+    optionalString (
+      ws.autostart && ws.startCommand != ""
+    ) "hl.exec_cmd(${luaStr (dropCaps ws.startCommand)})"
   ) cfg.specialWorkspaces;
 
-  primaryDisplay = findFirst (d: d.primary) (throw "No primary display") (attrValues cfg.displays);
+  primaryDisplayName = head (filter (n: cfg.displays.${n}.primary) (attrNames cfg.displays));
 in
 ''
   local mainMod = ${luaStr mainMod}
   local qsPath = ${luaStr "${quickshellStoreDir}"}
+
+  local function setXftDpi(monitorName)
+    if monitorName == nil or monitorName == "" then
+      local mons = hl.get_monitors()
+      if #mons == 0 then
+        error("setXftDpi: No monitors detected.")
+      end
+      monitorName = mons[1].name
+    end
+
+    local mon = hl.get_monitor(monitorName)
+    if mon == nil then
+      error("setXftDpi: Monitor '" .. tostring(monitorName) .. "' not found.")
+    end
+
+    local width = tonumber(mon.width) or 1920
+    local scale = tonumber(mon.scale) or 1.0
+
+    local dpi = math.floor(96 * (width / 1920) * scale)
+
+    hl.exec_cmd("printf 'Xft.dpi: %d\\n' " .. dpi .. " | xrdb -merge")
+  end
 
   ${concatStringsSep "\n" (mapAttrsToList hyprMonitor cfg.displays)}
 
@@ -118,15 +143,17 @@ in
   ${concatStringsSep "\n" (mapAttrsToList hyprSpecialWs cfg.specialWorkspaces)}
 
   hl.on("hyprland.start", function()
-    ${concatStringsSep "\n    " (map (a: "hl.exec_cmd(${luaStr (dropCaps a)})") cfg.autostart)}
-    ${concatStringsSep "\n    " specialWorkspaceAutostarts}
+    hl.dsp.focus({monitor = ${luaStr primaryDisplayName}})
     hl.exec_cmd(${luaStr (dropCaps "${pkgs.quickshell}/bin/qs -c ${quickshellStoreDir}")})
-    hl.exec_cmd(${luaStr "${setXftDpi { scale = primaryDisplay.scale; }}"})
+    setXftDpi(${luaStr primaryDisplayName})
     hl.exec_cmd(${luaStr "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"})
     hl.exec_cmd(${luaStr "${pkgs.awww}/bin/awww-daemon"})
     hl.exec_cmd(${luaStr "systemctl --user import-environment GTK_THEME QT_QPA_PLATFORMTHEME"})
     hl.exec_cmd(${luaStr "${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface gtk-theme Breeze-Dark"})
     hl.exec_cmd(${luaStr "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store"})
+
+    ${concatStringsSep "\n    " (map (a: "hl.exec_cmd(${luaStr (dropCaps a)})") cfg.autostart)}
+    ${concatStringsSep "\n    " specialWorkspaceAutostarts}
   end)
 
   local _kbLayoutHandle = io.popen("localectl status | sed -n 's/^[[:space:]]*X11 Layout:[[:space:]]*//p'")
