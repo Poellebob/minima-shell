@@ -8,8 +8,8 @@
   })
 
   hl.gesture({
-      fingers = 4,
-      direction = "vertical",
+      fingers = 3,
+      direction = "horizontal",
       action = "workspace",
   })
 ''
