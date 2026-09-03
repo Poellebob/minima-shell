@@ -14,7 +14,12 @@ let
     chmod -R u+rw $out
   '';
 
-  setXftDpi = pkgs.writeShellScript "set-xft-dpi.sh" (builtins.readFile ./set-xft-dpi.sh);
+  setXftDpi =
+    { scale }:
+    pkgs.writeShellScript "set-xft-dpi.sh" ''
+      export SCALE=${toString scale}
+      ${builtins.readFile ./set-xft-dpi.sh}
+    '';
 
   minimaConfigJson = pkgs.writeText "minima-config.json" (builtins.toJSON {
     system = {

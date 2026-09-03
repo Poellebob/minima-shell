@@ -45,6 +45,8 @@ let
     for_window [class=".*"] blur enable
   '';
 
+  primaryDisplay = findFirst (d: d.primary) (throw "No primary display") (attrValues cfg.displays);
+
   swayConfText = wm: ''
       set $mod ${cfg.sway.modifier}
     set $qs_path ${quickshellStoreDir}
@@ -74,7 +76,7 @@ in
     ${builtins.readFile ./config.d/input}
     ${import ./config.d/application-style.nix { inherit wm; }}
 
-    exec ${setXftDpi}
+    exec ${setXftDpi { scale = primaryDisplay.scale; }}
     exec awww-daemon
     exec ${pkgs.quickshell}/bin/qs -c $qs_path
     exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP

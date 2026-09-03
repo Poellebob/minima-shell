@@ -4,6 +4,8 @@ A NixOS/home-manager flake providing a Wayland-focused desktop environment with 
 
 > [!WARNING]
 > This project is not done and is still **alpha**; it will contain bugs.
+>
+> Rebuilding will cause keybinds interacting with the shell to break, but relogging will fix it.
 
 ---
 

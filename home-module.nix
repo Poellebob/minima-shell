@@ -18,6 +18,17 @@ in
   ];
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = length (filter id [
+          cfg.hyprland.enable
+          cfg.sway.enable
+          cfg.scroll.enable
+        ]) <= 1;
+        message = "minima: only one window manager (hyprland, sway, scroll) can be enabled at a time";
+      }
+    ];
+
     home.packages =
       with pkgs;
       [
@@ -65,6 +76,9 @@ in
         git
         afetch
       ]
+      ++ optionals cfg.hyprland.enable [
+        aquamarine
+      ]
       ++ cfg.extraPackages
       ++ optionals cfg.tex.enable [
         (pkgs.texlive.combine (
@@ -77,25 +91,29 @@ in
 
     xdg.portal = mkIf cfg.desktop.xdgPortal {
       enable = true;
-      extraPortals =
-        [
-          pkgs.xdg-desktop-portal-gtk
-          pkgs.kdePackages.xdg-desktop-portal-kde
-        ]
-        ++ optionals (cfg.sway.enable || cfg.scroll.enable) [
-          pkgs.xdg-desktop-portal-wlr
+      extraPortals = [
+        pkgs.xdg-desktop-portal-gtk
+        pkgs.kdePackages.xdg-desktop-portal-kde
+      ]
+      ++ optionals (cfg.sway.enable || cfg.scroll.enable) [
+        pkgs.xdg-desktop-portal-wlr
+      ];
+      config = {
+        common.default = [
+          "kde"
+          "gtk"
         ];
-      config = { common.default = [ "kde" "gtk" ]; }
-        // lib.optionalAttrs (cfg.sway.enable || cfg.scroll.enable) {
-          sway = {
-            ScreenCast = [ "wlr" ];
-          };
-        }
-        // lib.optionalAttrs cfg.hyprland.enable {
-          hyprland = {
-            ScreenCast = [ "hyprland" ];
-          };
+      }
+      // lib.optionalAttrs (cfg.sway.enable || cfg.scroll.enable) {
+        minima = {
+          ScreenCast = [ "wlr" ];
         };
+      }
+      // lib.optionalAttrs cfg.hyprland.enable {
+        minima = {
+          ScreenCast = [ "hyprland" ];
+        };
+      };
     };
 
     qt = mkIf cfg.theming.enable {
@@ -270,8 +288,9 @@ in
       {
         QT_SCALE_FACTOR_ROUNDING_POLICY = "RoundPreferFloor";
         QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+        QT_QPA_PLATFORM = "wayland;xcb";
         GDK_BACKEND = "wayland,x11";
-        SDL_VIDEODRIVER = "wayland";
+        SDL_VIDEODRIVER = "wayland,x11";
         CLUTTER_BACKEND = "wayland";
         ELECTRON_OZONE_PLATFORM_HINT = "wayland";
         XDG_SESSION_TYPE = "wayland";
@@ -289,6 +308,13 @@ in
         MINIMA_CONFIG = cfg.minimaConfigFile;
         MATUGEN_CONFIG = cfg.matugenConfigFile;
       }
+      (mkIf (cfg.sway.enable || cfg.scroll.enable || cfg.hyprland.enable) {
+        XDG_CURRENT_DESKTOP =
+          if cfg.scroll.enable then "minima:KDE:Scroll"
+          else if cfg.sway.enable then
+            (if cfg.sway.fx then "minima:KDE:SwayFX" else "minima:KDE:Sway")
+          else "minima:KDE:Hyprland";
+      })
     ];
 
     xdg.configFile."kdeglobals" = mkIf cfg.theming.enable {
