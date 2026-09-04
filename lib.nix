@@ -196,7 +196,7 @@ in
     keybinds = mkOption {
       type = types.listOf keybindType;
       default = [ ];
-      description = "Global keybindings. List of bindings that execute programs/commands.";
+      description = "Global keybindings using common modifier names (Main, Shift, Ctrl, Alt).";
     };
 
     kitty = {

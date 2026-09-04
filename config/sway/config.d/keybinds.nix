@@ -1,72 +1,72 @@
-{ wm, pkgs }:
+{ wm, pkgs, modifier }:
 let
   msgCmd = if wm == "scroll" then "scrollmsg" else "swaymsg";
   logoutTarget = if wm == "scroll" then "minimaLogout" else "minimaHome";
 in ''
   # Main binds
-  bindsym $mod+q kill
-  bindsym $mod+space floating toggle
-  bindsym $mod+f fullscreen toggle
-  bindsym $mod+Shift+s sticky toggle
-  bindsym $mod+Mod1+Delete exec swaylock
-  bindsym $mod+Shift+c exec ${msgCmd} reload
-  bindsym $mod+v exec qs -c $qs_path ipc call clipboard open
-  bindsym $mod+d exec qs -c $qs_path ipc call launcher open
+  bindsym ${modifier}+q kill
+  bindsym ${modifier}+space floating toggle
+  bindsym ${modifier}+f fullscreen toggle
+  bindsym ${modifier}+Shift+s sticky toggle
+  bindsym ${modifier}+Mod1+Delete exec swaylock
+  bindsym ${modifier}+Shift+c exec ${msgCmd} reload
+  bindsym ${modifier}+v exec qs -c $qs_path ipc call clipboard open
+  bindsym ${modifier}+d exec qs -c $qs_path ipc call launcher open
 
   ${if wm == "scroll" then ''
-  bindsym $mod+Mod1+l set_size h 1.0
-  bindsym $mod+Mod1+h set_size h 0.5
-  bindsym $mod+Mod1+j move left nomode after
-  bindsym $mod+Mod1+k move right nomode after
-  bindsym --no-repeat $mod+tab scale_workspace overview
+  bindsym ${modifier}+Mod1+l set_size h 1.0
+  bindsym ${modifier}+Mod1+h set_size h 0.5
+  bindsym ${modifier}+Mod1+j move left nomode after
+  bindsym ${modifier}+Mod1+k move right nomode after
+  bindsym --no-repeat ${modifier}+tab scale_workspace overview
   '' else ""}
 
   # Screenshots
   bindsym Print exec ${pkgs.grim}/bin/grim -g "$(${pkgs.slurp}/bin/slurp -o -d)" - | ${pkgs.imagemagick}/bin/magick - -shave 1x1 PNG:- | ${pkgs.wl-clipboard}/bin/wl-copy
   bindsym Shift+Print exec ${pkgs.grim}/bin/grim - | ${pkgs.wl-clipboard}/bin/wl-copy
-  bindsym $mod+Print exec ${pkgs.grim}/bin/grim -g "$(${pkgs.slurp}/bin/slurp -o -d)" - | ${pkgs.imagemagick}/bin/magick - -shave 1x1 PNG:- | ${pkgs.swappy}/bin/swappy -f -
-  bindsym $mod+Shift+Print exec ${pkgs.grim}/bin/grim - | ${pkgs.swappy}/bin/swappy -f -
+  bindsym ${modifier}+Print exec ${pkgs.grim}/bin/grim -g "$(${pkgs.slurp}/bin/slurp -o -d)" - | ${pkgs.imagemagick}/bin/magick - -shave 1x1 PNG:- | ${pkgs.swappy}/bin/swappy -f -
+  bindsym ${modifier}+Shift+Print exec ${pkgs.grim}/bin/grim - | ${pkgs.swappy}/bin/swappy -f -
 
   # Focus movement
-  bindsym $mod+h focus left
-  bindsym $mod+l focus right
-  bindsym $mod+k focus up
-  bindsym $mod+j focus down
+  bindsym ${modifier}+h focus left
+  bindsym ${modifier}+l focus right
+  bindsym ${modifier}+k focus up
+  bindsym ${modifier}+j focus down
 
   # Move windows
-  bindsym $mod+Control+h move left
-  bindsym $mod+Control+l move right
-  bindsym $mod+Control+k move up
-  bindsym $mod+Control+j move down
+  bindsym ${modifier}+Control+h move left
+  bindsym ${modifier}+Control+l move right
+  bindsym ${modifier}+Control+k move up
+  bindsym ${modifier}+Control+j move down
 
   # Resize windows
-  bindsym $mod+Shift+h resize shrink width 100px
-  bindsym $mod+Shift+l resize grow width 100px
-  bindsym $mod+Shift+k resize shrink height 100px
-  bindsym $mod+Shift+j resize grow height 100px
+  bindsym ${modifier}+Shift+h resize shrink width 100px
+  bindsym ${modifier}+Shift+l resize grow width 100px
+  bindsym ${modifier}+Shift+k resize shrink height 100px
+  bindsym ${modifier}+Shift+j resize grow height 100px
 
   ${if wm == "sway" || wm == "swayfx" then ''
   # Layout & Splitting
-  bindsym $mod+a split toggle
-  bindsym $mod+Mod1+j split v
-  bindsym $mod+Mod1+k split h
+  bindsym ${modifier}+a split toggle
+  bindsym ${modifier}+Mod1+j split v
+  bindsym ${modifier}+Mod1+k split h
 
-  bindsym $mod+Mod1+h layout stacking
-  bindsym $mod+Mod1+l layout tabbed
-  bindsym $mod+Escape layout default
+  bindsym ${modifier}+Mod1+h layout stacking
+  bindsym ${modifier}+Mod1+l layout tabbed
+  bindsym ${modifier}+Escape layout default
 
-  bindsym $mod+Control+a focus child
-  bindsym $mod+Shift+a focus parent
+  bindsym ${modifier}+Control+a focus child
+  bindsym ${modifier}+Shift+a focus parent
   '' else ""}
 
   ${if wm == "scroll" then ''
   # Direction
-  bindsym $mod+a set_mode toggle
+  bindsym ${modifier}+a set_mode toggle
   '' else ""}
 
   # Scratchpad
-  bindsym $mod+Shift+minus move scratchpad
-  bindsym $mod+minus scratchpad show
+  bindsym ${modifier}+Shift+minus move scratchpad
+  bindsym ${modifier}+minus scratchpad show
 
   # Logout
   bindsym XF86PowerOff exec qs -c $qs_path ipc call ${logoutTarget} open
@@ -86,6 +86,6 @@ in ''
   bindsym XF86AudioPrev exec playerctl previous
 
   # Mouse bindings
-  floating_modifier $mod normal
-  bindsym --whole-window $mod+button2 kill
+  floating_modifier ${modifier} normal
+  bindsym --whole-window ${modifier}+button2 kill
 ''

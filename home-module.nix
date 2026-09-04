@@ -349,7 +349,11 @@ in
       package = mkIf cfg.osModule null;
       configType = "lua";
       extraConfig = cfg.hyprlandLua;
-      plugins = cfg.hyprland.plugins;
+      plugins =
+        cfg.hyprland.plugins
+        ++ optionals (cfg.hyprland.layout == "hy3") [
+          pkgs.hyprlandPlugins.hy3
+        ];
     };
 
     home.file.".config/qalculate/qalc.cfg".source = ./config/qalculate/qalc.cfg;

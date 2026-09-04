@@ -108,9 +108,6 @@ in
     );
     minima.scrollConfigFile = mkIf cfg.scroll.enable (mkSwayConfig "scroll" cfg.scroll.extraConfig);
     minima.hyprlandLua = mkIf cfg.hyprland.enable mkHyprlandConfig;
-    minima.hyprland.plugins = mkIf (cfg.hyprland.enable && cfg.hyprland.layout == "hy3") [
-      pkgs.hyprlandPlugins.hy3
-    ];
 
     minima.quickshellStoreDir = quickshellStoreDir;
     minima.minimaConfigFile = "${minimaConfigJson}";

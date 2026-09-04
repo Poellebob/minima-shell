@@ -9,7 +9,12 @@ with lib;
 let
   luaStr = s: "\"" + lib.escape [ "\\" "\"" ] s + "\"";
 
-  mainMod = cfg.hyprland.modifier;
+  commonToHypr = {
+    "Main" = luaStr cfg.hyprland.modifier;
+    "Shift" = luaStr "SHIFT";
+    "Ctrl" = luaStr "CTRL";
+    "Alt" = luaStr "ALT";
+  };
 
   monitorMode = d: if d.hz != null && hasInfix "x" d.res then "${d.res}@${toString d.hz}" else d.res;
 
@@ -43,7 +48,10 @@ let
 
   hyprBindExpr =
     binds:
-    concatStringsSep " .. \" + \" .. " (map (b: if b == "mainMod" then "mainMod" else luaStr b) binds);
+    concatStringsSep " .. \" + \" .. " (map (b:
+      if commonToHypr ? ${b} then commonToHypr.${b}
+      else luaStr b
+    ) binds);
 
   hyprKeybind =
     kb:
@@ -85,7 +93,6 @@ let
   primaryDisplayName = head (filter (n: cfg.displays.${n}.primary) (attrNames cfg.displays));
 in
 ''
-  local mainMod = ${luaStr mainMod}
   local qsPath = ${luaStr "${quickshellStoreDir}"}
 
   local function setXftDpi(monitorName)
@@ -136,6 +143,7 @@ in
   ${import ./config.d/keybinds.nix {
     inherit lib pkgs;
     layout = cfg.hyprland.layout;
+    modifier = luaStr cfg.hyprland.modifier;
   }}
 
   ${concatStringsSep "\n" (map hyprKeybind (filter (kb: kb.bind != [ ]) cfg.keybinds))}
