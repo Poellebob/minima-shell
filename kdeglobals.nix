@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 with lib;
 {
@@ -142,6 +142,8 @@ with lib;
     LastUsedCustomAccentColor=232,203,45
     ColorScheme=BreezeDark
     UseSystemBell=true
+    TerminalApplication=${config.minima.programs.terminal.name}
+    TerminalService=${config.minima.programs.terminal.package}/share/applications/${config.minima.programs.terminal.name}.desktop
 
     [Icons]
     Theme=Papirus-Dark

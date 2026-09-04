@@ -20,11 +20,14 @@ in
   config = mkIf cfg.enable {
     assertions = [
       {
-        assertion = length (filter id [
-          cfg.hyprland.enable
-          cfg.sway.enable
-          cfg.scroll.enable
-        ]) <= 1;
+        assertion =
+          length (
+            filter id [
+              cfg.hyprland.enable
+              cfg.sway.enable
+              cfg.scroll.enable
+            ]
+          ) <= 1;
         message = "minima: only one window manager (hyprland, sway, scroll) can be enabled at a time";
       }
     ];
@@ -97,6 +100,9 @@ in
       ]
       ++ optionals (cfg.sway.enable || cfg.scroll.enable) [
         pkgs.xdg-desktop-portal-wlr
+      ]
+      ++ optionals (cfg.hyprland.enable) [
+        pkgs.xdg-desktop-portal-hyprland
       ];
       config = {
         common.default = [
@@ -299,6 +305,10 @@ in
         XCURSOR_THEME = "BreezeX-RosePine-Linux";
         XCURSOR_SIZE = "24";
       })
+      (mkIf cfg.vim.enable {
+        EDITOR = "nvim";
+        VISUAL = "nvim";
+      })
       (mkIf cfg.enableNvidia {
         LIBVA_DRIVER_NAME = "nvidia";
         GBM_BACKEND = "nvidia-drm";
@@ -307,13 +317,18 @@ in
       {
         MINIMA_CONFIG = cfg.minimaConfigFile;
         MATUGEN_CONFIG = cfg.matugenConfigFile;
+        TERM = cfg.programs.terminal.name;
+        TERM_PROGRAM = cfg.programs.terminal.name;
+        TERMINAL = cfg.programs.terminal.name;
       }
       (mkIf (cfg.sway.enable || cfg.scroll.enable || cfg.hyprland.enable) {
         XDG_CURRENT_DESKTOP =
-          if cfg.scroll.enable then "minima:KDE:Scroll"
+          if cfg.scroll.enable then
+            "minima:KDE:Scroll"
           else if cfg.sway.enable then
             (if cfg.sway.fx then "minima:KDE:SwayFX" else "minima:KDE:Sway")
-          else "minima:KDE:Hyprland";
+          else
+            "minima:KDE:Hyprland";
       })
     ];
 

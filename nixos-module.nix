@@ -50,6 +50,7 @@ in {
             enableNvidia      = mkDefault cfg.enableNvidia;
             keybinds          = mkDefault cfg.keybinds;
             kitty             = mkDefault cfg.kitty;
+            programs          = mkDefault cfg.programs;
             theming           = mkDefault cfg.theming;
             shell             = mkDefault cfg.shell;
             extraPackages     = mkDefault cfg.extraPackages;
