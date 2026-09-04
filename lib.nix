@@ -207,6 +207,21 @@ in
       };
     };
 
+    programs = {
+      terminal = {
+        name = mkOption {
+          type = types.str;
+          default = "kitty";
+          description = "Terminal application name (used for KDE defaults and env vars)";
+        };
+        package = mkOption {
+          type = types.package;
+          default = pkgs.kitty;
+          description = "Terminal application package";
+        };
+      };
+    };
+
     displays = mkOption {
       type = types.attrsOf displayType;
       default = { };

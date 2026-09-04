@@ -26,6 +26,8 @@ This document details all configuration options available in minima.
 | `minima.theming.enable` | bool | `true` | Enable Breeze/Papirus/Rose-Pine styling |
 | `minima.shell.enable` | bool | `true` | Enable zsh, fzf, starship, etc. |
 | `minima.extraPackages` | list | `[]` | Extra packages to install |
+| `minima.programs.terminal.name` | string | `"kitty"` | Terminal binary name (used for desktop file lookup and `lib.getExe'`) |
+| `minima.programs.terminal.package` | package | `pkgs.kitty` | Terminal application package |
 
 ### Example
 
@@ -36,6 +38,10 @@ This document details all configuration options available in minima.
     enableNvidia = true;
     theming.enable = true;
     extraPackages = with pkgs; [ git curl ];
+    programs.terminal = {
+      program = "kitty";
+      package = pkgs.kitty;
+    };
   };
 }
 ```
