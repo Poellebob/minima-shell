@@ -3,7 +3,6 @@
   pkgs,
   lib,
   quickshellStoreDir,
-  setXftDpi,
 }:
 
 with lib;
@@ -103,10 +102,11 @@ in
       error("setXftDpi: Monitor '" .. tostring(monitorName) .. "' not found.")
     end
 
-    local width = tonumber(mon.width) or 1920
     local scale = tonumber(mon.scale) or 1.0
 
-    local dpi = math.floor(96 * (width / 1920) * scale)
+    -- The +0.5 is to always round the float instead of flooring it.
+    local dpi = math.floor(96 * scale + 0.5)
+    hl.exec_cmd("notify-send dpi " .. dpi)
 
     hl.exec_cmd("printf 'Xft.dpi: %d\\n' " .. dpi .. " | xrdb -merge")
   end
