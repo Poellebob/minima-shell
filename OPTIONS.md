@@ -113,9 +113,14 @@ portals).
 
 Keybindings launch programs or run commands. They are rendered directly into
 the window manager config: as `hl.bind(...)` Lua calls for Hyprland, and as
-`bindsym` lines for sway/scroll. The modifier base is handled per-WM via
-`minima.hyprland.modifier` / `minima.sway.modifier` (referenced as `mainMod`
-in Hyprland keybinds and `$mod` in sway/scroll keybinds).
+`bindsym` lines for sway/scroll. Use common modifier names in the `bind` list:
+
+| Common Name | Hyprland | Sway/Scroll |
+|-------------|----------|-------------|
+| `Main` | `SUPER` | `Mod4` |
+| `Shift` | `SHIFT` | `Shift` |
+| `Ctrl` | `CTRL` | `Control` |
+| `Alt` | `ALT` | `Mod1` |
 
 WM-internal keybindings (window focus/move/resize, layout switching,
 screenshots, media keys, workspace switching, mouse binds) are hardcoded and
@@ -125,7 +130,7 @@ not configurable via this option.
 |--------|------|-------------|
 | `minima.keybinds` | list | List of keybindings |
 | `minima.keybinds[].exec` | string | Command to execute, or raw Lua/sway text when `raw = true` |
-| `minima.keybinds[].bind` | list | Keys / modifiers, joined with `+` (e.g. `["mainMod" "RETURN"]`, `["$mod" "K"]`) |
+| `minima.keybinds[].bind` | list | Keys / modifiers, joined with `+` (e.g. `["Main" "Return"]`, `["Main" "K"]`) |
 | `minima.keybinds[].type` | string | Bind command type (default `"bindsym"`, only used by sway/scroll) |
 | `minima.keybinds[].raw` | bool | `false` — emit `exec` verbatim instead of wrapping in `exec_cmd` (Hyprland) / `exec` (sway/scroll). Allows arbitrary Lua or sway commands |
 
@@ -134,17 +139,14 @@ not configurable via this option.
 ```nix
 {
   minima.keybinds = [
-    { exec = "kitty";   bind = [ "mainMod" "RETURN" ]; }
-    { exec = "firefox"; bind = [ "mainMod" "B" ]; }
-    { exec = "dolphin"; bind = [ "mainMod" "E" ]; }
-    { exec = "qs -c $qs_path ipc call launcher open";  bind = [ "mainMod" "D" ]; }
-    { exec = "qs -c $qs_path ipc call clipboard open"; bind = [ "mainMod" "V" ]; }
+    { exec = "kitty";   bind = [ "Main" "Return" ]; }
+    { exec = "firefox"; bind = [ "Main" "B" ]; }
+    { exec = "dolphin"; bind = [ "Main" "E" ]; }
+    { exec = "qs -c $qs_path ipc call launcher open";  bind = [ "Main" "D" ]; }
+    { exec = "qs -c $qs_path ipc call clipboard open"; bind = [ "Main" "V" ]; }
   ];
 }
 ```
-
-For sway/scroll, `bind` entries like `"$mod"` refer to the sway `$mod`
-variable; for Hyprland, `"mainMod"` refers to the generated `mainMod` local.
 
 ---
 
@@ -173,7 +175,7 @@ variable; for Hyprland, `"mainMod"` refers to the generated `mainMod` local.
 | Option | Type | Description |
 |--------|------|-------------|
 | `minima.specialWorkspaces` | attrs | `{}` | Attribute set of special workspace definitions |
-| `minima.specialWorkspaces.<name>.keybind` | list | Keys / modifiers to toggle the special workspace (e.g. `["mainMod" "M"]`) |
+| `minima.specialWorkspaces.<name>.keybind` | list | Keys / modifiers to toggle the special workspace (e.g. `["Main" "M"]`) |
 | `minima.specialWorkspaces.<name>.rule` | attrs | Window rules (e.g., `{ app_id = ["discord"]; class = ["Spotify"]; }`) |
 | `minima.specialWorkspaces.<name>.autostart` | bool | Autostart app |
 | `minima.specialWorkspaces.<name>.startCommand` | string | Command to run |
@@ -206,7 +208,7 @@ variable; for Hyprland, `"mainMod"` refers to the generated `mainMod` local.
 
   minima.specialWorkspaces = {
     discord = {
-      keybind = [ "mainMod" "M" ];
+      keybind = [ "Main" "M" ];
       rule = {
         app_id = [ "discord" "WebCord" ];
         class = [ "discord" ];
@@ -215,7 +217,7 @@ variable; for Hyprland, `"mainMod"` refers to the generated `mainMod` local.
       startCommand = "discord";
     };
     spotify = {
-      keybind = [ "mainMod" "S" ];
+      keybind = [ "Main" "S" ];
       rule = {
         class = [ "Spotify" ];
       };

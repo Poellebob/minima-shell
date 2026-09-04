@@ -19,7 +19,18 @@ let
         scale ${toString d.scale}
       }'';
 
-  swayBindExpr = binds: concatStringsSep "+" (map (b: if b == "mainMod" then "$mod" else b) binds);
+  commonToSway = {
+    "Main" = cfg.sway.modifier;
+    "Shift" = "Shift";
+    "Ctrl" = "Control";
+    "Alt" = "Mod1";
+  };
+
+  swayBindExpr = binds:
+    concatStringsSep "+" (map (b:
+      if commonToSway ? ${b} then commonToSway.${b}
+      else b
+    ) binds);
 
   swayKeybind =
     kb:
@@ -62,7 +73,6 @@ let
   primaryDisplay = findFirst (d: d.primary) (throw "No primary display") (attrValues cfg.displays);
 
   swayConfText = wm: ''
-      set $mod ${cfg.sway.modifier}
     set $qs_path ${quickshellStoreDir}
 
     ${concatMapStringsSep "\n" (x: swayOutputBlock x.name x.value) (
@@ -100,8 +110,8 @@ in
 pkgs.writeText "${wm}-config" ''
   ${swayConfText wm}
 
-  ${import ./config.d/keybinds.nix { inherit wm pkgs; }}
-  ${builtins.readFile ./config.d/workspace}
+  ${import ./config.d/keybinds.nix { inherit wm pkgs; modifier = cfg.sway.modifier; }}
+  ${import ./config.d/workspace.nix { modifier = cfg.sway.modifier; }}
   ${import ./config.d/application-behavior.nix { inherit wm; }}
   ${builtins.readFile ./config.d/env}
   ${builtins.readFile ./config.d/input}

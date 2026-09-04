@@ -169,7 +169,26 @@ All configuration options are documented in [OPTIONS.md](./OPTIONS.md).
 
 ## Keybinds
 
-### General
+### User-Defined Keybinds
+
+Keybindings use common modifier names that work across all window managers:
+
+| Modifier | Hyprland | Sway/Scroll |
+|----------|----------|-------------|
+| `Main` | `SUPER` | `Mod4` |
+| `Shift` | `SHIFT` | `Shift` |
+| `Ctrl` | `CTRL` | `Control` |
+| `Alt` | `ALT` | `Mod1` |
+
+```nix
+minima.keybinds = [
+  { exec = "kitty";   bind = [ "Main" "Return" ]; }
+  { exec = "firefox"; bind = [ "Main" "B" ]; }
+  { exec = "dolphin"; bind = [ "Main" "E" ]; }
+];
+```
+
+### General (Hardcoded)
 
 | Keybind | Action (Sway) | Action (Scroll) |
 |--------|---------------|---------------|
