@@ -27,29 +27,29 @@ let
         matugenBin = "${cfg.matugen.package}/bin/matugen";
       };
       theme = {
-        darkTheme = cfg.minimaConfig.darkTheme;
+        darkTheme = cfg.darkTheme;
       };
       panel = {
-        enabled = cfg.minimaConfig.panel.enable;
+        enabled = cfg.panel.enable;
         top = true;
-        panelAlwaysVisible = cfg.minimaConfig.panel.alwaysVisible;
+        panelAlwaysVisible = cfg.panel.alwaysVisible;
       };
       launcher = {
-        enabled = cfg.minimaConfig.launcher.enable;
-        qalcPath = cfg.minimaConfig.launcher.qalcPath;
+        enabled = cfg.launcher.enable;
+        qalcPath = cfg.launcher.qalcPath;
       };
       clipboard = {
-        enabled = cfg.minimaConfig.clipboard.enable;
+        enabled = cfg.clipboard.enable;
       };
       wallpaper = {
-        enabled = cfg.minimaConfig.wallpaper.enable;
-        engineEnabled = cfg.minimaConfig.wallpaper.engineEnabled;
+        enabled = cfg.wallpaper.enable;
+        engineEnabled = cfg.wallpaper.engineEnabled;
         enginePath = "${pkgs.linux-wallpaperengine}/bin/linux-wallpaperengine";
-        workshopPath = cfg.minimaConfig.wallpaper.workshopPath;
-        fps = cfg.minimaConfig.wallpaper.fps;
-        fill = cfg.minimaConfig.wallpaper.fill;
-        matureContent = cfg.minimaConfig.wallpaper.matureContent;
-        volume = cfg.minimaConfig.wallpaper.volume;
+        workshopPath = cfg.wallpaper.workshopPath;
+        fps = cfg.wallpaper.fps;
+        fill = cfg.wallpaper.fill;
+        matureContent = cfg.wallpaper.matureContent;
+        volume = cfg.wallpaper.volume;
       };
     }
   );

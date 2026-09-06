@@ -70,7 +70,21 @@ let
     for_window [class=".*"] blur enable
   '';
 
-  primaryDisplay = findFirst (d: d.primary) (throw "No primary display") (attrValues cfg.displays);
+  primaryDisplay = findFirst (d: d.primary) null (attrValues cfg.displays);
+
+  expandWorkspace = d:
+    let
+      wsList = if d.workspaces != null then d.workspaces
+               else if d.workspace != null then [ d.workspace ]
+               else [];
+      expandRange = item:
+        if builtins.isInt item then [ (toString item) ]
+        else let
+          parts = builtins.split "-" (toString item);
+          start = toInt (builtins.head parts);
+          end = toInt (builtins.head (builtins.tail (builtins.tail parts)));
+        in map toString (range start end);
+    in concatMap expandRange wsList;
 
   swayConfText = wm: ''
     set $qs_path ${quickshellStoreDir}
@@ -82,11 +96,10 @@ let
       }) cfg.displays
     )}
 
-    ${concatMapStringsSep "\n" (x: "workspace ${toString x.value.workspace} output ${x.name}") (
-      mapAttrsToList (n: v: {
-        name = n;
-        value = v;
-      }) (filterAttrs (n: v: v.workspace != null) cfg.displays)
+    ${concatMapStringsSep "\n" (x: "workspace ${x.ws} output ${x.name}") (
+      concatMap (n:
+        map (ws: { name = n; ws = ws; }) (expandWorkspace cfg.displays.${n})
+      ) (attrNames (filterAttrs (n: v: (v.workspace != null || v.workspaces != null)) cfg.displays))
     )}
 
     ${concatMapStringsSep "\n" (a: "exec ${a}") cfg.autostart}
