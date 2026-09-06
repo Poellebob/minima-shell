@@ -54,7 +54,25 @@ in {
             theming           = mkDefault cfg.theming;
             shell             = mkDefault cfg.shell;
             extraPackages     = mkDefault cfg.extraPackages;
-            minimaConfig      = mkDefault cfg.minimaConfig;
+            darkTheme         = mkDefault cfg.darkTheme;
+            panel             = {
+              enable        = mkDefault cfg.panel.enable;
+              alwaysVisible = mkDefault cfg.panel.alwaysVisible;
+            };
+            launcher          = {
+              enable   = mkDefault cfg.launcher.enable;
+              qalcPath = mkDefault cfg.launcher.qalcPath;
+            };
+            clipboard.enable  = mkDefault cfg.clipboard.enable;
+            wallpaper         = {
+              enable        = mkDefault cfg.wallpaper.enable;
+              engineEnabled = mkDefault cfg.wallpaper.engineEnabled;
+              workshopPath  = mkDefault cfg.wallpaper.workshopPath;
+              fps           = mkDefault cfg.wallpaper.fps;
+              fill          = mkDefault cfg.wallpaper.fill;
+              matureContent = mkDefault cfg.wallpaper.matureContent;
+              volume        = mkDefault cfg.wallpaper.volume;
+            };
             displays          = mkDefault cfg.displays;
             autostart         = mkDefault cfg.autostart;
             specialWorkspaces = mkDefault cfg.specialWorkspaces;

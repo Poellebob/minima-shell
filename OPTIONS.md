@@ -11,6 +11,7 @@ This document details all configuration options available in minima.
 - [Keybinds](#keybinds)
 - [Display & Workspaces](#display--workspaces)
 - [Desktop Integration](#desktop-integration)
+- [Matugen Theming](#matugen-theming)
 - [TeX/LaTeX](#texlatex)
 - [Panel & Launcher](#panel--launcher)
 - [Vim/Editor Options](#vimeditor-options)
@@ -26,6 +27,7 @@ This document details all configuration options available in minima.
 | `minima.theming.enable` | bool | `true` | Enable Breeze/Papirus/Rose-Pine styling |
 | `minima.shell.enable` | bool | `true` | Enable zsh, fzf, starship, etc. |
 | `minima.extraPackages` | list | `[]` | Extra packages to install |
+| `minima.kitty.enable` | bool | `true` | Enable kitty terminal config |
 | `minima.programs.terminal.name` | string | `"kitty"` | Terminal binary name (used for desktop file lookup and `lib.getExe'`) |
 | `minima.programs.terminal.package` | package | `pkgs.kitty` | Terminal application package |
 
@@ -59,7 +61,7 @@ error.
 |--------|------|---------|-------------|
 | `minima.hyprland.enable` | bool | `true` | Use Hyprland (auto-disabled if sway/scroll enabled, unless set explicitly) |
 | `minima.hyprland.modifier` | string | `"SUPER"` | Hyprland modifier key |
-| `minima.hyprland.layout` | enum | `"dwindle"` | Hyprland layout: `"dwindle"`, `"master"`, `"scrolling"` |
+| `minima.hyprland.layout` | enum | `"dwindle"` | Hyprland layout: `"dwindle"`, `"master"`, `"scrolling"`, `"hy3"` |
 | `minima.hyprland.extraLua` | lines | `""` | Extra Lua appended to the generated `hyprland.lua` |
 | `minima.hyprland.plugins` | list | `[]` | Hyprland plugins (packages or absolute paths) |
 | `minima.sway.enable` | bool | `false` | Use Sway |
@@ -162,7 +164,9 @@ not configurable via this option.
 | `minima.displays.<name>.position.x` | int | `0` | X position |
 | `minima.displays.<name>.position.y` | int | `0` | Y position |
 | `minima.displays.<name>.scale` | float | `1.0` | Display scale |
+| `minima.displays.<name>.primary` | bool | `false` | Mark this display as the primary monitor (mouse spawns here) |
 | `minima.displays.<name>.workspace` | null/int/str | `null` | Workspace to assign to this output |
+| `minima.displays.<name>.workspaces` | null/list | `null` | List of workspace numbers or ranges (e.g. `[1 2 3 "4-8"]`) to bind to this display |
 
 ### Autostart
 
@@ -191,7 +195,8 @@ not configurable via this option.
       position.x = 0;
       position.y = 0;
       scale = 1.0;
-      workspace = "1";
+      primary = true;
+      workspaces = [ 1 2 3 "4-8" ];
     };
     HDMI-A-1 = {
       res = "1920x1080";
@@ -237,6 +242,33 @@ not configurable via this option.
 
 ---
 
+## Matugen Theming
+
+Material-you color generation using [matugen](https://github.com/InioX/matugen).
+A seed color is used to generate a full color palette that is applied to the
+panel, launcher, and Sway/Hyprland via QuickShell templates.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `minima.matugen.sourceColor` | string | `"#6750A4"` | Seed color for matugen |
+| `minima.matugen.scheme` | string | `"content"` | Matugen color scheme type |
+| `minima.matugen.mode` | string | `"color"` | Matugen mode (`"color"` or `"image"`) |
+| `minima.matugen.package` | package | `pkgs.matugen` | Matugen package |
+
+### Example
+
+```nix
+{
+  minima.matugen = {
+    sourceColor = "#FF6B35";
+    scheme = "content";
+    mode = "color";
+  };
+}
+```
+
+---
+
 ## TeX/LaTeX
 
 | Option | Type | Default | Description |
@@ -268,24 +300,25 @@ not configurable via this option.
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `minima.minimaConfig.darkTheme` | bool | `true` | Use dark theme |
-| `minima.minimaConfig.panel.enable` | bool | `true` | Enable panel |
-| `minima.minimaConfig.panel.alwaysVisible` | bool | `true` | Panel always visible |
-| `minima.minimaConfig.launcher.enable` | bool | `true` | Enable app launcher |
-| `minima.minimaConfig.launcher.qalcPath` | string | `"${pkgs.libqalculate}/bin/qalc"` | Calculator path |
-| `minima.minimaConfig.clipboard.enable` | bool | `true` | Enable clipboard manager |
-| `minima.minimaConfig.wallpaper.enable` | bool | `true` | Enable wallpaper |
-| `minima.minimaConfig.wallpaper.engineEnabled` | bool | `false` | Enable wallpaper engine |
-| `minima.minimaConfig.wallpaper.workshopPath` | string | `"~/.steam/steam/steamapps/workshop/content/431960/"` | Workshop path |
-| `minima.minimaConfig.wallpaper.fps` | int | `25` | Animation FPS |
-| `minima.minimaConfig.wallpaper.fill` | bool | `true` | Fill mode |
-| `minima.minimaConfig.wallpaper.matureContent` | bool | `false` | Mature content |
+| `minima.darkTheme` | bool | `true` | Use dark theme |
+| `minima.panel.enable` | bool | `true` | Enable panel |
+| `minima.panel.alwaysVisible` | bool | `true` | Panel always visible |
+| `minima.launcher.enable` | bool | `true` | Enable app launcher |
+| `minima.launcher.qalcPath` | string | `"${pkgs.libqalculate}/bin/qalc"` | Calculator path |
+| `minima.clipboard.enable` | bool | `true` | Enable clipboard manager |
+| `minima.wallpaper.enable` | bool | `true` | Enable wallpaper |
+| `minima.wallpaper.engineEnabled` | bool | `false` | Enable wallpaper engine |
+| `minima.wallpaper.workshopPath` | string | `"~/.steam/steam/steamapps/workshop/content/431960/"` | Workshop path |
+| `minima.wallpaper.fps` | int | `25` | Animation FPS |
+| `minima.wallpaper.fill` | bool | `true` | Fill mode |
+| `minima.wallpaper.matureContent` | bool | `false` | Mature content |
+| `minima.wallpaper.volume` | int | `50` | Wallpaper volume |
 
 ### Example
 
 ```nix
 {
-  minima.minimaConfig = {
+  minima = {
     darkTheme = true;
     panel = {
       enable = true;
@@ -352,6 +385,7 @@ automatically.
 | `minima.vim.autocmd[].event` | string/list | Event(s) to trigger on |
 | `minima.vim.autocmd[].pattern` | string/list | File pattern |
 | `minima.vim.autocmd[].command` | string | Command to run |
+| `minima.vim.autocmd[].desc` | string | Description |
 
 ### Plugins
 

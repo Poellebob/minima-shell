@@ -29,6 +29,12 @@ let
       workspace = mkOption {
         type = types.nullOr (types.either types.int types.str);
         default = null;
+        description = "Default workspace for this display";
+      };
+      workspaces = mkOption {
+        type = types.nullOr (types.listOf (types.either types.int types.str));
+        default = null;
+        description = "List of workspace numbers or ranges (e.g. [1 2 3 \"4-8\"]) to bind to this display";
       };
       primary = mkOption {
         type = types.bool;
@@ -289,69 +295,67 @@ in
       };
     };
 
-    minimaConfig = {
-      darkTheme = mkOption {
+    darkTheme = mkOption {
+      type = types.bool;
+      default = true;
+    };
+
+    panel = {
+      enable = mkOption {
         type = types.bool;
         default = true;
       };
-
-      panel = {
-        enable = mkOption {
-          type = types.bool;
-          default = true;
-        };
-        alwaysVisible = mkOption {
-          type = types.bool;
-          default = true;
-        };
-      };
-
-      launcher = {
-        enable = mkOption {
-          type = types.bool;
-          default = true;
-        };
-        qalcPath = mkOption {
-          type = types.str;
-          default = "${pkgs.libqalculate}/bin/qalc";
-        };
-      };
-
-      clipboard.enable = mkOption {
+      alwaysVisible = mkOption {
         type = types.bool;
         default = true;
       };
+    };
 
-      wallpaper = {
-        enable = mkOption {
-          type = types.bool;
-          default = true;
-        };
-        engineEnabled = mkOption {
-          description = "Enable wallpaper engine support";
-          type = types.bool;
-          default = false;
-        };
-        workshopPath = mkOption {
-          type = types.str;
-          default = "~/.steam/steam/steamapps/workshop/content/431960/";
-        };
-        fps = mkOption {
-          type = types.int;
-          default = 25;
-        };
-        fill = mkOption {
-          type = types.bool;
-          default = true;
-        };
-        matureContent = mkOption {
-          type = types.bool;
-          default = false;
-        };
-        volume = mkOption {
-          type = types.int;
-          default = 50;
-        };
+    launcher = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+      };
+      qalcPath = mkOption {
+        type = types.str;
+        default = "${pkgs.libqalculate}/bin/qalc";
+      };
+    };
+
+    clipboard.enable = mkOption {
+      type = types.bool;
+      default = true;
+    };
+
+    wallpaper = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+      };
+      engineEnabled = mkOption {
+        description = "Enable wallpaper engine support";
+        type = types.bool;
+        default = false;
+      };
+      workshopPath = mkOption {
+        type = types.str;
+        default = "~/.steam/steam/steamapps/workshop/content/431960/";
+      };
+      fps = mkOption {
+        type = types.int;
+        default = 25;
+      };
+      fill = mkOption {
+        type = types.bool;
+        default = true;
+      };
+      matureContent = mkOption {
+        type = types.bool;
+        default = false;
+      };
+      volume = mkOption {
+        type = types.int;
+        default = 50;
       };
     };
 

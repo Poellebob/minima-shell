@@ -66,11 +66,9 @@ most one window manager may be enabled at a time.
             hyprland.enable = true;  # default; or sway.enable / scroll.enable
             shell.enable = true;
             theming.enable = true;
-            minimaConfig = {
-              darkTheme = true;
-              wallpaper.engineEnabled = true;
-              panel.alwaysVisible = true;
-            };
+            darkTheme = true;
+            wallpaper.engineEnabled = true;
+            panel.alwaysVisible = true;
             vim.enable = true;
           };
         }
@@ -121,11 +119,9 @@ most one window manager may be enabled at a time.
               enable = true;
               shell.enable = true;
               theming.enable = true;
-              minimaConfig = {
-                darkTheme = true;
-                wallpaper.engineEnabled = true;
-                panel.alwaysVisible = true;
-              };
+            darkTheme = true;
+            wallpaper.engineEnabled = true;
+            panel.alwaysVisible = true;
               vim.enable = true;
             };
           };
@@ -155,7 +151,7 @@ All configuration options are documented in [OPTIONS.md](./OPTIONS.md).
 
 ## Features
 
-- **Hyprland / Sway / SwayFX / Scroll** — pick your window manager with `minima.hyprland.enable`, `minima.sway.enable` (+ `minima.sway.fx`), or `minima.scroll.enable`
+- **Hyprland / Sway / SwayFX / Scroll** — pick your window manager with `minima.hyprland.enable`, `minima.sway.enable` (+ `minima.sway.fx`), or `minima.scroll.enable`; Hyprland layouts include dwindle, master, scrolling, and hy3
 - **QuickShell panel & launcher** — animated bar, app launcher with qalc, clipboard manager, wallpaper engine support
 - **Material you theming** — matugen-rendered colors using a seed color, applied to the panel, launcher, and Sway
 - **KDE-style styling** — Breeze cursor/GTK/Qt theming, Papirus icons, `kdeglobals`
