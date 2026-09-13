@@ -112,12 +112,12 @@ in
       }
       // lib.optionalAttrs (cfg.sway.enable || cfg.scroll.enable) {
         minima = {
-          ScreenCast = [ "wlr" ];
+          "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];
         };
       }
       // lib.optionalAttrs cfg.hyprland.enable {
         minima = {
-          ScreenCast = [ "hyprland" ];
+          "org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
         };
       };
     };
