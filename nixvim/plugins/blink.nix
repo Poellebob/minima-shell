@@ -11,10 +11,10 @@
           ghost_text.enabled = true;
           documentation = {
             auto_show = true;
-            window.border = "rounded";
+            window.border = "single";
           };
           menu = {
-            border = "rounded";
+            border = "single";
             draw = {
               columns = [
                 { __unkeyed-1 = "label"; }
@@ -50,7 +50,7 @@
         };
         signature = {
           enabled = true;
-          window.border = "rounded";
+          window.border = "single";
         };
         sources = {
           default = [

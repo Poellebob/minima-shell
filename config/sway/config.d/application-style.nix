@@ -6,7 +6,7 @@
   default_border pixel 2
 
   ${if wm == "scroll" then ''
-  default_decoration border_radius 8
+  default_decoration border_radius 0
 
   # Animations
   animations {

@@ -14,6 +14,7 @@
         lsp_trouble = true;
         markdown = true;
         mini.enabled = true;
+        telescope.enabled = true;
         native_lsp = {
           enabled = true;
           virtual_text = {
