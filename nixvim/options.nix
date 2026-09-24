@@ -61,6 +61,11 @@
         laststatus = 3;
         fileencoding = "utf-8";
         termguicolors = true;
+        winblend = 0;
+        pumblend = 0;
+        winborder = "single";
+
+        title = true;
         spelllang = lib.mkDefault [ "en_us" ];
         spell = true;
         wrap = false;

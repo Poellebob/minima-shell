@@ -12,6 +12,13 @@
             "cmp.entry.get_documentation" = true;
           };
         };
+        views = {
+          cmdline_popup.border.style = "single";
+          cmdline_input.border.style = "single";
+          confirm.border.style = "single";
+          popup.border.style = "single";
+          hover.border.style = "single";
+        };
       };
     };
   };

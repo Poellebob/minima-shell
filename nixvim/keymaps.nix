@@ -81,20 +81,6 @@
           options.desc = "Resize right";
         }
 
-        # ── Splits ────────────────────────────────────────────────────────────
-        {
-          mode = "n";
-          key = "\\";
-          action = "<cmd>split<CR>";
-          options.desc = "Horizontal split";
-        }
-        {
-          mode = "n";
-          key = "|";
-          action = "<cmd>vsplit<CR>";
-          options.desc = "Vertical split";
-        }
-
         # ── File / buffer management ──────────────────────────────────────────
         {
           mode = "n";
@@ -131,96 +117,6 @@
           key = "<leader>bC";
           action = "<cmd>bufdo bdelete<CR>";
           options.desc = "Close all buffers";
-        }
-
-        # ── Tabs ──────────────────────────────────────────────────────────────
-        {
-          mode = "n";
-          key = "]t";
-          action = "<cmd>tabnext<CR>";
-          options.desc = "Next tab";
-        }
-        {
-          mode = "n";
-          key = "[t";
-          action = "<cmd>tabprevious<CR>";
-          options.desc = "Prev tab";
-        }
-
-        # ── Better escape ─────────────────────────────────────────────────────
-        {
-          mode = "i";
-          key = "jj";
-          action = "<Esc>";
-          options.desc = "Escape";
-        }
-        {
-          mode = "i";
-          key = "jk";
-          action = "<Esc>";
-          options.desc = "Escape";
-        }
-
-        # ── Quickfix / location list ──────────────────────────────────────────
-        {
-          mode = "n";
-          key = "<leader>xq";
-          action = "<cmd>copen<CR>";
-          options.desc = "Open quickfix";
-        }
-        {
-          mode = "n";
-          key = "<leader>xl";
-          action = "<cmd>lopen<CR>";
-          options.desc = "Open local list";
-        }
-        {
-          mode = "n";
-          key = "]q";
-          action = "<cmd>cnext<CR>";
-          options.desc = "Next quickfix";
-        }
-        {
-          mode = "n";
-          key = "[q";
-          action = "<cmd>cprevious<CR>";
-          options.desc = "Prev quickfix";
-        }
-        {
-          mode = "n";
-          key = "]Q";
-          action = "<cmd>clast<CR>";
-          options.desc = "Last quickfix";
-        }
-        {
-          mode = "n";
-          key = "[Q";
-          action = "<cmd>cfirst<CR>";
-          options.desc = "First quickfix";
-        }
-        {
-          mode = "n";
-          key = "]l";
-          action = "<cmd>lnext<CR>";
-          options.desc = "Next local list";
-        }
-        {
-          mode = "n";
-          key = "[l";
-          action = "<cmd>lprevious<CR>";
-          options.desc = "Prev local list";
-        }
-        {
-          mode = "n";
-          key = "]L";
-          action = "<cmd>llast<CR>";
-          options.desc = "Last local list";
-        }
-        {
-          mode = "n";
-          key = "[L";
-          action = "<cmd>lfirst<CR>";
-          options.desc = "First local list";
         }
 
         # ── UI toggles ────────────────────────────────────────────────────────
