@@ -35,12 +35,6 @@
         cursorword = { };
         jump = { };
         jump2d = { };
-        files = {
-          windows = {
-            preview = true;
-            width_preview = 65;
-          };
-        };
         indentscope = {
           symbol = "▏";
           options = {
@@ -51,19 +45,6 @@
     };
 
     programs.nixvim.keymaps =
-      lib.optionals
-        (
-          config.programs.nixvim.plugins.mini.enable
-          && lib.hasAttr "files" config.programs.nixvim.plugins.mini.modules
-        )
-        [
-          {
-            mode = "n";
-            key = "<leader>e";
-            action.__raw = "MiniFiles.open";
-          }
-        ]
-      ++
         lib.optionals
           (
             config.programs.nixvim.plugins.mini.enable
@@ -102,36 +83,5 @@
               action.__raw = "MiniExtra.pickers.spellsuggest";
             }
           ];
-
-    programs.nixvim.autoCmd = [
-      {
-        event = "User";
-        pattern = "MiniFilesBufferCreate";
-        callback.__raw = ''
-          function(args)
-            local MiniFiles = require("mini.files")
-            local map = function(lhs, rhs)
-              vim.keymap.set("n", lhs, rhs, { buffer = args.data.buf_id })
-            end
-            map("l", function()
-              local entry = MiniFiles.get_fs_entry()
-              if entry == nil then
-                return
-              end
-              MiniFiles.go_in()
-              if entry.fs_type == "file" then
-                MiniFiles.close()
-              end
-            end)
-            map("h", function()
-              MiniFiles.go_out()
-            end)
-            map("<esc>", function()
-              MiniFiles.close()
-            end)
-          end
-        '';
-      }
-    ];
   };
 }
