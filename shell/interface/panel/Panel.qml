@@ -26,9 +26,8 @@ PanelWindow {
     bottom: true
   }
 
-  implicitHeight: content.height + (barMenu.visible ? barMenu.implicitHeight :
-                                                      0)
-  exclusiveZone: height
+  implicitHeight: content.height + (barMenu.visible ? barMenu.implicitHeight : 0)
+  exclusiveZone: Global.format.panel_height
   color: Global.colors.background
   aboveWindows: true
 
