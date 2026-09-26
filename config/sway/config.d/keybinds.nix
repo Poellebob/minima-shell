@@ -10,8 +10,8 @@ in ''
   bindsym ${modifier}+Shift+s sticky toggle
   bindsym ${modifier}+Mod1+Delete exec swaylock
   bindsym ${modifier}+Shift+c exec ${msgCmd} reload
-  bindsym ${modifier}+v exec qs -c $qs_path ipc call clipboard open
-  bindsym ${modifier}+d exec qs -c $qs_path ipc call launcher open
+  bindsym ${modifier}+v exec qs -c $qs_config ipc call clipboard open
+  bindsym ${modifier}+d exec qs -c $qs_config ipc call launcher open
 
   ${if wm == "scroll" then ''
   bindsym ${modifier}+Mod1+l set_size h 1.0
@@ -69,7 +69,7 @@ in ''
   bindsym ${modifier}+minus scratchpad show
 
   # Logout
-  bindsym XF86PowerOff exec qs -c $qs_path ipc call ${logoutTarget} open
+  bindsym XF86PowerOff exec qs -c $qs_config ipc call ${logoutTarget} open
 
   # Multimedia keys
   bindsym XF86AudioRaiseVolume exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+

@@ -26,8 +26,8 @@ in
   hl.bind(${modifier} .. " + SHIFT + S", hl.dsp.window.pin())
   hl.bind(${modifier} .. " + ALT + DELETE", hl.dsp.exec_cmd("swaylock"))
   hl.bind(${modifier} .. " + SHIFT + C", hl.dsp.exec_cmd("hyprctl reload"))
-  hl.bind(${modifier} .. " + V", hl.dsp.exec_cmd("qs -c " .. qsPath .. " ipc call clipboard open"))
-  hl.bind(${modifier} .. " + D", hl.dsp.exec_cmd("qs -c " .. qsPath .. " ipc call launcher open"))
+  hl.bind(${modifier} .. " + V", hl.dsp.exec_cmd("qs -c " .. qsConfigName .. " ipc call clipboard open"))
+  hl.bind(${modifier} .. " + D", hl.dsp.exec_cmd("qs -c " .. qsConfigName .. " ipc call launcher open"))
 
   hl.bind("PRINT", hl.dsp.exec_cmd("${grim} -g \"$(${slurp} -o -d)\" - | ${magick} - -shave 1x1 PNG:- | ${wlCopy}"))
   hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("${grim} - | ${wlCopy}"))
@@ -113,7 +113,7 @@ in
   ''}
   hl.bind(${modifier} .. " + MINUS", hl.dsp.workspace.toggle_special("scratchpad"))
 
-  hl.bind("XF86PowerOff", hl.dsp.exec_cmd("qs -c " .. qsPath .. " ipc call minimaLogout open"))
+  hl.bind("XF86PowerOff", hl.dsp.exec_cmd("qs -c " .. qsConfigName .. " ipc call minimaLogout open"))
 
   hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"))
   hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"))

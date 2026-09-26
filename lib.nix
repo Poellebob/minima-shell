@@ -188,6 +188,17 @@ in
       internal = true;
     };
 
+    quickshellConfigName = mkOption {
+      type = types.str;
+      default = "minima";
+      internal = true;
+      description = ''
+        Stable name the QuickShell config is registered under
+        (`~/.config/quickshell/<name>`), used by the session service and by
+        the keybinds to address the running shell.
+      '';
+    };
+
     hyprlandLua = mkOption {
       type = types.nullOr types.str;
       default = null;
@@ -252,6 +263,23 @@ in
       type = types.bool;
       default = true;
       description = "Enable zsh, fzf, starship, etc.";
+    };
+
+    session = {
+      systemd = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = ''
+            Run the Minima session (QuickShell panel and helper daemons) as
+            systemd user units bound to graphical-session.target instead of
+            launching them from the window manager config. Rebuilds then
+            restart the shell automatically, so new config is picked up
+            without relogging. When false, the old behaviour is used: the
+            window manager config starts everything at compositor startup.
+          '';
+        };
+      };
     };
 
     extraPackages = mkOption {

@@ -86,7 +86,6 @@ let
       cfg
       pkgs
       lib
-      quickshellStoreDir
       ;
   };
   mkHyprlandConfig = import ./config/hyprland/hyprland.nix {
@@ -94,7 +93,6 @@ let
       cfg
       pkgs
       lib
-      quickshellStoreDir
       ;
   };
 in

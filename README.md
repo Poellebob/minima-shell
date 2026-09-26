@@ -4,8 +4,6 @@ A NixOS/home-manager flake providing a Wayland-focused desktop environment with 
 
 > [!WARNING]
 > This project is not done and is still **alpha**; it will contain bugs.
->
-> Rebuilding will cause keybinds interacting with the shell to break, but relogging will fix it.
 
 ---
 
@@ -30,11 +28,8 @@ and passes system-level options down to Home Manager, which actually manages
 all of your config files, the QuickShell panel, styling, and shell setup.
 
 You also need a window manager — **Hyprland** (the default), **Sway**,
-**SwayFX**, or **Scroll**. Select it with `minima.hyprland.enable`
-(default `true`), `minima.sway.enable` (`minima.sway.fx = true` for
-SwayFX), or `minima.scroll.enable`. Enabling sway or scroll automatically
-disables Hyprland unless you set `minima.hyprland.enable` explicitly; at
-most one window manager may be enabled at a time.
+**SwayFX**, or **Scroll**. Select it with `minima.<wm>.enable`
+hyprland defaults to true with the dwindle layout.
 
 ---
 
@@ -153,6 +148,7 @@ All configuration options are documented in [OPTIONS.md](./OPTIONS.md).
 
 - **Hyprland / Sway / SwayFX / Scroll** — pick your window manager with `minima.hyprland.enable`, `minima.sway.enable` (+ `minima.sway.fx`), or `minima.scroll.enable`; Hyprland layouts include dwindle, master, scrolling, and hy3
 - **QuickShell panel & launcher** — animated bar, app launcher with qalc, clipboard manager, wallpaper engine support
+- **Session as systemd units** — panel and helper daemons run under `graphical-session.target`, so rebuilds apply without relogging
 - **Material you theming** — matugen-rendered colors using a seed color, applied to the panel, launcher, and Sway
 - **KDE-style styling** — Breeze cursor/GTK/Qt theming, Papirus icons, `kdeglobals`
 - **Shell setup** — zsh, starship, eza, fzf, zoxide, bat, ripgrep, lazygit
@@ -169,12 +165,12 @@ All configuration options are documented in [OPTIONS.md](./OPTIONS.md).
 
 Keybindings use common modifier names that work across all window managers:
 
-| Modifier | Hyprland | Sway/Scroll |
-|----------|----------|-------------|
-| `Main` | `SUPER` | `Mod4` |
-| `Shift` | `SHIFT` | `Shift` |
-| `Ctrl` | `CTRL` | `Control` |
-| `Alt` | `ALT` | `Mod1` |
+| Modifiers |
+|-----------|
+| `Main`    |
+| `Shift`   |
+| `Ctrl`    |
+| `Alt`     |
 
 ```nix
 minima.keybinds = [
