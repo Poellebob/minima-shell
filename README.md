@@ -14,6 +14,16 @@ A NixOS/home-manager flake providing a Wayland-focused desktop environment with 
 - [Flake Outputs](#flake-outputs)
 - [Features](#features)
 - [Keybinds](#keybinds)
+  - [User-Defined Keybinds](#user-defined-keybinds)
+  - [General (Hardcoded)](#general-hardcoded)
+  - [Workspaces](#workspaces)
+  - [Focus Movement](#focus-movement-vim-style)
+  - [Move Windows](#move-windows)
+  - [Resize Windows](#resize-windows)
+  - [hy3 Layout](#hy3-layout-hyprland-only)
+  - [Screenshots](#screenshots)
+  - [Mouse](#mouse)
+  - [Multimedia](#multimedia)
 - [Related Documentation](#related-documentation)
 
 ---
@@ -182,31 +192,33 @@ minima.keybinds = [
 
 ### General (Hardcoded)
 
-| Keybind | Action (Sway) | Action (Scroll) |
-|--------|---------------|---------------|
-| `$mod + Return` | Open terminal | Open terminal |
-| `$mod + q` | Kill focused window | Kill focused window |
-| `$mod + e` | Open file manager | Open file manager |
-| `$mod + b` | Open browser | Open browser |
-| `$mod + Space` | Toggle floating | Toggle floating |
-| `$mod + f` | Toggle fullscreen | Toggle fullscreen |
-| `$mod + Shift + s` | Toggle sticky | Toggle sticky |
-| `$mod + Alt + Delete` | Lock screen (swaylock) | Lock screen (swaylock) |
-| `$mod + v` | Open clipboard manager | Open clipboard manager |
-| `$mod + d` | Open app launcher | Open app launcher |
-| `$mod + Shift + c` | Reload config | Reload config |
-| `$mod + Alt + l` | Tabbed layout | Set window height to 100% |
-| `$mod + Alt + h` | Stacking layout | Set window height to 50% |
-| `$mod + Alt + j` | Split vertical | Move window into column on left |
-| `$mod + Alt + k` | Split horizontal | Move window into column on right |
-| `$mod + a` | Split toggle | Direction mode |
-| `$mod + Shift + a` | Focus parent | - |
-| `$mod + Ctrl + a` | Focus child | - |
-| `$mod + Escape` | Default layout | - |
-| `$mod + Tab` | - | Workspace overview |
-| `$mod + Shift + -` | - | Move to scratchpad |
-| `$mod + -` | - | Show scratchpad |
-| `XF86PowerOff` | Open logout menu | Open logout menu |
+> hy3 actions only apply if the layout is hy3
+
+| Keybind | Action (Hyprland) | Action (Sway) | Action (Scroll) |
+|--------|-------------------|---------------|---------------|
+| `Main + Return` | Open terminal | Open terminal | Open terminal |
+| `Main + q` | Kill focused window | Kill focused window | Kill focused window |
+| `Main + e` | Open file manager | Open file manager | Open file manager |
+| `Main + b` | Open browser | Open browser | Open browser |
+| `Main + Space` | Toggle floating | Toggle floating | Toggle floating |
+| `Main + f` | Toggle fullscreen | Toggle fullscreen | Toggle fullscreen |
+| `Main + Shift + s` | Pin (sticky) | Toggle sticky | Toggle sticky |
+| `Main + Alt + Delete` | Lock screen (swaylock) | Lock screen (swaylock) | Lock screen (swaylock) |
+| `Main + v` | Open clipboard manager | Open clipboard manager | Open clipboard manager |
+| `Main + d` | Open app launcher | Open app launcher | Open app launcher |
+| `Main + Shift + c` | Reload config | Reload config | Reload config |
+| `Main + Alt + l` | hy3: toggle tab group | Tabbed layout | Set window height to 100% |
+| `Main + Alt + h` | hy3: toggle tab group | Stacking layout | Set window height to 50% |
+| `Main + Alt + j` | hy3: vertical split | Split vertical | Move window into column on left |
+| `Main + Alt + k` | hy3: horizontal split | Split horizontal | Move window into column on right |
+| `Main + a` | dwindle: toggle split | Split toggle | Direction mode |
+| `Main + Shift + a` | hy3: focus parent | Focus parent | - |
+| `Main + Ctrl + a` | hy3: focus child | Focus child | - |
+| `Main + Escape` | hy3: untab group | Default layout | - |
+| `Main + Tab` | hy3: next tab | - | Workspace overview |
+| `Main + Shift + -` | Move to scratchpad | - | Move to scratchpad |
+| `Main + -` | Toggle scratchpad | - | Show scratchpad |
+| `XF86PowerOff` | Open logout menu | Open logout menu | Open logout menu |
 
 ### Workspaces
 
@@ -244,13 +256,23 @@ minima.keybinds = [
 | `$mod + Shift + K` | Shrink height 100px |
 | `$mod + Shift + J` | Grow height 100px |
 
+
 ### Screenshots
 
 | Keybind | Action |
 |--------|--------|
+| `Print` | Screenshot selection → clipboard |
 | `Shift + Print` | Screenshot fullscreen → clipboard |
 | `$mod + Print` | Screenshot selection → edit in swappy |
 | `$mod + Shift + Print` | Screenshot fullscreen → edit in swappy |
+
+### Mouse
+
+| Keybind | Action |
+|--------|--------|
+| `$mod + LMB drag` | Move window |
+| `$mod + RMB drag` | Resize window |
+| `$mod + MMB` | Kill focused window |
 
 ### Multimedia
 
