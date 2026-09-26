@@ -2,12 +2,15 @@
   cfg,
   pkgs,
   lib,
-  quickshellStoreDir,
 }:
 
 with lib;
 let
   luaStr = s: "\"" + lib.escape [ "\\" "\"" ] s + "\"";
+
+  # Stable QuickShell config name; session.nix symlinks it to the config
+  # derivation so keybinds survive rebuilds.
+  qsConfigName = cfg.quickshellConfigName;
 
   commonToHypr = {
     "Main" = luaStr cfg.hyprland.modifier;
@@ -116,11 +119,25 @@ let
     ) "hl.exec_cmd(${luaStr (dropCaps ws.startCommand)})"
   ) cfg.specialWorkspaces;
 
+  # systemd-managed daemons (session.nix) are exec'd from here only when
+  # session.systemd.enable is false.
+  startupLua = ''
+    hl.exec_cmd(${luaStr "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"})
+    hl.exec_cmd(${luaStr "${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface gtk-theme Breeze-Dark"})
+    ${optionalString (!cfg.session.systemd.enable) ''
+      hl.exec_cmd(${luaStr (dropCaps "${pkgs.quickshell}/bin/qs -c ${qsConfigName}")})
+      hl.exec_cmd(${luaStr "${pkgs.awww}/bin/awww-daemon"})
+      hl.exec_cmd(${luaStr "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store"})
+    ''}
+    ${concatStringsSep "\n    " (map (a: "hl.exec_cmd(${luaStr (dropCaps a)})") cfg.autostart)}
+    ${concatStringsSep "\n    " specialWorkspaceAutostarts}
+  '';
+
   primaryDisplays = filter (n: cfg.displays.${n}.primary) (attrNames cfg.displays);
   primaryDisplayName = if primaryDisplays != [ ] then head primaryDisplays else null;
 in
 ''
-  local qsPath = ${luaStr "${quickshellStoreDir}"}
+  local qsConfigName = ${luaStr qsConfigName}
 
   local function setXftDpi(monitorName)
     local mon = hl.get_monitor(monitorName)
@@ -252,15 +269,8 @@ in
     activatePrimaryWhenReady(${
       if primaryDisplayName != null then luaStr primaryDisplayName else "nil"
     }, 40)
-    hl.exec_cmd(${luaStr (dropCaps "${pkgs.quickshell}/bin/qs -c ${quickshellStoreDir}")})
-    hl.exec_cmd(${luaStr "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"})
-    hl.exec_cmd(${luaStr "${pkgs.awww}/bin/awww-daemon"})
-    hl.exec_cmd(${luaStr "systemctl --user import-environment GTK_THEME QT_QPA_PLATFORMTHEME"})
-    hl.exec_cmd(${luaStr "${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface gtk-theme Breeze-Dark"})
-    hl.exec_cmd(${luaStr "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store"})
 
-    ${concatStringsSep "\n    " (map (a: "hl.exec_cmd(${luaStr (dropCaps a)})") cfg.autostart)}
-    ${concatStringsSep "\n    " specialWorkspaceAutostarts}
+    ${startupLua}
   end)
 
   local _kbLayoutHandle = io.popen("localectl status | sed -n 's/^[[:space:]]*X11 Layout:[[:space:]]*//p'")

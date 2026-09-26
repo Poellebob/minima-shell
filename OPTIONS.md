@@ -26,6 +26,7 @@ This document details all configuration options available in minima.
 | `minima.enableNvidia` | bool | `false` | Enable NVIDIA GPU support |
 | `minima.theming.enable` | bool | `true` | Enable Breeze/Papirus/Rose-Pine styling |
 | `minima.shell.enable` | bool | `true` | Enable zsh, fzf, starship, etc. |
+| `minima.session.systemd.enable` | bool | `true` | Run the QuickShell panel and session daemons as systemd user units bound to `graphical-session.target` (rebuilds restart them automatically). When `false`, the window manager config starts them at compositor startup instead |
 | `minima.extraPackages` | list | `[]` | Extra packages to install |
 | `minima.kitty.enable` | bool | `true` | Enable kitty terminal config |
 | `minima.programs.terminal.name` | string | `"kitty"` | Terminal binary name (used for desktop file lookup and `lib.getExe'`) |
@@ -52,10 +53,6 @@ This document details all configuration options available in minima.
 
 ## Window Managers
 
-Select exactly one window manager. **Hyprland is the default**; enabling sway
-or scroll automatically disables Hyprland unless you set
-`minima.hyprland.enable` explicitly. Enabling more than one is an evaluation
-error.
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -72,11 +69,6 @@ error.
 | `minima.scroll.modifier` | string | `"Mod4"` | Scroll modifier key |
 | `minima.scroll.extraConfig` | lines | `""` | Extra scroll config appended to the generated config |
 
-Hyprland is configured declaratively through Home Manager
-(`wayland.windowManager.hyprland` with `configType = "lua"`), so plugins,
-systemd session integration, and xwayland handling come for free. The NixOS
-module enables `programs.hyprland` for system-level setup (session entry,
-portals).
 
 ### Example
 
@@ -144,8 +136,8 @@ not configurable via this option.
     { exec = "kitty";   bind = [ "Main" "Return" ]; }
     { exec = "firefox"; bind = [ "Main" "B" ]; }
     { exec = "dolphin"; bind = [ "Main" "E" ]; }
-    { exec = "qs -c $qs_path ipc call launcher open";  bind = [ "Main" "D" ]; }
-    { exec = "qs -c $qs_path ipc call clipboard open"; bind = [ "Main" "V" ]; }
+    { exec = "qs -c minima ipc call launcher open";  bind = [ "Main" "D" ]; }
+    { exec = "qs -c minima ipc call clipboard open"; bind = [ "Main" "V" ]; }
   ];
 }
 ```

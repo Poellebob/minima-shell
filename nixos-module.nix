@@ -53,6 +53,7 @@ in {
             programs          = mkDefault cfg.programs;
             theming           = mkDefault cfg.theming;
             shell             = mkDefault cfg.shell;
+            session           = mkDefault cfg.session;
             extraPackages     = mkDefault cfg.extraPackages;
             darkTheme         = mkDefault cfg.darkTheme;
             panel             = {

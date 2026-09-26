@@ -15,6 +15,7 @@ in
     ./nixvim.nix
     ./kdeglobals.nix
     ./config.nix
+    ./session.nix
   ];
 
   config = mkIf cfg.enable {
@@ -349,6 +350,17 @@ in
       package = mkIf cfg.osModule null;
       configType = "lua";
       extraConfig = cfg.hyprlandLua;
+      # Imported before hyprland-session.target pulls in the minima units.
+      systemd.variables = [
+        "DISPLAY"
+        "HYPRLAND_INSTANCE_SIGNATURE"
+        "WAYLAND_DISPLAY"
+        "XDG_CURRENT_DESKTOP"
+        "XDG_SESSION_TYPE"
+        "XDG_SESSION_ID"
+        "GTK_THEME"
+        "QT_QPA_PLATFORMTHEME"
+      ];
       plugins =
         cfg.hyprland.plugins
         ++ optionals (cfg.hyprland.layout == "hy3") [

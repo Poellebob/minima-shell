@@ -2,11 +2,13 @@
   cfg,
   pkgs,
   lib,
-  quickshellStoreDir,
 }:
 
 with lib;
 let
+  # Stable QuickShell config name; session.nix symlinks it to the config
+  # derivation so keybinds survive rebuilds.
+  qsConfigName = cfg.quickshellConfigName;
   swayOutputBlock =
     name: d:
     let
@@ -87,7 +89,7 @@ let
     in concatMap expandRange wsList;
 
   swayConfText = wm: ''
-    set $qs_path ${quickshellStoreDir}
+    set $qs_config ${qsConfigName}
 
     ${concatMapStringsSep "\n" (x: swayOutputBlock x.name x.value) (
       mapAttrsToList (n: v: {
@@ -130,11 +132,18 @@ pkgs.writeText "${wm}-config" ''
   ${builtins.readFile ./config.d/input}
   ${import ./config.d/application-style.nix { inherit wm; }}
 
-  exec awww-daemon
-  exec ${pkgs.quickshell}/bin/qs -c $qs_path
-  exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+  # Session vars for the systemd units (WAYLAND_DISPLAY etc.), before
+  # minima-session.target starts them.
+  exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_SESSION_ID GTK_THEME QT_QPA_PLATFORMTHEME
+  ${optionalString cfg.session.systemd.enable ''
+    exec_always --no-startup-id systemctl --user start minima-session.target
+  ''}
   exec ${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1
-  exec wl-paste --watch cliphist store
+  ${optionalString (!cfg.session.systemd.enable) ''
+    exec awww-daemon
+    exec ${pkgs.quickshell}/bin/qs -c $qs_config
+    exec wl-paste --watch cliphist store
+  ''}
 
   exec_always --no-startup-id sh -c '${msgCmd} input type:keyboard xkb_layout "$(localectl status | sed -n "s/^\s*X11 Layout:\s*//p")"'
 
