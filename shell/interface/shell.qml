@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import qs
 import qs.panel
+import qs.session
 
 ShellRoot {
   id: root
@@ -20,6 +21,18 @@ ShellRoot {
     delegate: Panel {
       screen: modelData
     }
+  }
+
+  Instantiator {
+    model: Quickshell.screens
+
+    delegate: LogoutMenu {
+      screen: modelData
+    }
+  }
+
+  LockScreen {
+    id: lockScreen
   }
 
   IpcHandler {
@@ -49,4 +62,18 @@ ShellRoot {
           Global.openNotifications();
         }
         }
-        }
+
+  IpcHandler {
+    target: "minimaLogout"
+    function open(): void {
+      Global.openLogoutMenu();
+    }
+  }
+
+  IpcHandler {
+    target: "minimaLock"
+    function open(): void {
+      Global.openLockScreen();
+    }
+  }
+}

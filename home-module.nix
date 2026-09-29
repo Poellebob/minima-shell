@@ -39,7 +39,6 @@ in
         matugen
         wiremix
         bluetui
-        swaylock
         bluez
         bluez-tools
         upower
@@ -212,7 +211,7 @@ in
 
         zv() { local prev="$PWD"; z "$1" || return; nvim .; cd "$prev"; }
         ziv() { local prev="$PWD"; zi || return; nvim .; cd "$prev"; }
-        alias lock='swaylock'
+        alias lock='qs -c ${cfg.quickshellConfigName} ipc call minimaLock open'
         alias hibernate='systemctl hibernate'
         alias suspend='systemctl suspend'
         alias reboot='systemctl reboot'
@@ -350,7 +349,9 @@ in
       package = mkIf cfg.osModule null;
       configType = "lua";
       extraConfig = cfg.hyprlandLua;
-      # Imported before hyprland-session.target pulls in the minima units.
+      # Import session vars into the user manager at compositor start; the
+      # minima units re-import these themselves right before restarting (they
+      # are started by the compositor config, not by hyprland-session.target).
       systemd.variables = [
         "DISPLAY"
         "HYPRLAND_INSTANCE_SIGNATURE"

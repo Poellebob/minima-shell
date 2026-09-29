@@ -24,7 +24,7 @@ in
   hl.bind(${modifier} .. " + SPACE", hl.dsp.window.float())
   hl.bind(${modifier} .. " + F", hl.dsp.window.fullscreen())
   hl.bind(${modifier} .. " + SHIFT + S", hl.dsp.window.pin())
-  hl.bind(${modifier} .. " + ALT + DELETE", hl.dsp.exec_cmd("swaylock"))
+  hl.bind(${modifier} .. " + ALT + DELETE", hl.dsp.exec_cmd("qs -c " .. qsConfigName .. " ipc call minimaLock open"))
   hl.bind(${modifier} .. " + SHIFT + C", hl.dsp.exec_cmd("hyprctl reload"))
   hl.bind(${modifier} .. " + V", hl.dsp.exec_cmd("qs -c " .. qsConfigName .. " ipc call clipboard open"))
   hl.bind(${modifier} .. " + D", hl.dsp.exec_cmd("qs -c " .. qsConfigName .. " ipc call launcher open"))
@@ -74,13 +74,13 @@ in
   hl.bind(${modifier} .. " + SHIFT + J", hl.dsp.window.resize({ x = 0, y = 100, relative = true }))
 
   ${lib.optionalString (layout == "dwindle") ''
-    hl.bind(${modifier} .. " + A", hl.dsp.layout("togglesplit"))
+    hl.bind(${modifier} .. " + SHIFT + A", hl.dsp.layout("togglesplit"))
   ''}
 
   ${lib.optionalString (layout == "hy3") ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3
-      hl.bind(${modifier} .. " + A", hy3.make_group("opposite", { toggle = true }))
+      hl.bind(${modifier} .. " + SHIFT + A", hy3.make_group("opposite", { toggle = true }))
       hl.bind(${modifier} .. " + ALT + J", hy3.make_group("v"))
       hl.bind(${modifier} .. " + ALT + K", hy3.make_group("h"))
       -- hy3 has no separate "stacked" layout like sway — tab groups are
@@ -92,7 +92,7 @@ in
       -- "raise" = ascend to parent (mirrors sway's focus parent)
       -- "lower" = descend into child (mirrors sway's focus child)
       hl.bind(${modifier} .. " + CTRL + A", hy3.change_focus("lower"))
-      hl.bind(${modifier} .. " + SHIFT + A", hy3.change_focus("raise"))
+      hl.bind(${modifier} .. " + A", hy3.change_focus("raise"))
       hl.bind(${modifier} .. " + TAB", hy3.focus_tab({ direction = "right", wrap = true }))
       hl.bind(${modifier} .. " + SHIFT + TAB", hy3.focus_tab({ direction = "left", wrap = true }))
       hl.bind(${modifier} .. " + SHIFT + E", hy3.equalize())

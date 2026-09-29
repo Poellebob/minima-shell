@@ -272,11 +272,12 @@ in
           default = true;
           description = ''
             Run the Minima session (QuickShell panel and helper daemons) as
-            systemd user units bound to graphical-session.target instead of
-            launching them from the window manager config. Rebuilds then
+            systemd user units, started by the window manager config at
+            compositor startup (right after the session environment is
+            imported, so the units see a live IPC socket). Rebuilds then
             restart the shell automatically, so new config is picked up
-            without relogging. When false, the old behaviour is used: the
-            window manager config starts everything at compositor startup.
+            without relogging. When false, the window manager config execs
+            the daemons directly instead.
           '';
         };
       };

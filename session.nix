@@ -47,13 +47,17 @@ let
     ]
   );
 
+  # Not WantedBy graphical-session.target: that target is already active when
+  # the compositor comes up, which started the units before the compositor's
+  # IPC socket existed (and before HYPRLAND_INSTANCE_SIGNATURE/SWAYSOCK were
+  # imported), leaving the shell attached to a dead socket with no workspaces.
+  # The window manager config imports the session env and restarts these units
+  # from its startup hook instead. PartOf still stops them at logout.
   sessionUnit = description: {
     Unit = {
       Description = description;
       PartOf = [ "graphical-session.target" ];
-      After = [ "graphical-session.target" ];
     };
-    Install.WantedBy = [ "graphical-session.target" ];
   };
 
   sessionService = service: {

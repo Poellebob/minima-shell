@@ -26,4 +26,6 @@ Singleton {
   signal openLauncher
   signal openClipboard
   signal openNotifications
+  signal openLogoutMenu
+  signal openLockScreen
 }
