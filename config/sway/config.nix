@@ -132,9 +132,11 @@ pkgs.writeText "${wm}-config" ''
   ${builtins.readFile ./config.d/input}
   ${import ./config.d/application-style.nix { inherit wm; }}
 
-  # Session vars for the systemd units (WAYLAND_DISPLAY etc.), before
-  # minima-session.target starts them.
-  exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_SESSION_ID GTK_THEME QT_QPA_PLATFORMTHEME
+  # Session vars for the systemd units. SWAYSOCK too: the units are not bound
+  # to graphical-session.target (it is already active here and would start
+  # them before the compositor's IPC socket exists), so the compositor starts
+  # them itself, chained after the import to pick up the fresh SWAYSOCK.
+  exec dbus-update-activation-environment --systemd SWAYSOCK WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_SESSION_ID GTK_THEME QT_QPA_PLATFORMTHEME${optionalString cfg.session.systemd.enable " && systemctl --user restart minima-shell.service minima-wallpaper.service minima-cliphist.service"}
   ${optionalString cfg.session.systemd.enable ''
     exec_always --no-startup-id systemctl --user start minima-session.target
   ''}

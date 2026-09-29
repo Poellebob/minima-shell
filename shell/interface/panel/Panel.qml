@@ -34,8 +34,7 @@ PanelWindow {
   property Item activeBarContent: statusContent
 
   function isFocusedScreen(): bool {
-    const focused = Wm.focusedMonitorName;
-    return !focused || screen.name == focused;
+    return Wm.isFocused(screen.name);
   }
 
   function openBarMenu(barContent: Item) {
@@ -335,6 +334,14 @@ PanelWindow {
         }
         function onOpenNotifications() {
           panel.openBarContent(notifContent);
+        }
+        function onOpenLogoutMenu() {
+          panel.closeBarMenu();
+          barMenu.hideContent();
+        }
+        function onOpenLockScreen() {
+          panel.closeBarMenu();
+          barMenu.hideContent();
         }
       }
 

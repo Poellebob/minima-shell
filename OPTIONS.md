@@ -26,7 +26,7 @@ This document details all configuration options available in minima.
 | `minima.enableNvidia` | bool | `false` | Enable NVIDIA GPU support |
 | `minima.theming.enable` | bool | `true` | Enable Breeze/Papirus/Rose-Pine styling |
 | `minima.shell.enable` | bool | `true` | Enable zsh, fzf, starship, etc. |
-| `minima.session.systemd.enable` | bool | `true` | Run the QuickShell panel and session daemons as systemd user units bound to `graphical-session.target` (rebuilds restart them automatically). When `false`, the window manager config starts them at compositor startup instead |
+| `minima.session.systemd.enable` | bool | `true` | Run the QuickShell panel and session daemons as systemd user units, started by the window manager config at compositor startup (rebuilds restart them automatically). When `false`, the window manager config execs them directly instead |
 | `minima.extraPackages` | list | `[]` | Extra packages to install |
 | `minima.kitty.enable` | bool | `true` | Enable kitty terminal config |
 | `minima.programs.terminal.name` | string | `"kitty"` | Terminal binary name (used for desktop file lookup and `lib.getExe'`) |

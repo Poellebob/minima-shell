@@ -12,6 +12,8 @@ in {
 
   config = mkMerge [
     (mkIf cfg.enable {
+      security.pam.services.login = { };
+
       programs.hyprland = mkIf cfg.hyprland.enable {
         enable = true;
       };

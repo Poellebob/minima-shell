@@ -1,14 +1,13 @@
 { wm, pkgs, modifier }:
 let
   msgCmd = if wm == "scroll" then "scrollmsg" else "swaymsg";
-  logoutTarget = if wm == "scroll" then "minimaLogout" else "minimaHome";
 in ''
   # Main binds
   bindsym ${modifier}+q kill
   bindsym ${modifier}+space floating toggle
   bindsym ${modifier}+f fullscreen toggle
   bindsym ${modifier}+Shift+s sticky toggle
-  bindsym ${modifier}+Mod1+Delete exec swaylock
+  bindsym ${modifier}+Mod1+Delete exec qs -c $qs_config ipc call minimaLock open
   bindsym ${modifier}+Shift+c exec ${msgCmd} reload
   bindsym ${modifier}+v exec qs -c $qs_config ipc call clipboard open
   bindsym ${modifier}+d exec qs -c $qs_config ipc call launcher open
@@ -56,12 +55,12 @@ in ''
   bindsym ${modifier}+Escape layout default
 
   bindsym ${modifier}+Control+a focus child
-  bindsym ${modifier}+Shift+a focus parent
+  bindsym ${modifier}+a focus parent
   '' else ""}
 
   ${if wm == "scroll" then ''
   # Direction
-  bindsym ${modifier}+a set_mode toggle
+  bindsym ${modifier}+Shift+a set_mode toggle
   '' else ""}
 
   # Scratchpad
@@ -69,7 +68,7 @@ in ''
   bindsym ${modifier}+minus scratchpad show
 
   # Logout
-  bindsym XF86PowerOff exec qs -c $qs_config ipc call ${logoutTarget} open
+  bindsym XF86PowerOff exec qs -c $qs_config ipc call minimaLogout open
 
   # Multimedia keys
   bindsym XF86AudioRaiseVolume exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+

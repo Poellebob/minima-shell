@@ -158,7 +158,7 @@ All configuration options are documented in [OPTIONS.md](./OPTIONS.md).
 
 - **Hyprland / Sway / SwayFX / Scroll** — pick your window manager with `minima.hyprland.enable`, `minima.sway.enable` (+ `minima.sway.fx`), or `minima.scroll.enable`; Hyprland layouts include dwindle, master, scrolling, and hy3
 - **QuickShell panel & launcher** — animated bar, app launcher with qalc, clipboard manager, wallpaper engine support
-- **Session as systemd units** — panel and helper daemons run under `graphical-session.target`, so rebuilds apply without relogging
+- **Session as systemd units** — panel and helper daemons run as user units started by the compositor at startup, so rebuilds apply without relogging
 - **Material you theming** — matugen-rendered colors using a seed color, applied to the panel, launcher, and Sway
 - **KDE-style styling** — Breeze cursor/GTK/Qt theming, Papirus icons, `kdeglobals`
 - **Shell setup** — zsh, starship, eza, fzf, zoxide, bat, ripgrep, lazygit
@@ -211,8 +211,8 @@ minima.keybinds = [
 | `Main + Alt + h` | hy3: toggle tab group | Stacking layout | Set window height to 50% |
 | `Main + Alt + j` | hy3: vertical split | Split vertical | Move window into column on left |
 | `Main + Alt + k` | hy3: horizontal split | Split horizontal | Move window into column on right |
-| `Main + a` | dwindle: toggle split | Split toggle | Direction mode |
-| `Main + Shift + a` | hy3: focus parent | Focus parent | - |
+| `Main + Shift + a` | toggle split | Split toggle | Direction mode |
+| `Main + a` | hy3: focus parent | Focus parent | - |
 | `Main + Ctrl + a` | hy3: focus child | Focus child | - |
 | `Main + Escape` | hy3: untab group | Default layout | - |
 | `Main + Tab` | hy3: next tab | - | Workspace overview |

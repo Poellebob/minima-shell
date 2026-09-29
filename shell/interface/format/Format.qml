@@ -8,6 +8,8 @@ Item {
   readonly property int text_size: 13
   readonly property int module_height: 22
   readonly property int panel_height: 24
+  readonly property int action_width: 72
+  readonly property int action_height: 64
 
   readonly property int spacing_tiny: 2
   readonly property int spacing_small: 4

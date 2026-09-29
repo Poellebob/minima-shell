@@ -119,9 +119,20 @@ let
     ) "hl.exec_cmd(${luaStr (dropCaps ws.startCommand)})"
   ) cfg.specialWorkspaces;
 
-  # systemd-managed daemons (session.nix) are exec'd from here only when
+  # systemd-managed daemons (session.nix) are started from here: the units are
+  # deliberately not bound to graphical-session.target, because that target is
+  # already active when Hyprland comes up and the units would start before the
+  # compositor's IPC socket exists. The restart is chained after the session
+  # env import so the units pick up the fresh HYPRLAND_INSTANCE_SIGNATURE (a
+  # plain "start" would keep a unit that is already running on a stale socket).
+  systemdSessionStart = "dbus-update-activation-environment --systemd DISPLAY HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_SESSION_ID GTK_THEME QT_QPA_PLATFORMTHEME && systemctl --user restart minima-shell.service minima-wallpaper.service minima-cliphist.service";
+
+  # systemd-managed daemons are exec'd directly from here only when
   # session.systemd.enable is false.
   startupLua = ''
+    ${optionalString cfg.session.systemd.enable ''
+      hl.exec_cmd(${luaStr systemdSessionStart})
+    ''}
     hl.exec_cmd(${luaStr "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"})
     hl.exec_cmd(${luaStr "${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface gtk-theme Breeze-Dark"})
     ${optionalString (!cfg.session.systemd.enable) ''

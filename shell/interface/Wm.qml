@@ -20,6 +20,11 @@ Singleton {
     return m ? m.name.toString() : "";
   }
 
+  function isFocused(name: string): bool {
+    const focused = focusedMonitorName;
+    return !focused || name == focused;
+  }
+
   function escapeLua(s: string): string {
     return s.replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
   }
