@@ -11,6 +11,7 @@ Item {
 
   property string icon: ""
   property string text: ""
+  property bool selected: false
   property color baseColor: Global.colors.surface
   property color hoverColor: Global.colors.surface_container_high
   property color pressColor: Global.colors.surface_container_highest
@@ -20,8 +21,10 @@ Item {
   Rectangle {
     id: background
     anchors.fill: parent
-    color: mouseArea.containsPress ? root.pressColor : mouseArea.containsMouse ?
-           root.hoverColor : root.baseColor
+    color: mouseArea.containsPress ? root.pressColor : mouseArea.containsMouse ||
+           root.selected ? root.hoverColor : root.baseColor
+    border.width: root.selected ? 2 : 0
+    border.color: Global.colors.primary
 
     Behavior on color {
       ColorAnimation {

@@ -22,6 +22,8 @@ PanelWindow {
   color: "transparent"
   visible: false
 
+  property int currentIndex: 0
+
   function isFocusedScreen(): bool {
     return Wm.isFocused(screen.name);
   }
@@ -30,6 +32,7 @@ PanelWindow {
     if (!root.isFocusedScreen())
       return;
     visible = true;
+    currentIndex = 0;
     card.forceActiveFocus();
     root.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
   }
@@ -112,6 +115,29 @@ PanelWindow {
 
     Keys.onEscapePressed: root.close()
 
+    Keys.onLeftPressed: {
+      if (root.currentIndex > 0)
+        root.currentIndex--;
+    }
+    Keys.onRightPressed: {
+      if (root.currentIndex < root.actions.length - 1)
+        root.currentIndex++;
+    }
+    Keys.onUpPressed: {
+      if (root.currentIndex > 0)
+        root.currentIndex--;
+    }
+    Keys.onDownPressed: {
+      if (root.currentIndex < root.actions.length - 1)
+        root.currentIndex++;
+    }
+    Keys.onReturnPressed: {
+      root.actions[root.currentIndex].execute();
+    }
+    Keys.onSpacePressed: {
+      root.actions[root.currentIndex].execute();
+    }
+
     ColumnLayout {
       id: cardCol
       anchors.fill: parent
@@ -134,10 +160,15 @@ PanelWindow {
 
           delegate: ActionButton {
             required property var modelData
+            required property int index
             icon: modelData.icon
             text: modelData.text
+            selected: root.currentIndex === index
 
-            onClicked: mouse => modelData.execute()
+            onClicked: mouse => {
+              root.currentIndex = index;
+              modelData.execute();
+            }
           }
         }
       }
