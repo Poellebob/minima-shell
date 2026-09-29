@@ -260,6 +260,8 @@ in
 
   ${import ./config.d/window-rules.nix}
 
+  ${import ./config.d/layer-rules.nix}
+
   ${import ./config.d/gestures.nix}
 
   ${import ./config.d/input.nix}
