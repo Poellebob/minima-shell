@@ -13,12 +13,14 @@
       conform-nvim.settings.formatters_by_ft.qml = [ "qmlformat" ];
       conform-nvim.settings.formatters.qmlformat = {
         command = "${pkgs.kdePackages.qtdeclarative}/bin/qmlformat";
+        stdin = false;
         args = [
-          "-i"
+          "--inplace"
           "--indent-width"
           "2"
-          "--column-width"
-          "80"
+          "--normalize"
+          "--objects-spacing"
+          "--single-line-empty-objects"
           "$FILENAME"
         ];
       };
