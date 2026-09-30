@@ -295,6 +295,7 @@ panel, launcher, and Sway/Hyprland via QuickShell templates.
 | `minima.darkTheme` | bool | `true` | Use dark theme |
 | `minima.panel.enable` | bool | `true` | Enable panel |
 | `minima.panel.alwaysVisible` | bool | `true` | Panel always visible |
+| `minima.calendar.weekStart` | enum `"monday"` \| `"sunday"` | `"monday"` | First day of the week in the calendar popup |
 | `minima.launcher.enable` | bool | `true` | Enable app launcher |
 | `minima.launcher.qalcPath` | string | `"${pkgs.libqalculate}/bin/qalc"` | Calculator path |
 | `minima.clipboard.enable` | bool | `true` | Enable clipboard manager |
@@ -316,6 +317,7 @@ panel, launcher, and Sway/Hyprland via QuickShell templates.
       enable = true;
       alwaysVisible = true;
     };
+    calendar.weekStart = "monday";
     launcher = {
       enable = true;
       qalcPath = "${pkgs.libqalculate}/bin/qalc";

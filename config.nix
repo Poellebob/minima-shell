@@ -34,6 +34,9 @@ let
         top = true;
         panelAlwaysVisible = cfg.panel.alwaysVisible;
       };
+      calendar = {
+        weekStart = cfg.calendar.weekStart;
+      };
       launcher = {
         enabled = cfg.launcher.enable;
         qalcPath = cfg.launcher.qalcPath;

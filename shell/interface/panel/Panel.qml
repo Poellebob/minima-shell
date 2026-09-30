@@ -12,6 +12,7 @@ import qs.panel.bluetooth
 import qs.panel.network
 import qs.panel.battery
 import qs.panel.clock
+import qs.panel.calendar
 import qs.panel.launcher
 import qs.panel.clipboard
 import qs.panel.wallpaper
@@ -230,6 +231,7 @@ PanelWindow {
               }
               Clock {
                 Layout.alignment: Qt.AlignVCenter
+                onCalendarMenuTriggered: openBarContent(calendarContent)
               }
               Notification {
                 id: notifWidget
@@ -357,6 +359,13 @@ PanelWindow {
       NotificationControl {
         id: notifContent
         notifServer: notifWidget.notifServer
+        anchors.fill: parent
+        anchors.margins: Global.format.spacing_large
+        visible: false
+      }
+
+      CalendarControl {
+        id: calendarContent
         anchors.fill: parent
         anchors.margins: Global.format.spacing_large
         visible: false

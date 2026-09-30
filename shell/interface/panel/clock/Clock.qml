@@ -7,6 +7,13 @@ import qs
 BarWidget {
   id: clockRoot
 
+  signal calendarMenuTriggered
+
+  onClicked: mouse => {
+               if (mouse.button === Qt.LeftButton)
+               calendarMenuTriggered();
+             }
+
   StyledText {
     id: text
     text: Qt.formatDateTime(clock.date, "HH:mm")

@@ -340,6 +340,17 @@ in
       };
     };
 
+    calendar = {
+      weekStart = mkOption {
+        type = types.enum [
+          "monday"
+          "sunday"
+        ];
+        default = "monday";
+        description = "First day of the week in the calendar popup";
+      };
+    };
+
     launcher = {
       enable = mkOption {
         type = types.bool;
