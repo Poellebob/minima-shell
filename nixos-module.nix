@@ -67,6 +67,7 @@ in {
               qalcPath = mkDefault cfg.launcher.qalcPath;
             };
             clipboard.enable  = mkDefault cfg.clipboard.enable;
+            calendar.weekStart = mkDefault cfg.calendar.weekStart;
             wallpaper         = {
               enable        = mkDefault cfg.wallpaper.enable;
               engineEnabled = mkDefault cfg.wallpaper.engineEnabled;

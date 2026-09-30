@@ -27,6 +27,9 @@ Item {
       property JsonObject panel: JsonObject {
         property bool enabled: true
       }
+      property JsonObject calendar: JsonObject {
+        property string weekStart: "monday"
+      }
       property JsonObject launcher: JsonObject {
         property bool enabled: true
         property string qalcPath: ""
