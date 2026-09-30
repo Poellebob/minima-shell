@@ -18,6 +18,8 @@
           "--inplace"
           "--indent-width"
           "2"
+          "--column-width"
+          "120"
           "--normalize"
           "--objects-spacing"
           "--single-line-empty-objects"
