@@ -9,44 +9,6 @@ import qs.components.text
 PanelWindow {
   id: root
 
-  anchors {
-    left: true
-    right: true
-    top: true
-    bottom: true
-  }
-
-  WlrLayershell.layer: WlrLayer.Overlay
-  exclusiveZone: 0
-  aboveWindows: true
-  color: "transparent"
-  visible: false
-
-  property int currentIndex: 0
-
-  function isFocusedScreen(): bool {
-    return Wm.isFocused(screen.name);
-  }
-
-  function open() {
-    if (!root.isFocusedScreen())
-      return;
-    visible = true;
-    currentIndex = 0;
-    card.forceActiveFocus();
-    root.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
-  }
-
-  function close() {
-    root.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None;
-    visible = false;
-  }
-
-  function trigger(command: var) {
-    root.close();
-    Quickshell.execDetached(command);
-  }
-
   readonly property var actions: [
     {
       icon: "󰌾",
@@ -60,110 +22,151 @@ PanelWindow {
       icon: "󰍃",
       text: "Logout",
       execute: function () {
-        root.trigger(["loginctl", "terminate-session", Quickshell.env("XDG_SESSION_ID")]);
+        root.close();
+        Quickshell.execDetached(["loginctl", "terminate-session", Quickshell.env("XDG_SESSION_ID")]);
       }
     },
     {
       icon: "󰒲",
       text: "Suspend",
       execute: function () {
-        root.trigger(["systemctl", "suspend"]);
+        Global.openLockScreen();
+        root.close();
+        Quickshell.execDetached(["systemctl", "suspend"]);
       }
     },
     {
       icon: "󰋊",
       text: "Hibernate",
       execute: function () {
-        root.trigger(["systemctl", "hibernate"]);
+        Global.openLockScreen();
+        root.close();
+        Quickshell.execDetached(["systemctl", "hibernate"]);
       }
     },
     {
       icon: "󰜉",
       text: "Reboot",
       execute: function () {
-        root.trigger(["systemctl", "reboot"]);
+        root.close();
+        Quickshell.execDetached(["systemctl", "reboot"]);
       }
     },
     {
       icon: "󰐥",
       text: "Shutdown",
       execute: function () {
-        root.trigger(["systemctl", "poweroff"]);
+        root.close();
+        Quickshell.execDetached(["systemctl", "poweroff"]);
       }
     }
   ]
+  property int currentIndex: 0
+
+  function close() {
+    root.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None;
+    visible = false;
+  }
+  function isFocusedScreen(): bool {
+    return Wm.isFocused(screen.name);
+  }
+  function open() {
+    if (!root.isFocusedScreen())
+      return;
+    visible = true;
+    currentIndex = 0;
+    card.forceActiveFocus();
+    root.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
+  }
+
+  WlrLayershell.layer: WlrLayer.Overlay
+  aboveWindows: true
+  color: "transparent"
+  exclusiveZone: 0
+  visible: false
+
+  anchors {
+    bottom: true
+    left: true
+    right: true
+    top: true
+  }
 
   Rectangle {
     id: scrim
+
     anchors.fill: parent
     color: Global.colors.scrim
     opacity: 0.6
 
     MouseArea {
       anchors.fill: parent
+
       onClicked: root.close()
     }
   }
 
   Rectangle {
     id: card
+
     anchors.centerIn: parent
     color: Global.colors.surface_container
-    implicitWidth: cardCol.implicitWidth + Global.format.spacing_large * 2
-    implicitHeight: cardCol.implicitHeight + Global.format.spacing_large * 2
     focus: true
+    implicitHeight: cardCol.implicitHeight + Global.format.spacing_large * 2
+    implicitWidth: cardCol.implicitWidth + Global.format.spacing_large * 2
 
+    Keys.onDownPressed: {
+      if (root.currentIndex < root.actions.length - 1)
+        root.currentIndex++;
+    }
     Keys.onEscapePressed: root.close()
-
     Keys.onLeftPressed: {
       if (root.currentIndex > 0)
         root.currentIndex--;
+    }
+    Keys.onReturnPressed: {
+      root.actions[root.currentIndex].execute();
     }
     Keys.onRightPressed: {
       if (root.currentIndex < root.actions.length - 1)
         root.currentIndex++;
     }
+    Keys.onSpacePressed: {
+      root.actions[root.currentIndex].execute();
+    }
     Keys.onUpPressed: {
       if (root.currentIndex > 0)
         root.currentIndex--;
     }
-    Keys.onDownPressed: {
-      if (root.currentIndex < root.actions.length - 1)
-        root.currentIndex++;
-    }
-    Keys.onReturnPressed: {
-      root.actions[root.currentIndex].execute();
-    }
-    Keys.onSpacePressed: {
-      root.actions[root.currentIndex].execute();
-    }
 
     ColumnLayout {
       id: cardCol
+
       anchors.fill: parent
       anchors.margins: Global.format.spacing_large
       spacing: Global.format.spacing_medium
 
       StyledText {
-        text: "Session"
-        font.bold: true
-        color: Global.colors.primary
         Layout.alignment: Qt.AlignHCenter
+        color: Global.colors.primary
+        font.bold: true
+        text: "Session"
       }
 
       RowLayout {
-        spacing: Global.format.spacing_large
         Layout.alignment: Qt.AlignHCenter
+        spacing: Global.format.spacing_large
 
         Repeater {
           model: root.actions
 
           delegate: ActionButton {
-            required property var modelData
             required property int index
+            required property var modelData
+
             icon: modelData.icon
-            text: modelData.text
             selected: root.currentIndex === index
+            text: modelData.text
 
             onClicked: mouse => {
               root.currentIndex = index;
@@ -176,10 +179,10 @@ PanelWindow {
   }
 
   Connections {
-    target: Global
-
     function onOpenLogoutMenu() {
       root.open();
     }
+
+    target: Global
   }
 }

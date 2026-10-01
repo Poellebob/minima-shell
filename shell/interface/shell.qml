@@ -36,44 +36,50 @@ ShellRoot {
   }
 
   IpcHandler {
-    target: "systray"
     function open(index: int): void {
     Global.openSystrayMenu(index);
   }
+
+    target: "systray"
   }
 
-    IpcHandler {
-      target: "launcher"
-      function open(): void {
-      Global.openLauncher();
-    }
-    }
+  IpcHandler {
+    function open(): void {
+    Global.openLauncher();
+  }
 
-      IpcHandler {
-        target: "clipboard"
-        function open(): void {
-        Global.openClipboard();
-      }
-      }
-
-        IpcHandler {
-          target: "notifications"
-          function open(): void {
-          Global.openNotifications();
-        }
-        }
+    target: "launcher"
+  }
 
   IpcHandler {
+    function open(): void {
+    Global.openClipboard();
+  }
+
+    target: "clipboard"
+  }
+
+  IpcHandler {
+    function open(): void {
+    Global.openNotifications();
+  }
+
+    target: "notifications"
+  }
+
+  IpcHandler {
+    function open(): void {
+    Global.openLogoutMenu();
+  }
+
     target: "minimaLogout"
-    function open(): void {
-      Global.openLogoutMenu();
-    }
   }
 
   IpcHandler {
-    target: "minimaLock"
     function open(): void {
-      Global.openLockScreen();
-    }
+    Global.openLockScreen();
+  }
+
+    target: "minimaLock"
   }
 }
