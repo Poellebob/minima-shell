@@ -33,23 +33,6 @@
         pattern = [ "markdown" ];
         command = "setlocal spell spelllang=en_us";
       }
-      {
-        event = [
-          "CursorHold"
-          "CursorHoldI"
-        ];
-        callback.__raw = ''
-          function()
-            vim.diagnostic.open_float(nil, {
-              focusable = false,
-              border = "single",
-              scope = "line",
-              close_events = { "BufLeave", "CursorMoved", "CursorMovedI", "InsertEnter", "FocusLost" },
-            })
-          end
-        '';
-        desc = "Show line diagnostics on hover";
-      }
     ]
     ++ map (a: {
       event = a.event;
