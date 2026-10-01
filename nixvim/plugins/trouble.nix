@@ -44,8 +44,9 @@
     programs.nixvim.keymaps = lib.mkIf config.programs.nixvim.plugins.trouble.enable [
       {
         mode = "n";
-        key = "<leader>td";
+        key = "<leader>dd";
         action = "<cmd>Trouble diagnostics<cr>";
+        options.desc = "Diagnostics";
       }
     ];
   };

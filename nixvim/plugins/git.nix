@@ -40,6 +40,7 @@
           mode = "n";
           key = "<leader>gg";
           action = "<cmd>LazyGit<cr>";
+          options.desc = "LazyGit";
         }
       ]
       ++ lib.optionals config.programs.nixvim.plugins.gitsigns.enable [
