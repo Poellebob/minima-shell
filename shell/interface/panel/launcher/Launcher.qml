@@ -8,12 +8,6 @@ import qs
 Item {
   id: launcherRoot
 
-  property string searchText: ""
-  property int currentIndex: 0
-  property bool isExpr: false
-  property bool isCommand: searchText.length > 0 && searchText[0] === ">"
-  property string mathRes: ""
-
   readonly property var commands: [
     {
       name: "Wallpapers",
@@ -40,8 +34,7 @@ Item {
       name: "Logout",
       description: "Terminate the current session",
       execute: function () {
-        Quickshell.execDetached(["loginctl", "terminate-session", Quickshell.env(
-                                   "XDG_SESSION_ID")]);
+        Quickshell.execDetached(["loginctl", "terminate-session", Quickshell.env("XDG_SESSION_ID")]);
       }
     },
     {
@@ -62,6 +55,7 @@ Item {
       name: "Suspend",
       description: "Suspend to RAM",
       execute: function () {
+        Global.openLockScreen();
         Quickshell.execDetached(["systemctl", "suspend"]);
       }
     },
@@ -69,11 +63,12 @@ Item {
       name: "Hibernate",
       description: "Suspend to disk",
       execute: function () {
+        Global.openLockScreen();
         Quickshell.execDetached(["systemctl", "hibernate"]);
       }
     }
   ]
-
+  property int currentIndex: 0
   readonly property var filteredEntries: {
     let all;
     if (isCommand) {
@@ -83,14 +78,37 @@ Item {
     }
     if (searchText.trim() === "")
       return all;
-    const term = isCommand ? searchText.slice(1).trim().toLowerCase() :
-                             searchText.toLowerCase();
+    const term = isCommand ? searchText.slice(1).trim().toLowerCase() : searchText.toLowerCase();
     return all.filter(e => e.name.toLowerCase().includes(term));
   }
+  property bool isCommand: searchText.length > 0 && searchText[0] === ">"
+  property bool isExpr: false
+  property string mathRes: ""
+  property string searchText: ""
 
   signal closed
   signal commandTriggered(string name)
 
+  function close(skipSignal = false) {
+    searchInput.text = "";
+    isExpr = false;
+    mathRes = "";
+    if (!skipSignal)
+      closed();
+  }
+  function copyResult() {
+    if (mathRes !== "") {
+      Quickshell.execDetached(["wl-copy", mathRes]);
+      close();
+    }
+  }
+  function executeSelected() {
+    if (currentIndex >= 0 && currentIndex < filteredEntries.length) {
+      const entry = filteredEntries[currentIndex];
+      close(isCommand);
+      entry.execute();
+    }
+  }
   function open() {
     searchText = "";
     currentIndex = 0;
@@ -100,32 +118,11 @@ Item {
     searchInput.forceActiveFocus();
   }
 
-  function close(skipSignal = false) {
-    searchInput.text = "";
-    isExpr = false;
-    mathRes = "";
-    if (!skipSignal)
-      closed();
-  }
-
-  function executeSelected() {
-    if (currentIndex >= 0 && currentIndex < filteredEntries.length) {
-      const entry = filteredEntries[currentIndex];
-      close(isCommand);
-      entry.execute();
-    }
-  }
-
-  function copyResult() {
-    if (mathRes !== "") {
-      Quickshell.execDetached(["wl-copy", mathRes]);
-      close();
-    }
-  }
-
   Process {
     id: mathProc
+
     property string expr: ""
+
     command: [Global.config.launcher.qalcPath, expr]
 
     stdout: StdioCollector {
@@ -145,21 +142,37 @@ Item {
     spacing: Global.format.spacing_large
 
     Item {
-      Layout.preferredWidth: 180
       Layout.fillHeight: true
+      Layout.preferredWidth: 180
 
       TextInput {
         id: searchInput
+
         anchors.verticalCenter: parent.verticalCenter
-        width: parent.width
+        clip: true
         color: Global.colors.on_surface_variant
+        focus: true
         font.family: "JetBrainsMono Nerd Font"
         font.pixelSize: Global.format.text_size
-        clip: true
-        focus: true
-        visible: true
         verticalAlignment: Text.AlignVCenter
+        visible: true
+        width: parent.width
 
+        Keys.onEscapePressed: launcherRoot.close()
+        Keys.onLeftPressed: {
+          if (!launcherRoot.isExpr && launcherRoot.currentIndex > 0)
+            launcherRoot.currentIndex--;
+        }
+        Keys.onReturnPressed: {
+          if (launcherRoot.isExpr)
+            launcherRoot.copyResult();
+          else
+            launcherRoot.executeSelected();
+        }
+        Keys.onRightPressed: {
+          if (!launcherRoot.isExpr && launcherRoot.currentIndex < launcherRoot.filteredEntries.length - 1)
+            launcherRoot.currentIndex++;
+        }
         onTextChanged: {
           const t = text;
           if (t.length > 0 && t[0] === "=") {
@@ -177,66 +190,49 @@ Item {
             launcherRoot.currentIndex = 0;
           }
         }
-
-        Keys.onLeftPressed: {
-          if (!launcherRoot.isExpr && launcherRoot.currentIndex > 0)
-            launcherRoot.currentIndex--;
-        }
-        Keys.onRightPressed: {
-          if (!launcherRoot.isExpr && launcherRoot.currentIndex
-              < launcherRoot.filteredEntries.length - 1)
-            launcherRoot.currentIndex++;
-        }
-        Keys.onReturnPressed: {
-          if (launcherRoot.isExpr)
-            launcherRoot.copyResult();
-          else
-            launcherRoot.executeSelected();
-        }
-        Keys.onEscapePressed: launcherRoot.close()
       }
     }
 
     Text {
-      text: "|"
+      Layout.alignment: Qt.AlignVCenter
       color: Global.colors.outline
       font.family: "JetBrainsMono Nerd Font"
       font.pixelSize: Global.format.text_size
-      Layout.alignment: Qt.AlignVCenter
+      text: "|"
     }
 
     Text {
-      visible: launcherRoot.isExpr
-      text: launcherRoot.mathRes
+      Layout.fillHeight: true
+      Layout.fillWidth: true
       color: Global.colors.primary
       font.family: "JetBrainsMono Nerd Font"
       font.pixelSize: Global.format.text_size
+      text: launcherRoot.mathRes
       verticalAlignment: Text.AlignVCenter
-      Layout.fillWidth: true
-      Layout.fillHeight: true
+      visible: launcherRoot.isExpr
     }
 
     ListView {
       id: appList
-      visible: !launcherRoot.isExpr
-      Layout.fillWidth: true
+
       Layout.fillHeight: true
-      orientation: ListView.Horizontal
-      spacing: Global.format.spacing_large
+      Layout.fillWidth: true
       clip: true
       currentIndex: launcherRoot.currentIndex
       highlightMoveDuration: 0
-
       model: launcherRoot.filteredEntries
+      orientation: ListView.Horizontal
+      spacing: Global.format.spacing_large
+      visible: !launcherRoot.isExpr
 
       delegate: ClickableText {
-        required property var modelData
         required property int index
-        text: index === launcherRoot.currentIndex ? `[${modelData.name}]` : ` ${modelData.name} `
-        baseColor: index === launcherRoot.currentIndex ? Global.colors.primary :
-                                                         Global.colors.on_surface_variant
-        verticalAlignment: Text.AlignVCenter
+        required property var modelData
+
+        baseColor: index === launcherRoot.currentIndex ? Global.colors.primary : Global.colors.on_surface_variant
         height: parent ? parent.height : 0
+        text: index === launcherRoot.currentIndex ? `[${modelData.name}]` : ` ${modelData.name} `
+        verticalAlignment: Text.AlignVCenter
 
         onClicked: launcherRoot.currentIndex = index
         onDoubleClicked: {
@@ -249,15 +245,14 @@ Item {
           }
         }
         onWheel: wheel => {
-                   if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
-                     if (launcherRoot.currentIndex
-                         < launcherRoot.filteredEntries.length - 1)
-                     launcherRoot.currentIndex++;
-                   } else {
-                     if (launcherRoot.currentIndex > 0)
-                     launcherRoot.currentIndex--;
-                   }
-                 }
+          if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
+            if (launcherRoot.currentIndex < launcherRoot.filteredEntries.length - 1)
+              launcherRoot.currentIndex++;
+          } else {
+            if (launcherRoot.currentIndex > 0)
+              launcherRoot.currentIndex--;
+          }
+        }
       }
     }
   }
