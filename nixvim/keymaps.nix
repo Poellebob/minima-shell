@@ -146,8 +146,8 @@
         }
         {
           mode = "n";
-          key = "<leader>dh";
-          action = "<cmd>lua vim.diagnostic.enable(not vim.diagnostic.is_enabled())<CR>";
+          key = "<leader>dd";
+          action = "<cmd>lua vim.diagnostic.open_float()<CR>";
           options.desc = "Toggle diagnostics";
         }
       ]
