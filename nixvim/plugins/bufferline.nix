@@ -30,13 +30,14 @@
         mode = "n";
         key = "g${toString n}";
         action = "<cmd>BufferLineGoToBuffer ${toString n}<cr>";
+        options.desc = "Go to buffer ${toString n}";
       }) (lib.range 1 9)
       ++
         [
           {
             mode = "n";
             key = "<leader>c";
-            action = "<cmd>Bdelete<CR>";
+            action.__raw = "MiniBufremove.delete";
             options.desc = "Close buffer";
           }
           {

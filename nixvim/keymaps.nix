@@ -140,15 +140,15 @@
         }
         {
           mode = "n";
-          key = "<leader>ud";
-          action = "<cmd>lua vim.diagnostic.enable(not vim.diagnostic.is_enabled())<CR>";
-          options.desc = "Toggle diagnostics";
-        }
-        {
-          mode = "n";
           key = "<leader>ub";
           action = "<cmd>lua vim.o.background = vim.o.background == 'dark' and 'light' or 'dark'<CR>";
           options.desc = "Toggle background";
+        }
+        {
+          mode = "n";
+          key = "<leader>dh";
+          action = "<cmd>lua vim.diagnostic.enable(not vim.diagnostic.is_enabled())<CR>";
+          options.desc = "Toggle diagnostics";
         }
       ]
       ++ (lib.map (k: {

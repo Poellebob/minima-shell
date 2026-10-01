@@ -8,7 +8,7 @@
 
       lsp = {
         enable = true;
-        inlayHints = true;
+        inlayHints = false;
 
         keymaps = {
           lspBuf = {
@@ -18,13 +18,6 @@
             "K" = "hover";
             "<leader>ca" = "code_action";
           };
-
-          extra = [
-            {
-              key = "<leader>ih";
-              action = ''vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())'';
-            }
-          ];
         };
 
         servers = config.minima.vim.lsp.servers;

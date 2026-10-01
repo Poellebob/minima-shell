@@ -48,19 +48,6 @@
         lib.optionals
           (
             config.programs.nixvim.plugins.mini.enable
-            && lib.hasAttr "bufremove" config.programs.nixvim.plugins.mini.modules
-          )
-          [
-            {
-              mode = "n";
-              key = "<leader>x";
-              action.__raw = "MiniBufremove.delete";
-            }
-          ]
-      ++
-        lib.optionals
-          (
-            config.programs.nixvim.plugins.mini.enable
             && lib.hasAttr "visits" config.programs.nixvim.plugins.mini.modules
           )
           [
@@ -68,6 +55,7 @@
               mode = "n";
               key = "<leader>v";
               action.__raw = "MiniVisits.select_path";
+              options.desc = "Select visited path";
             }
           ]
       ++
@@ -81,6 +69,7 @@
               mode = "n";
               key = "<leader>ms";
               action.__raw = "MiniExtra.pickers.spellsuggest";
+              options.desc = "Spell suggestions";
             }
           ];
   };

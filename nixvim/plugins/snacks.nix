@@ -42,12 +42,6 @@
       }
       {
         mode = "n";
-        key = "<leader>tl";
-        action = "<cmd>lua Snacks.terminal.toggle('lazygit')<CR>";
-        options.desc = "Lazygit";
-      }
-      {
-        mode = "n";
         key = "<leader>uD";
         action = "<cmd>lua Snacks.notifier.hide()<CR>";
         options.desc = "Dismiss notifications";
