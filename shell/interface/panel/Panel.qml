@@ -78,7 +78,7 @@ PanelWindow {
     barMenu.showContent(wallpaperContent);
   }
 
-  aboveWindows: true
+  aboveWindows: false
   color: Global.colors.background
   exclusiveZone: Global.format.panel_height
   implicitHeight: content.height + (barMenu.visible ? barMenu.implicitHeight : 0)
