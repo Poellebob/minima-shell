@@ -77,6 +77,9 @@ in {
               matureContent = mkDefault cfg.wallpaper.matureContent;
               volume        = mkDefault cfg.wallpaper.volume;
             };
+            notifications     = {
+              output = mkDefault cfg.notifications.output;
+            };
             displays          = mkDefault cfg.displays;
             autostart         = mkDefault cfg.autostart;
             specialWorkspaces = mkDefault cfg.specialWorkspaces;

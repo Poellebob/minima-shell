@@ -47,6 +47,9 @@ Item {
         property bool matureContent: false
         property int volume: 50
       }
+      property JsonObject notifications: JsonObject {
+        property string output: ""
+      }
     }
   }
 

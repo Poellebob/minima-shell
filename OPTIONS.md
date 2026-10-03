@@ -306,6 +306,7 @@ panel, launcher, and Sway/Hyprland via QuickShell templates.
 | `minima.wallpaper.fill` | bool | `true` | Fill mode |
 | `minima.wallpaper.matureContent` | bool | `false` | Mature content |
 | `minima.wallpaper.volume` | int | `50` | Wallpaper volume |
+| `minima.notifications.output` | string | `""` | Output name for notification popups. Empty string auto-selects the primary screen (screen at 0,0) |
 
 ### Example
 

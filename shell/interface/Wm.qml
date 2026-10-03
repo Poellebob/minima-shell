@@ -20,9 +20,29 @@ Singleton {
     return m ? m.name.toString() : "";
   }
 
+  readonly property string primaryScreenName: {
+    const configured = Global.config.notifications.output;
+    if (configured) {
+      for (let i = 0; i < Quickshell.screens.length; i++) {
+        if (Quickshell.screens[i].name === configured)
+          return configured;
+      }
+    }
+    for (let i = 0; i < Quickshell.screens.length; i++) {
+      const s = Quickshell.screens[i];
+      if (s.x === 0 && s.y === 0)
+        return s.name;
+    }
+    return Quickshell.screens.length > 0 ? Quickshell.screens[0].name : "";
+  }
+
   function isFocused(name: string): bool {
     const focused = focusedMonitorName;
     return !focused || name == focused;
+  }
+
+  function isPrimaryScreen(name: string): bool {
+    return name === primaryScreenName;
   }
 
   function escapeLua(s: string): string {
