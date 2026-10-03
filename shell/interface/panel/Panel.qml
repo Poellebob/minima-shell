@@ -78,7 +78,7 @@ PanelWindow {
     barMenu.showContent(wallpaperContent);
   }
 
-  aboveWindows: false
+  aboveWindows: true
   color: Global.colors.background
   exclusiveZone: Global.format.panel_height
   implicitHeight: content.height + (barMenu.visible ? barMenu.implicitHeight : 0)
@@ -418,5 +418,9 @@ PanelWindow {
         visible: false
       }
     }
+  }
+
+  NotificationPopups {
+    panel: panel
   }
 }

@@ -54,6 +54,9 @@ let
         matureContent = cfg.wallpaper.matureContent;
         volume = cfg.wallpaper.volume;
       };
+      notifications = {
+        output = cfg.notifications.output;
+      };
     }
   );
 
