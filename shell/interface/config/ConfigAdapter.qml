@@ -20,6 +20,7 @@ Item {
         property string wm: "sway"
         property string matugenConfigPath: ""
         property string matugenBin: ""
+        property string primaryOutput: ""
       }
       property JsonObject theme: JsonObject {
         property bool darkTheme: true
@@ -46,9 +47,6 @@ Item {
         property bool fill: true
         property bool matureContent: false
         property int volume: 50
-      }
-      property JsonObject notifications: JsonObject {
-        property string output: ""
       }
     }
   }

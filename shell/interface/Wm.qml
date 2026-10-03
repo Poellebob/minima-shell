@@ -21,7 +21,7 @@ Singleton {
   }
 
   readonly property string primaryScreenName: {
-    const configured = Global.config.notifications.output;
+    const configured = Global.config.system.primaryOutput;
     if (configured) {
       for (let i = 0; i < Quickshell.screens.length; i++) {
         if (Quickshell.screens[i].name === configured)

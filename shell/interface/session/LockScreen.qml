@@ -40,7 +40,7 @@ Item {
     onCompleted: result => {
       if (result === PamResult.Success) {
         root.unlock();
-      } else {
+      } else if (lockSurface.isPrimaryScreen) {
         passwordInput.forceActiveFocus();
       }
     }
@@ -54,8 +54,8 @@ Item {
       id: lockSurface
       color: Global.colors.background
 
-      readonly property bool isFocusedScreen: Wm.isFocused(
-                                                lockSurface.screen.name)
+      readonly property bool isPrimaryScreen: Wm.isPrimaryScreen(
+                                                  lockSurface.screen.name)
 
       SystemClock {
         id: clock
@@ -81,7 +81,7 @@ Item {
         }
 
         Rectangle {
-          visible: lockSurface.isFocusedScreen
+          visible: lockSurface.isPrimaryScreen
           color: "transparent"
           border.color: Global.colors.outline
           border.width: 1
@@ -134,7 +134,10 @@ Item {
 
                 Keys.onEscapePressed: passwordInput.text = ""
 
-                Component.onCompleted: passwordInput.forceActiveFocus()
+                Component.onCompleted: {
+                  if (lockSurface.isPrimaryScreen)
+                    passwordInput.forceActiveFocus();
+                }
               }
             }
           }
