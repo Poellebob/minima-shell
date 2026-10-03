@@ -156,7 +156,7 @@ not configurable via this option.
 | `minima.displays.<name>.position.x` | int | `0` | X position |
 | `minima.displays.<name>.position.y` | int | `0` | Y position |
 | `minima.displays.<name>.scale` | float | `1.0` | Display scale |
-| `minima.displays.<name>.primary` | bool | `false` | Mark this display as the primary monitor (mouse spawns here) |
+| `minima.displays.<name>.primary` | bool | `false` | Mark this display as the primary monitor. Controls where the mouse spawns, notification popups, the logout dialog, and the lock-screen prompt appear. If unset, the display at `(0, 0)` is used |
 | `minima.displays.<name>.workspace` | null/int/str | `null` | Workspace to assign to this output |
 | `minima.displays.<name>.workspaces` | null/list | `null` | List of workspace numbers or ranges (e.g. `[1 2 3 "4-8"]`) to bind to this display |
 
@@ -306,7 +306,6 @@ panel, launcher, and Sway/Hyprland via QuickShell templates.
 | `minima.wallpaper.fill` | bool | `true` | Fill mode |
 | `minima.wallpaper.matureContent` | bool | `false` | Mature content |
 | `minima.wallpaper.volume` | int | `50` | Wallpaper volume |
-| `minima.notifications.output` | string | `""` | Output name for notification popups. Empty string auto-selects the primary screen (screen at 0,0) |
 
 ### Example
 

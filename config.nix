@@ -9,6 +9,16 @@ with lib;
 let
   cfg = config.minima;
 
+  primaryOutput = let
+    displays = mapAttrsToList (name: value: { inherit name; } // value) cfg.displays;
+    primary = findFirst (d: d.primary) null displays;
+    origin = findFirst (d: d.position.x == 0 && d.position.y == 0) null displays;
+  in
+    if primary != null then primary.name
+    else if origin != null then origin.name
+    else if displays != [] then (head displays).name
+    else "";
+
   quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./shell/interface; } ''
     mkdir -p $out
     cd $src
@@ -25,6 +35,7 @@ let
         wm = if wm == null then "sway" else wm;
         matugenConfigPath = "${matugenConfigFile}";
         matugenBin = "${cfg.matugen.package}/bin/matugen";
+        primaryOutput = primaryOutput;
       };
       theme = {
         darkTheme = cfg.darkTheme;
@@ -53,9 +64,6 @@ let
         fill = cfg.wallpaper.fill;
         matureContent = cfg.wallpaper.matureContent;
         volume = cfg.wallpaper.volume;
-      };
-      notifications = {
-        output = cfg.notifications.output;
       };
     }
   );

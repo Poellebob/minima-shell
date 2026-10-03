@@ -41,5 +41,6 @@ Singleton {
   signal openClipboard
   signal openNotifications
   signal openLogoutMenu
+  signal closeLogoutMenu
   signal openLockScreen
 }

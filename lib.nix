@@ -399,14 +399,6 @@ in
       };
     };
 
-    notifications = {
-      output = mkOption {
-        type = types.str;
-        default = "";
-        description = "Output name on which to show notification popups. Empty string picks the primary screen (the screen at 0,0).";
-      };
-    };
-
     matugenConfigFile = mkOption {
       type = types.nullOr types.package;
       default = null;

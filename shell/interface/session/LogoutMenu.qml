@@ -14,7 +14,7 @@ PanelWindow {
       icon: "󰌾",
       text: "Lock",
       execute: function () {
-        root.close();
+        root.closeAll();
         Global.openLockScreen();
       }
     },
@@ -22,7 +22,7 @@ PanelWindow {
       icon: "󰍃",
       text: "Logout",
       execute: function () {
-        root.close();
+        root.closeAll();
         Quickshell.execDetached(["loginctl", "terminate-session", Quickshell.env("XDG_SESSION_ID")]);
       }
     },
@@ -31,7 +31,7 @@ PanelWindow {
       text: "Suspend",
       execute: function () {
         Global.openLockScreen();
-        root.close();
+        root.closeAll();
         Quickshell.execDetached(["systemctl", "suspend"]);
       }
     },
@@ -40,7 +40,7 @@ PanelWindow {
       text: "Hibernate",
       execute: function () {
         Global.openLockScreen();
-        root.close();
+        root.closeAll();
         Quickshell.execDetached(["systemctl", "hibernate"]);
       }
     },
@@ -48,7 +48,7 @@ PanelWindow {
       icon: "󰜉",
       text: "Reboot",
       execute: function () {
-        root.close();
+        root.closeAll();
         Quickshell.execDetached(["systemctl", "reboot"]);
       }
     },
@@ -56,7 +56,7 @@ PanelWindow {
       icon: "󰐥",
       text: "Shutdown",
       execute: function () {
-        root.close();
+        root.closeAll();
         Quickshell.execDetached(["systemctl", "poweroff"]);
       }
     }
@@ -67,16 +67,19 @@ PanelWindow {
     root.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None;
     visible = false;
   }
-  function isFocusedScreen(): bool {
-    return Wm.isFocused(screen.name);
+  function closeAll() {
+    Global.closeLogoutMenu();
+  }
+  function isPrimaryScreen(): bool {
+    return Wm.isPrimaryScreen(screen.name);
   }
   function open() {
-    if (!root.isFocusedScreen())
-      return;
     visible = true;
     currentIndex = 0;
-    card.forceActiveFocus();
-    root.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
+    if (root.isPrimaryScreen()) {
+      card.forceActiveFocus();
+      root.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
+    }
   }
 
   WlrLayershell.layer: WlrLayer.Overlay
@@ -102,7 +105,7 @@ PanelWindow {
     MouseArea {
       anchors.fill: parent
 
-      onClicked: root.close()
+      onClicked: root.closeAll()
     }
   }
 
@@ -114,12 +117,13 @@ PanelWindow {
     focus: true
     implicitHeight: cardCol.implicitHeight + Global.format.spacing_large * 2
     implicitWidth: cardCol.implicitWidth + Global.format.spacing_large * 2
+    visible: root.isPrimaryScreen()
 
     Keys.onDownPressed: {
       if (root.currentIndex < root.actions.length - 1)
         root.currentIndex++;
     }
-    Keys.onEscapePressed: root.close()
+    Keys.onEscapePressed: root.closeAll()
     Keys.onLeftPressed: {
       if (root.currentIndex > 0)
         root.currentIndex--;
@@ -179,6 +183,9 @@ PanelWindow {
   }
 
   Connections {
+    function onCloseLogoutMenu() {
+      root.close();
+    }
     function onOpenLogoutMenu() {
       root.open();
     }
