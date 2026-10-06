@@ -55,17 +55,17 @@ in
 
   ${lib.optionalString (layout == "hy3") ''
     if hl.plugin.hy3 ~= nil then
-      hl.bind(${modifier} .. " + CTRL + H", hl.plugin.hy3.move_window("left"))
-      hl.bind(${modifier} .. " + CTRL + L", hl.plugin.hy3.move_window("right"))
-      hl.bind(${modifier} .. " + CTRL + K", hl.plugin.hy3.move_window("up"))
-      hl.bind(${modifier} .. " + CTRL + J", hl.plugin.hy3.move_window("down"))
+      hl.bind(${modifier} .. " + CTRL + H", hl.plugin.hy3.move_window("left",{once = true}))
+      hl.bind(${modifier} .. " + CTRL + L", hl.plugin.hy3.move_window("right",{once = true}))
+      hl.bind(${modifier} .. " + CTRL + K", hl.plugin.hy3.move_window("up",{once = true}))
+      hl.bind(${modifier} .. " + CTRL + J", hl.plugin.hy3.move_window("down",{once = true}))
     end
   ''}
   ${lib.optionalString (layout != "hy3") ''
-    hl.bind(${modifier} .. " + CTRL + H", hl.dsp.window.move({ direction = "left" }))
+    hl.bind(${modifier} .. " + CTRL + H", hl.dsp.window.move({ direction = "left"}))
     hl.bind(${modifier} .. " + CTRL + L", hl.dsp.window.move({ direction = "right" }))
-    hl.bind(${modifier} .. " + CTRL + K", hl.dsp.window.move({ direction = "up" }))
-    hl.bind(${modifier} .. " + CTRL + J", hl.dsp.window.move({ direction = "down" }))
+    hl.bind(${modifier} .. " + CTRL + K", hl.dsp.window.move({ direction = "up"}))
+    hl.bind(${modifier} .. " + CTRL + J", hl.dsp.window.move({ direction = "down"}))
   ''}
 
   hl.bind(${modifier} .. " + SHIFT + H", hl.dsp.window.resize({ x = -100, y = 0, relative = true }))
@@ -96,9 +96,9 @@ in
       hl.bind(${modifier} .. " + TAB", hy3.focus_tab({ direction = "right", wrap = true }))
       hl.bind(${modifier} .. " + SHIFT + TAB", hy3.focus_tab({ direction = "left", wrap = true }))
       hl.bind(${modifier} .. " + SHIFT + E", hy3.equalize())
-      hl.bind(${modifier} .. " + EQUAL", hy3.expand("expand"))
-      hl.bind(${modifier} .. " + SHIFT + EQUAL", hy3.expand("shrink"))
-      hl.bind(${modifier} .. " + 0", hy3.expand("base"))
+      hl.bind(${modifier} .. " + O", hy3.expand("expand"))
+      hl.bind(${modifier} .. " + I", hy3.expand("shrink"))
+      hl.bind(${modifier} .. " + P", hy3.expand("base"))
     end
   ''}
 
