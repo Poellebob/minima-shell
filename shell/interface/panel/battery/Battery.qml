@@ -8,62 +8,6 @@ import qs
 
 BarWidget {
   id: batteryRoot
-  visible: UPower.displayDevice.percentage == 0 ? false : true
-
-  Component.onCompleted: displayInfo()
-
-  RowLayout {
-    id: column
-    anchors.centerIn: parent
-    spacing: Global.format.spacing_small
-
-    StyledText {
-      id: batteryIcon
-      horizontalAlignment: Text.AlignHCenter
-    }
-
-    StyledText {
-      id: percentageText
-      text: "-%"
-      horizontalAlignment: Text.AlignHCenter
-    }
-  }
-
-  Timer {
-    interval: Global.format.interval_long
-    running: true
-    repeat: true
-    onTriggered: displayInfo()
-  }
-
-  property bool p10: false
-  property bool p5: false
-
-  function displayInfo() {
-    if (!UPower.displayDevice.ready)
-      return;
-    percentageText.text = Math.round(UPower.displayDevice.percentage * 100)
-        + "%";
-
-    if (UPower.displayDevice.percentage * 100 < 10 && !p10 && !(
-          UPower.displayDevice.percentage == 0)) {
-      p10 = true;
-      Quickshell.execDetached(["sh", "-c",
-                               "notify-send -u critical battery low"]);
-    }
-    if (UPower.displayDevice.percentage * 100 < 5 && !p5 && !(
-          UPower.displayDevice.percentage == 0)) {
-      p5 = true;
-      Quickshell.execDetached(["sh", "-c",
-                               "notify-send -u critical battery low"]);
-    }
-    if (UPower.displayDevice.percentage * 100 > 10) {
-      p5 = false;
-      p10 = false;
-    }
-
-    batteryIcon.text = getBatteryIcon(UPower.displayDevice.iconName);
-  }
 
   function getBatteryIcon(name) {
     switch (name) {
@@ -85,6 +29,31 @@ BarWidget {
       return "󰂄";
     default:
       return "󰁹";
+    }
+  }
+
+  visible: UPower.displayDevice.percentage == 0 ? false : true
+
+  Component.onCompleted: displayInfo()
+
+  RowLayout {
+    id: column
+
+    anchors.centerIn: parent
+    spacing: Global.format.spacing_small
+
+    StyledText {
+      id: batteryIcon
+
+      horizontalAlignment: Text.AlignHCenter
+      text: getBatteryIcon(UPower.displayDevice.iconName)
+    }
+
+    StyledText {
+      id: percentageText
+
+      horizontalAlignment: Text.AlignHCenter
+      text: `${Math.round(UPower.displayDevice.percentage * 100)}%`
     }
   }
 }
