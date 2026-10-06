@@ -19,7 +19,7 @@ let
     else if displays != [] then (head displays).name
     else "";
 
-  quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./shell/interface; } ''
+  quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./shell; } ''
     mkdir -p $out
     cd $src
     shopt -s dotglob
