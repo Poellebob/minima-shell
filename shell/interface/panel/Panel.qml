@@ -258,12 +258,7 @@ PanelWindow {
         visible: false
 
         onClosed: panel.closeBarMenu()
-        onCommandTriggered: name => {
-          if (name === "Wallpapers")
-            openWallpapers();
-          else if (name === "Clip")
-            openClipboard();
-        }
+        onOpenClipboard: panel.openClipboard()
       }
 
       Clipboard {

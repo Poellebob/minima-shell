@@ -13,14 +13,14 @@ Item {
       name: "Wallpapers",
       description: "Open wallpaper selector",
       execute: function () {
-        commandTriggered("Wallpapers");
+        openWallpaperSelector();
       }
     },
     {
       name: "Clip",
       description: "Open clipboard manager",
       execute: function () {
-        commandTriggered("Clip");
+        openClipboard();
       }
     },
     {
@@ -87,7 +87,8 @@ Item {
   property string searchText: ""
 
   signal closed
-  signal commandTriggered(string name)
+  signal openClipboard
+  signal openWallpaperSelector
 
   function close(skipSignal = false) {
     searchInput.text = "";
@@ -162,6 +163,8 @@ Item {
         Keys.onLeftPressed: {
           if (!launcherRoot.isExpr && launcherRoot.currentIndex > 0)
             launcherRoot.currentIndex--;
+          if (launcherRoot.isExpr && !(cursorPosition <= 1))
+            cursorPosition--;
         }
         Keys.onReturnPressed: {
           if (launcherRoot.isExpr)
@@ -172,6 +175,8 @@ Item {
         Keys.onRightPressed: {
           if (!launcherRoot.isExpr && launcherRoot.currentIndex < launcherRoot.filteredEntries.length - 1)
             launcherRoot.currentIndex++;
+          if (launcherRoot.isExpr)
+            cursorPosition++;
         }
         onTextChanged: {
           const t = text;
@@ -236,13 +241,8 @@ Item {
 
         onClicked: launcherRoot.currentIndex = index
         onDoubleClicked: {
-          if (launcherRoot.isCommand) {
-            launcherRoot.close();
-            launcherRoot.commandTriggered(modelData.name);
-          } else {
-            modelData.execute();
-            launcherRoot.close();
-          }
+          modelData.execute();
+          launcherRoot.close();
         }
         onWheel: wheel => {
           if (wheel.angleDelta.x < 0 || wheel.angleDelta.y < 0) {
