@@ -92,6 +92,8 @@ in
         ))
       ];
 
+    services.poweralertd.enable = true;
+
     xdg.portal = mkIf cfg.desktop.xdgPortal {
       enable = true;
       extraPortals = [
