@@ -10,7 +10,7 @@ import qs.panel.pager
 import qs.panel.audio
 import qs.panel.bluetooth
 import qs.panel.network
-import qs.panel.battery
+import qs.panel.power
 import qs.panel.clock
 import qs.panel.calendar
 import qs.panel.launcher
@@ -219,6 +219,8 @@ PanelWindow {
 
               Battery {
                 Layout.alignment: Qt.AlignVCenter
+
+                onBatteryMenuTriggered: openBarContent(powerContent)
               }
 
               Bluetooth {
@@ -259,6 +261,7 @@ PanelWindow {
 
         onClosed: panel.closeBarMenu()
         onOpenClipboard: panel.openClipboard()
+        onOpenWallpaperSelector: panel.openWallpapers()
       }
 
       Clipboard {
@@ -354,6 +357,9 @@ PanelWindow {
         function onOpenNotifications() {
           panel.openBarContent(notifContent);
         }
+        function onOpenPowerMenu() {
+          panel.openBarContent(powerContent);
+        }
         function onOpenSystrayMenu(index: int) {
           systray.triggerItem(index);
         }
@@ -399,6 +405,14 @@ PanelWindow {
 
       BluetoothControl {
         id: bluetoothContent
+
+        anchors.fill: parent
+        anchors.margins: Global.format.spacing_large
+        visible: false
+      }
+
+      PowerControl {
+        id: powerContent
 
         anchors.fill: parent
         anchors.margins: Global.format.spacing_large
