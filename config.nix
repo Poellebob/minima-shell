@@ -9,17 +9,22 @@ with lib;
 let
   cfg = config.minima;
 
-  primaryOutput = let
-    displays = mapAttrsToList (name: value: { inherit name; } // value) cfg.displays;
-    primary = findFirst (d: d.primary) null displays;
-    origin = findFirst (d: d.position.x == 0 && d.position.y == 0) null displays;
-  in
-    if primary != null then primary.name
-    else if origin != null then origin.name
-    else if displays != [] then (head displays).name
-    else "";
+  primaryOutput =
+    let
+      displays = mapAttrsToList (name: value: { inherit name; } // value) cfg.displays;
+      primary = findFirst (d: d.primary) null displays;
+      origin = findFirst (d: d.position.x == 0 && d.position.y == 0) null displays;
+    in
+    if primary != null then
+      primary.name
+    else if origin != null then
+      origin.name
+    else if displays != [ ] then
+      (head displays).name
+    else
+      "";
 
-  quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./shell/interface; } ''
+  quickshellStoreDir = pkgs.runCommand "quickshell-config" { src = ./shell; } ''
     mkdir -p $out
     cd $src
     shopt -s dotglob
