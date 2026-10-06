@@ -9,6 +9,8 @@ import qs
 BarWidget {
   id: batteryRoot
 
+  signal batteryMenuTriggered
+
   function getBatteryIcon(name) {
     switch (name) {
     case "battery-empty-symbolic":
@@ -34,8 +36,6 @@ BarWidget {
 
   visible: UPower.displayDevice.percentage == 0 ? false : true
 
-  Component.onCompleted: displayInfo()
-
   RowLayout {
     id: column
 
@@ -55,5 +55,10 @@ BarWidget {
       horizontalAlignment: Text.AlignHCenter
       text: `${Math.round(UPower.displayDevice.percentage * 100)}%`
     }
+  }
+
+  onClicked: mouse => {
+    if (mouse.button === Qt.LeftButton)
+    batteryMenuTriggered();
   }
 }

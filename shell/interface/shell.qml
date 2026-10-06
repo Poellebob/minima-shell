@@ -61,10 +61,18 @@ ShellRoot {
 
   IpcHandler {
     function open(): void {
-    Global.openNotifications();
-  }
+      Global.openNotifications();
+    }
 
     target: "notifications"
+  }
+
+  IpcHandler {
+    function open(): void {
+      Global.openPowerMenu();
+    }
+
+    target: "power"
   }
 
   IpcHandler {

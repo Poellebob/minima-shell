@@ -92,7 +92,17 @@ in
         ))
       ];
 
-    services.poweralertd.enable = true;
+    services.batsignal = {
+      enable = true;
+      extraArgs = [
+        "-w"
+        "20"
+        "-c"
+        "10"
+        "-d"
+        "5"
+      ];
+    };
 
     xdg.portal = mkIf cfg.desktop.xdgPortal {
       enable = true;
