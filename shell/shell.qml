@@ -61,16 +61,16 @@ ShellRoot {
 
   IpcHandler {
     function open(): void {
-      Global.openNotifications();
-    }
+    Global.openNotifications();
+  }
 
     target: "notifications"
   }
 
   IpcHandler {
     function open(): void {
-      Global.openPowerMenu();
-    }
+    Global.openPowerMenu();
+  }
 
     target: "power"
   }
@@ -80,7 +80,7 @@ ShellRoot {
     Global.openLogoutMenu();
   }
 
-    target: "minimaLogout"
+    target: "logout"
   }
 
   IpcHandler {

@@ -104,7 +104,7 @@ in
   ${lib.optionalString (layout != "hy3") (bind b.scratchpad.send "hl.dsp.window.move({ workspace = \"special:scratchpad\" })")}
   ${bind b.scratchpad.toggle "hl.dsp.workspace.toggle_special(\"scratchpad\")"}
 
-  ${bind b.session.logout "hl.dsp.exec_cmd(\"qs -c \" .. qsConfigName .. \" ipc call minimaLogout open\")"}
+  ${bind b.session.logout "hl.dsp.exec_cmd(\"qs -c \" .. qsConfigName .. \" ipc call logout open\")"}
   ${bind b.audio.volumeUp "hl.dsp.exec_cmd(\"wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+\")"}
   ${bind b.audio.volumeDown "hl.dsp.exec_cmd(\"wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-\")"}
   ${bind b.audio.mute "hl.dsp.exec_cmd(\"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle\")"}
