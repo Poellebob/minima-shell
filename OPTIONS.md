@@ -28,9 +28,10 @@ This document details all configuration options available in minima.
 | `minima.shell.enable` | bool | `true` | Enable zsh, fzf, starship, etc. |
 | `minima.session.systemd.enable` | bool | `true` | Run the QuickShell panel and session daemons as systemd user units, started by the window manager config at compositor startup (rebuilds restart them automatically). When `false`, the window manager config execs them directly instead |
 | `minima.extraPackages` | list | `[]` | Extra packages to install |
-| `minima.kitty.enable` | bool | `true` | Enable kitty terminal config |
-| `minima.programs.terminal.name` | string | `"kitty"` | Terminal binary name (used for desktop file lookup and `lib.getExe'`) |
-| `minima.programs.terminal.package` | package | `pkgs.kitty` | Terminal application package |
+| `minima.terminal.enable` | bool | `true` | Enable Kitty terminal |
+| `minima.terminal.fontSize` | float | `13.0` | Kitty font size |
+| `minima.terminal.backgroundOpacity` | float | `0.8` | Kitty background opacity |
+| `minima.terminal.shellIntegration` | enum | `"enabled"` | Kitty shell integration mode (`"enabled"`, `"disabled"`, or `"no-cursor"`) |
 
 ### Example
 
@@ -41,15 +42,14 @@ This document details all configuration options available in minima.
     enableNvidia = true;
     theming.enable = true;
     extraPackages = with pkgs; [ git curl ];
-    programs.terminal = {
-      program = "kitty";
-      package = pkgs.kitty;
+    terminal = {
+      fontSize = 14.0;
+      backgroundOpacity = 0.9;
+      shellIntegration = "enabled";
     };
   };
 }
 ```
-
----
 
 ## Window Managers
 
@@ -105,9 +105,9 @@ This document details all configuration options available in minima.
 
 ## Keybinds
 
-Keybindings launch programs or run commands. They are rendered directly into
-the window manager config: as `hl.bind(...)` Lua calls for Hyprland, and as
-`bindsym` lines for sway/scroll. Use common modifier names in the `bind` list:
+All built-in keybindings are configurable under `minima.keybinds`; set any
+shortcut to `[]` to disable it. They are rendered as `hl.bind(...)` Lua calls
+for Hyprland and `bindsym` lines for Sway/Scroll. Use common modifier names:
 
 | Common Name | Hyprland | Sway/Scroll |
 |-------------|----------|-------------|
@@ -116,31 +116,104 @@ the window manager config: as `hl.bind(...)` Lua calls for Hyprland, and as
 | `Ctrl` | `CTRL` | `Control` |
 | `Alt` | `ALT` | `Mod1` |
 
-WM-internal keybindings (window focus/move/resize, layout switching,
-screenshots, media keys, workspace switching, mouse binds) are hardcoded and
-not configurable via this option.
-
 | Option | Type | Description |
 |--------|------|-------------|
-| `minima.keybinds` | list | List of keybindings |
-| `minima.keybinds[].exec` | string | Command to execute, or raw Lua/sway text when `raw = true` |
-| `minima.keybinds[].bind` | list | Keys / modifiers, joined with `+` (e.g. `["Main" "Return"]`, `["Main" "K"]`) |
-| `minima.keybinds[].type` | string | Bind command type (default `"bindsym"`, only used by sway/scroll) |
-| `minima.keybinds[].raw` | bool | `false` — emit `exec` verbatim instead of wrapping in `exec_cmd` (Hyprland) / `exec` (sway/scroll). Allows arbitrary Lua or sway commands |
+| `minima.keybinds.enable` | bool | Enable all built-in bindings |
+| `minima.keybinds.terminal` | list | Open Kitty; default `[ "Main" "Return" ]` |
+| `minima.keybinds.{window,session,focus,move,resize,layout,tree}` | attrs | Standard window-manager action bindings |
+| `minima.keybinds.{hy3,scroll}` | attrs | Layout-specific action bindings |
+| `minima.keybinds.{scratchpad,screenshot,audio,brightness,media}` | attrs | Scratchpad, screenshot, and hardware bindings |
+| `minima.keybinds.mouse.enable` | bool | Enable static mouse move/resize/close bindings |
+| `minima.keybinds.custom` | list | Extra command or raw compositor bindings |
+| `minima.keybinds.custom[].exec` | string | Command to execute, or raw Lua/Sway text when `raw = true` |
+| `minima.keybinds.custom[].bind` | list | Keys/modifiers, joined with `+` |
+| `minima.keybinds.custom[].type` | string | Sway/Scroll binding type; defaults to `"bindsym"` |
+| `minima.keybinds.custom[].raw` | bool | Emit `exec` verbatim instead of wrapping it |
 
 ### Example
 
 ```nix
 {
-  minima.keybinds = [
-    { exec = "kitty";   bind = [ "Main" "Return" ]; }
-    { exec = "firefox"; bind = [ "Main" "B" ]; }
-    { exec = "dolphin"; bind = [ "Main" "E" ]; }
-    { exec = "qs -c minima ipc call launcher open";  bind = [ "Main" "D" ]; }
-    { exec = "qs -c minima ipc call clipboard open"; bind = [ "Main" "V" ]; }
-  ];
+  minima.keybinds = {
+    terminal = [ "Main" "Return" ];
+    session.launcher = [ "Main" "Space" ];
+    window.floating = [];
+
+    custom = [
+      { exec = "firefox"; bind = [ "Main" "B" ]; }
+    ];
+  };
 }
 ```
+
+Workspace switching and window movement remain fixed at Main + 1–9, 0 for
+workspaces 1–10, plus Main + Ctrl + Left/Right for previous/next workspace.
+
+### Hyprland Defaults Example
+
+This follows the shortcuts in Hyprland's official example configuration while
+keeping Minima's launcher and logout menu. It is intended for the dwindle
+layout. The `raw` bindings are Hyprland Lua actions.
+
+```nix
+{
+  minima = {
+    hyprland.layout = "dwindle";
+
+    keybinds = {
+      terminal = [ "Main" "q" ];
+
+      window = {
+        close = [ "Main" "c" ];
+        floating = [ "Main" "v" ];
+        sticky = [];
+      };
+
+      session = {
+        launcher = [ "Main" "r" ];
+        logout = [ "Main" "m" ];
+        clipboard = [];
+      };
+
+      focus = {
+        left = [ "Main" "Left" ];
+        right = [ "Main" "Right" ];
+        up = [ "Main" "Up" ];
+        down = [ "Main" "Down" ];
+      };
+
+      layout.toggleSplit = [ "Main" "j" ];
+
+      scratchpad = {
+        toggle = [ "Main" "s" ];
+        send = [ "Main" "Shift" "s" ];
+      };
+
+      custom = [
+        { exec = "dolphin"; bind = [ "Main" "e" ]; }
+        {
+          exec = "hl.dsp.window.pseudo()";
+          bind = [ "Main" "p" ];
+          raw = true;
+        }
+        {
+          exec = ''hl.dsp.focus({ workspace = "e+1" })'';
+          bind = [ "Main" "mouse_down" ];
+          raw = true;
+        }
+        {
+          exec = ''hl.dsp.focus({ workspace = "e-1" })'';
+          bind = [ "Main" "mouse_up" ];
+          raw = true;
+        }
+      ];
+    };
+  };
+}
+```
+
+The fixed Main + 1–0 workspace bindings and Main + mouse-drag window movement
+already match Hyprland's example. Minima retains its other enabled shortcuts.
 
 ---
 

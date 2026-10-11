@@ -51,8 +51,7 @@ in {
             osModule          = true;
             enableNvidia      = mkDefault cfg.enableNvidia;
             keybinds          = mkDefault cfg.keybinds;
-            kitty             = mkDefault cfg.kitty;
-            programs          = mkDefault cfg.programs;
+            terminal          = mkDefault cfg.terminal;
             theming           = mkDefault cfg.theming;
             shell             = mkDefault cfg.shell;
             session           = mkDefault cfg.session;
