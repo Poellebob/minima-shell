@@ -2,6 +2,10 @@
   lib,
   pkgs,
   layout,
+  keybinds,
+  terminalEnabled,
+  bind,
+  mouseModifier,
   modifier,
 }:
 let
@@ -10,141 +14,127 @@ let
   magick = "${pkgs.imagemagick}/bin/magick";
   swappy = "${pkgs.swappy}/bin/swappy";
   wlCopy = "${pkgs.wl-clipboard}/bin/wl-copy";
+  b = keybinds;
 in
 ''
+  ${lib.optionalString terminalEnabled (bind b.terminal "hl.dsp.exec_cmd(\"${pkgs.kitty}/bin/kitty\")")}
   ${lib.optionalString (layout == "hy3") ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3
-      hl.bind(${modifier} .. " + Q", hy3.kill_active())
+      ${bind b.window.close "hy3.kill_active()"}
     end
   ''}
-  ${lib.optionalString (layout != "hy3") ''
-    hl.bind(${modifier} .. " + Q", hl.dsp.window.close())
-  ''}
-  hl.bind(${modifier} .. " + SPACE", hl.dsp.window.float())
-  hl.bind(${modifier} .. " + F", hl.dsp.window.fullscreen())
-  hl.bind(${modifier} .. " + SHIFT + S", hl.dsp.window.pin())
-  hl.bind(${modifier} .. " + ALT + DELETE", hl.dsp.exec_cmd("qs -c " .. qsConfigName .. " ipc call minimaLock open"))
-  hl.bind(${modifier} .. " + SHIFT + C", hl.dsp.exec_cmd("hyprctl reload"))
-  hl.bind(${modifier} .. " + V", hl.dsp.exec_cmd("qs -c " .. qsConfigName .. " ipc call clipboard open"))
-  hl.bind(${modifier} .. " + D", hl.dsp.exec_cmd("qs -c " .. qsConfigName .. " ipc call launcher open"))
+  ${lib.optionalString (layout != "hy3") (bind b.window.close "hl.dsp.window.close()")}
+  ${bind b.window.floating "hl.dsp.window.float()"}
+  ${bind b.window.fullscreen "hl.dsp.window.fullscreen()"}
+  ${bind b.window.sticky "hl.dsp.window.pin()"}
+  ${bind b.session.lock "hl.dsp.exec_cmd(\"qs -c \" .. qsConfigName .. \" ipc call minimaLock open\")"}
+  ${bind b.session.reload "hl.dsp.exec_cmd(\"hyprctl reload\")"}
+  ${bind b.session.clipboard "hl.dsp.exec_cmd(\"qs -c \" .. qsConfigName .. \" ipc call clipboard open\")"}
+  ${bind b.session.launcher "hl.dsp.exec_cmd(\"qs -c \" .. qsConfigName .. \" ipc call launcher open\")"}
 
-  hl.bind("PRINT", hl.dsp.exec_cmd("${grim} -g \"$(${slurp} -o -d)\" - | ${magick} - -shave 1x1 PNG:- | ${wlCopy}"))
-  hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("${grim} - | ${wlCopy}"))
-  hl.bind(${modifier} .. " + PRINT", hl.dsp.exec_cmd("${grim} -g \"$(${slurp} -o -d)\" - | ${swappy} -f -"))
-  hl.bind(${modifier} .. " + SHIFT + PRINT", hl.dsp.exec_cmd("${grim} - | ${swappy} -f -"))
-
-  ${lib.optionalString (layout == "hy3") ''
-    if hl.plugin.hy3 ~= nil then
-      local hy3 = hl.plugin.hy3
-      -- NOTE: no `visible = true` here — that flag restricts movement to
-      -- currently-rendered nodes only, which is what was blocking focus
-      -- movement into/through tab groups.
-      hl.bind(${modifier} .. " + H", hy3.move_focus("left"))
-      hl.bind(${modifier} .. " + L", hy3.move_focus("right"))
-      hl.bind(${modifier} .. " + K", hy3.move_focus("up"))
-      hl.bind(${modifier} .. " + J", hy3.move_focus("down"))
-    end
-  ''}
-  ${lib.optionalString (layout != "hy3") ''
-    hl.bind(${modifier} .. " + H", hl.dsp.focus({ direction = "left" }))
-    hl.bind(${modifier} .. " + L", hl.dsp.focus({ direction = "right" }))
-    hl.bind(${modifier} .. " + K", hl.dsp.focus({ direction = "up" }))
-    hl.bind(${modifier} .. " + J", hl.dsp.focus({ direction = "down" }))
-  ''}
-
-  ${lib.optionalString (layout == "hy3") ''
-    if hl.plugin.hy3 ~= nil then
-      hl.bind(${modifier} .. " + CTRL + H", hl.plugin.hy3.move_window("left",{once = true}))
-      hl.bind(${modifier} .. " + CTRL + L", hl.plugin.hy3.move_window("right",{once = true}))
-      hl.bind(${modifier} .. " + CTRL + K", hl.plugin.hy3.move_window("up",{once = true}))
-      hl.bind(${modifier} .. " + CTRL + J", hl.plugin.hy3.move_window("down",{once = true}))
-    end
-  ''}
-  ${lib.optionalString (layout != "hy3") ''
-    hl.bind(${modifier} .. " + CTRL + H", hl.dsp.window.move({ direction = "left"}))
-    hl.bind(${modifier} .. " + CTRL + L", hl.dsp.window.move({ direction = "right" }))
-    hl.bind(${modifier} .. " + CTRL + K", hl.dsp.window.move({ direction = "up"}))
-    hl.bind(${modifier} .. " + CTRL + J", hl.dsp.window.move({ direction = "down"}))
-  ''}
-
-  hl.bind(${modifier} .. " + SHIFT + H", hl.dsp.window.resize({ x = -100, y = 0, relative = true }))
-  hl.bind(${modifier} .. " + SHIFT + L", hl.dsp.window.resize({ x = 100, y = 0, relative = true }))
-  hl.bind(${modifier} .. " + SHIFT + K", hl.dsp.window.resize({ x = 0, y = -100, relative = true }))
-  hl.bind(${modifier} .. " + SHIFT + J", hl.dsp.window.resize({ x = 0, y = 100, relative = true }))
-
-  ${lib.optionalString (layout == "dwindle") ''
-    hl.bind(${modifier} .. " + SHIFT + A", hl.dsp.layout("togglesplit"))
-  ''}
+  ${bind b.screenshot.selection "hl.dsp.exec_cmd(\"${grim} -g \\\"$(${slurp} -o -d)\\\" - | ${magick} - -shave 1x1 PNG:- | ${wlCopy}\")"}
+  ${bind b.screenshot.fullscreen "hl.dsp.exec_cmd(\"${grim} - | ${wlCopy}\")"}
+  ${bind b.screenshot.editSelection "hl.dsp.exec_cmd(\"${grim} -g \\\"$(${slurp} -o -d)\\\" - | ${swappy} -f -\")"}
+  ${bind b.screenshot.editFullscreen "hl.dsp.exec_cmd(\"${grim} - | ${swappy} -f -\")"}
 
   ${lib.optionalString (layout == "hy3") ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3
-      hl.bind(${modifier} .. " + SHIFT + A", hy3.make_group("opposite", { toggle = true }))
-      hl.bind(${modifier} .. " + ALT + J", hy3.make_group("v"))
-      hl.bind(${modifier} .. " + ALT + K", hy3.make_group("h"))
-      -- hy3 has no separate "stacked" layout like sway — tab groups are
-      -- the only grouping mode, so both the old sway "stack" and
-      -- "tabbed" binds map to the same toggletab action.
-      hl.bind(${modifier} .. " + ALT + H", hy3.change_group("toggletab"))
-      hl.bind(${modifier} .. " + ALT + L", hy3.change_group("toggletab"))
-      hl.bind(${modifier} .. " + ESCAPE", hy3.change_group("untab"))
-      -- "raise" = ascend to parent (mirrors sway's focus parent)
-      -- "lower" = descend into child (mirrors sway's focus child)
-      hl.bind(${modifier} .. " + CTRL + A", hy3.change_focus("lower"))
-      hl.bind(${modifier} .. " + A", hy3.change_focus("raise"))
-      hl.bind(${modifier} .. " + TAB", hy3.focus_tab({ direction = "right", wrap = true }))
-      hl.bind(${modifier} .. " + SHIFT + TAB", hy3.focus_tab({ direction = "left", wrap = true }))
-      hl.bind(${modifier} .. " + SHIFT + E", hy3.equalize())
-      hl.bind(${modifier} .. " + O", hy3.expand("expand"))
-      hl.bind(${modifier} .. " + I", hy3.expand("shrink"))
-      hl.bind(${modifier} .. " + P", hy3.expand("base"))
+      ${bind b.focus.left "hy3.move_focus(\"left\")"}
+      ${bind b.focus.right "hy3.move_focus(\"right\")"}
+      ${bind b.focus.up "hy3.move_focus(\"up\")"}
+      ${bind b.focus.down "hy3.move_focus(\"down\")"}
+    end
+  ''}
+  ${lib.optionalString (layout != "hy3") ''
+    ${bind b.focus.left "hl.dsp.focus({ direction = \"left\" })"}
+    ${bind b.focus.right "hl.dsp.focus({ direction = \"right\" })"}
+    ${bind b.focus.up "hl.dsp.focus({ direction = \"up\" })"}
+    ${bind b.focus.down "hl.dsp.focus({ direction = \"down\" })"}
+  ''}
+
+  ${lib.optionalString (layout == "hy3") ''
+    if hl.plugin.hy3 ~= nil then
+      ${bind b.move.left "hl.plugin.hy3.move_window(\"left\", { once = true })"}
+      ${bind b.move.right "hl.plugin.hy3.move_window(\"right\", { once = true })"}
+      ${bind b.move.up "hl.plugin.hy3.move_window(\"up\", { once = true })"}
+      ${bind b.move.down "hl.plugin.hy3.move_window(\"down\", { once = true })"}
+    end
+  ''}
+  ${lib.optionalString (layout != "hy3") ''
+    ${bind b.move.left "hl.dsp.window.move({ direction = \"left\" })"}
+    ${bind b.move.right "hl.dsp.window.move({ direction = \"right\" })"}
+    ${bind b.move.up "hl.dsp.window.move({ direction = \"up\" })"}
+    ${bind b.move.down "hl.dsp.window.move({ direction = \"down\" })"}
+  ''}
+
+  ${bind b.resize.shrinkWidth "hl.dsp.window.resize({ x = -100, y = 0, relative = true })"}
+  ${bind b.resize.growWidth "hl.dsp.window.resize({ x = 100, y = 0, relative = true })"}
+  ${bind b.resize.shrinkHeight "hl.dsp.window.resize({ x = 0, y = -100, relative = true })"}
+  ${bind b.resize.growHeight "hl.dsp.window.resize({ x = 0, y = 100, relative = true })"}
+
+  ${lib.optionalString (layout == "dwindle") (bind b.layout.toggleSplit "hl.dsp.layout(\"togglesplit\")")}
+  ${lib.optionalString (layout == "hy3") ''
+    if hl.plugin.hy3 ~= nil then
+      local hy3 = hl.plugin.hy3
+      ${bind b.layout.toggleSplit "hy3.make_group(\"opposite\", { toggle = true })"}
+      ${bind b.layout.vertical "hy3.make_group(\"v\")"}
+      ${bind b.layout.horizontal "hy3.make_group(\"h\")"}
+      ${bind b.layout.stacking "hy3.change_group(\"toggletab\")"}
+      ${bind b.layout.tabbed "hy3.change_group(\"toggletab\")"}
+      ${bind b.layout.default "hy3.change_group(\"untab\")"}
+      ${bind b.tree.child "hy3.change_focus(\"lower\")"}
+      ${bind b.tree.parent "hy3.change_focus(\"raise\")"}
+      ${bind b.hy3.nextTab "hy3.focus_tab({ direction = \"right\", wrap = true })"}
+      ${bind b.hy3.previousTab "hy3.focus_tab({ direction = \"left\", wrap = true })"}
+      ${bind b.hy3.equalize "hy3.equalize()"}
+      ${bind b.hy3.expand "hy3.expand(\"expand\")"}
+      ${bind b.hy3.shrink "hy3.expand(\"shrink\")"}
+      ${bind b.hy3.resetExpansion "hy3.expand(\"base\")"}
     end
   ''}
 
   ${lib.optionalString (layout == "hy3") ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3
-      hl.bind(${modifier} .. " + SHIFT + MINUS", hy3.move_to_workspace("special:scratchpad"))
+      ${bind b.scratchpad.send "hy3.move_to_workspace(\"special:scratchpad\")"}
     end
   ''}
-  ${lib.optionalString (layout != "hy3") ''
-    hl.bind(${modifier} .. " + SHIFT + MINUS", hl.dsp.window.move({ workspace = "special:scratchpad" }))
-  ''}
-  hl.bind(${modifier} .. " + MINUS", hl.dsp.workspace.toggle_special("scratchpad"))
+  ${lib.optionalString (layout != "hy3") (bind b.scratchpad.send "hl.dsp.window.move({ workspace = \"special:scratchpad\" })")}
+  ${bind b.scratchpad.toggle "hl.dsp.workspace.toggle_special(\"scratchpad\")"}
 
-  hl.bind("XF86PowerOff", hl.dsp.exec_cmd("qs -c " .. qsConfigName .. " ipc call minimaLogout open"))
-
-  hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"))
-  hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"))
-  hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"))
-  hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"))
-  hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl s 10%+"))
-  hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl s 10%-"))
-
-  hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"))
-  hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"))
-  hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"))
-  hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"))
+  ${bind b.session.logout "hl.dsp.exec_cmd(\"qs -c \" .. qsConfigName .. \" ipc call minimaLogout open\")"}
+  ${bind b.audio.volumeUp "hl.dsp.exec_cmd(\"wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+\")"}
+  ${bind b.audio.volumeDown "hl.dsp.exec_cmd(\"wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-\")"}
+  ${bind b.audio.mute "hl.dsp.exec_cmd(\"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle\")"}
+  ${bind b.audio.microphoneMute "hl.dsp.exec_cmd(\"wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle\")"}
+  ${bind b.brightness.up "hl.dsp.exec_cmd(\"brightnessctl s 10%+\")"}
+  ${bind b.brightness.down "hl.dsp.exec_cmd(\"brightnessctl s 10%-\")"}
+  ${bind b.media.next "hl.dsp.exec_cmd(\"playerctl next\")"}
+  ${bind b.media.pause "hl.dsp.exec_cmd(\"playerctl play-pause\")"}
+  ${bind b.media.play "hl.dsp.exec_cmd(\"playerctl play-pause\")"}
+  ${bind b.media.previous "hl.dsp.exec_cmd(\"playerctl previous\")"}
 
   for i = 1, 10 do
-      local key = i % 10
-      hl.bind(${modifier} .. " + " .. key, hl.dsp.focus({ workspace = i }))
-      hl.bind(${modifier} .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
+    local key = i % 10
+    hl.bind(${modifier} .. " + " .. key, hl.dsp.focus({ workspace = i }))
+    hl.bind(${modifier} .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
   end
-
   hl.bind(${modifier} .. " + CTRL + RIGHT", hl.dsp.focus({ workspace = "e+1" }))
   hl.bind(${modifier} .. " + CTRL + LEFT", hl.dsp.focus({ workspace = "e-1" }))
 
-  hl.bind(${modifier} .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
-  hl.bind(${modifier} .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
-  ${lib.optionalString (layout == "hy3") ''
-    if hl.plugin.hy3 ~= nil then
-      local hy3 = hl.plugin.hy3
-      hl.bind(${modifier} .. " + mouse:274", hy3.kill_active(), { mouse = true })
-    end
-  ''}
-  ${lib.optionalString (layout != "hy3") ''
-    hl.bind(${modifier} .. " + mouse:274", hl.dsp.window.close(), { mouse = true })
+  ${lib.optionalString (b.mouse.enable && b.enable) ''
+    hl.bind(${mouseModifier} .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
+    hl.bind(${mouseModifier} .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+    ${lib.optionalString (layout == "hy3") ''
+      if hl.plugin.hy3 ~= nil then
+        local hy3 = hl.plugin.hy3
+        hl.bind(${mouseModifier} .. " + mouse:274", hy3.kill_active(), { mouse = true })
+      end
+    ''}
+    ${lib.optionalString (layout != "hy3") ''
+      hl.bind(${mouseModifier} .. " + mouse:274", hl.dsp.window.close(), { mouse = true })
+    ''}
   ''}
 ''

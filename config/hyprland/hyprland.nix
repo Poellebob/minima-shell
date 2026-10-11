@@ -89,6 +89,10 @@ let
     else
       "hl.bind(${hyprBindExpr kb.bind}, hl.dsp.exec_cmd(${luaStr kb.exec}))";
 
+  hyprDefaultBind =
+    binds: action:
+    optionalString (cfg.keybinds.enable && binds != [ ]) "hl.bind(${hyprBindExpr binds}, ${action})";
+
   hyprSpecialWs =
     name: ws:
     concatStringsSep "\n" (
@@ -268,13 +272,17 @@ in
 
   ${import ./config.d/misc.nix}
 
-  ${import ./config.d/keybinds.nix {
-    inherit lib pkgs;
-    layout = cfg.hyprland.layout;
-    modifier = luaStr cfg.hyprland.modifier;
-  }}
+   ${import ./config.d/keybinds.nix {
+     inherit lib pkgs;
+     layout = cfg.hyprland.layout;
+     keybinds = cfg.keybinds;
+     terminalEnabled = cfg.terminal.enable;
+     bind = hyprDefaultBind;
+     mouseModifier = luaStr cfg.hyprland.modifier;
+     modifier = luaStr cfg.hyprland.modifier;
+   }}
 
-  ${concatStringsSep "\n" (map hyprKeybind (filter (kb: kb.bind != [ ]) cfg.keybinds))}
+   ${concatStringsSep "\n" (map hyprKeybind (filter (kb: kb.bind != [ ]) cfg.keybinds.custom))}
 
   ${concatStringsSep "\n" (mapAttrsToList hyprSpecialWs cfg.specialWorkspaces)}
 
