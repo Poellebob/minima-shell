@@ -300,4 +300,8 @@ in
   })
 
   ${cfg.hyprland.extraLua}
+
+  -- minima: runtime monitor overrides (managed by the shell).
+  -- Loaded last so its hl.monitor rules win over the declarative ones above.
+  pcall(function() dofile(os.getenv("HOME") .. "/.config/minima/monitors.lua") end)
 ''

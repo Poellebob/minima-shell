@@ -150,4 +150,8 @@ pkgs.writeText "${wm}-config" ''
   exec_always --no-startup-id sh -c '${msgCmd} input type:keyboard xkb_layout "$(localectl status | sed -n "s/^\s*X11 Layout:\s*//p")"'
 
   ${extraConfig}
+
+  # minima: runtime monitor overrides (managed by the shell).
+  # Included last so its output blocks win over the declarative ones above.
+  include ~/.config/minima/monitors-sway.conf
 ''

@@ -36,6 +36,7 @@ let
         matugenConfigPath = "${matugenConfigFile}";
         matugenBin = "${cfg.matugen.package}/bin/matugen";
         primaryOutput = primaryOutput;
+        nixDisplays = builtins.attrNames cfg.displays;
       };
       theme = {
         darkTheme = cfg.darkTheme;
