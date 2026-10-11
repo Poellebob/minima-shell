@@ -8,66 +8,73 @@ import qs
 Item {
   id: launcherRoot
 
-  readonly property var commands: [
-    {
-      name: "Wallpapers",
-      description: "Open wallpaper selector",
-      execute: function () {
-        openWallpaperSelector();
-      }
-    },
-    {
-      name: "Clip",
-      description: "Open clipboard manager",
-      execute: function () {
-        openClipboard();
-      }
-    },
-    {
-      name: "Lock",
-      description: "Lock the session",
-      execute: function () {
-        Global.openLockScreen();
-      }
-    },
-    {
-      name: "Logout",
-      description: "Terminate the current session",
-      execute: function () {
-        Quickshell.execDetached(["loginctl", "terminate-session", Quickshell.env("XDG_SESSION_ID")]);
-      }
-    },
-    {
-      name: "Shutdown",
-      description: "Power off the machine",
-      execute: function () {
-        Quickshell.execDetached(["systemctl", "poweroff"]);
-      }
-    },
-    {
-      name: "Reboot",
-      description: "Restart the machine",
-      execute: function () {
-        Quickshell.execDetached(["systemctl", "reboot"]);
-      }
-    },
-    {
-      name: "Suspend",
-      description: "Suspend to RAM",
-      execute: function () {
-        Global.openLockScreen();
-        Quickshell.execDetached(["systemctl", "suspend"]);
-      }
-    },
-    {
-      name: "Hibernate",
-      description: "Suspend to disk",
-      execute: function () {
-        Global.openLockScreen();
-        Quickshell.execDetached(["systemctl", "hibernate"]);
-      }
+  readonly property var commands: {
+    const entries = [];
+    if (Global.config.wallpaper.enabled) {
+      entries.push({
+        name: "Wallpapers",
+        description: "Open wallpaper selector",
+        execute: function () {
+          openWallpaperSelector();
+        }
+      });
     }
-  ]
+
+    entries.push(
+      {
+        name: "Clip",
+        description: "Open clipboard manager",
+        execute: function () {
+          openClipboard();
+        }
+      },
+      {
+        name: "Lock",
+        description: "Lock the session",
+        execute: function () {
+          Global.openLockScreen();
+        }
+      },
+      {
+        name: "Logout",
+        description: "Terminate the current session",
+        execute: function () {
+          Quickshell.execDetached(["loginctl", "terminate-session", Quickshell.env("XDG_SESSION_ID")]);
+        }
+      },
+      {
+        name: "Shutdown",
+        description: "Power off the machine",
+        execute: function () {
+          Quickshell.execDetached(["systemctl", "poweroff"]);
+        }
+      },
+      {
+        name: "Reboot",
+        description: "Restart the machine",
+        execute: function () {
+          Quickshell.execDetached(["systemctl", "reboot"]);
+        }
+      },
+      {
+        name: "Suspend",
+        description: "Suspend to RAM",
+        execute: function () {
+          Global.openLockScreen();
+          Quickshell.execDetached(["systemctl", "suspend"]);
+        }
+      },
+      {
+        name: "Hibernate",
+        description: "Suspend to disk",
+        execute: function () {
+          Global.openLockScreen();
+          Quickshell.execDetached(["systemctl", "hibernate"]);
+        }
+      }
+    );
+    return entries;
+  }
   property int currentIndex: 0
   readonly property var filteredEntries: {
     let all;
