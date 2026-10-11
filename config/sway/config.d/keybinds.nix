@@ -62,7 +62,7 @@ in
 
   ${bind b.scratchpad.send "move scratchpad"}
   ${bind b.scratchpad.toggle "scratchpad show"}
-  ${bind b.session.logout "exec qs -c $qs_config ipc call minimaLogout open"}
+  ${bind b.session.logout "exec qs -c $qs_config ipc call logout open"}
   ${bind b.audio.volumeUp "exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"}
   ${bind b.audio.volumeDown "exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"}
   ${bind b.audio.mute "exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"}
