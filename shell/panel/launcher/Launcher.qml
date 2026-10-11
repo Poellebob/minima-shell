@@ -10,6 +10,13 @@ Item {
 
   readonly property var commands: [
     {
+      name: "Monitors",
+      description: "Edit monitor layout and modes",
+      execute: function () {
+        Global.openMonitorMenu();
+      }
+    },
+    {
       name: "Wallpapers",
       description: "Open wallpaper selector",
       execute: function () {

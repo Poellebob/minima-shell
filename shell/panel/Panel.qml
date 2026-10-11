@@ -17,6 +17,7 @@ import qs.panel.launcher
 import qs.panel.clipboard
 import qs.panel.wallpaper
 import qs.panel.notification
+import qs.panel.monitor
 
 PanelWindow {
   id: panel
@@ -357,6 +358,13 @@ PanelWindow {
         function onOpenNotifications() {
           panel.openBarContent(notifContent);
         }
+        function onOpenMonitorMenu() {
+          if (!panel.isFocusedScreen())
+            return;
+          panel.closeBarMenu();
+          panel.openBarContent(monitorContent);
+          monitorContent.open();
+        }
         function onOpenPowerMenu() {
           panel.openBarContent(powerContent);
         }
@@ -421,6 +429,14 @@ PanelWindow {
 
       WallpaperPicker {
         id: wallpaperContent
+
+        anchors.fill: parent
+        anchors.margins: Global.format.spacing_large
+        visible: false
+      }
+
+      MonitorControl {
+        id: monitorContent
 
         anchors.fill: parent
         anchors.margins: Global.format.spacing_large

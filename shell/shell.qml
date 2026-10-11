@@ -9,6 +9,8 @@ import qs.session
 ShellRoot {
   id: root
 
+  Component.onCompleted: Wm.ensureFragments()
+
   Process {
     command: ["sh", "-c",
       "systemd-inhibit --who=\"minima shell\" --why=\"lock keybind\" --what=handle-power-key --mode=block sleep infinity"]
@@ -65,6 +67,14 @@ ShellRoot {
     }
 
     target: "notifications"
+  }
+
+  IpcHandler {
+    function open(): void {
+      Global.openMonitorMenu();
+    }
+
+    target: "monitor"
   }
 
   IpcHandler {

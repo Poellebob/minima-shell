@@ -21,6 +21,7 @@ Item {
         property string matugenConfigPath: ""
         property string matugenBin: ""
         property string primaryOutput: ""
+        property list<string> nixDisplays: []
       }
       property JsonObject theme: JsonObject {
         property bool darkTheme: true
