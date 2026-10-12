@@ -2,6 +2,8 @@
 
 A NixOS/home-manager flake providing a Wayland-focused desktop environment with [Hyprland](https://hyprland.org/), [Sway](https://swaywm.org/), [SwayFX](https://github.com/Ericmorgenta/swayfx), and [Scroll](https://github.com/dawsers/scroll/) support.
 
+For the early shell-only, non-Nix installation path, see [NONNIX.md](./NONNIX.md).
+
 > [!WARNING]
 > This project is not done and is still **alpha**; it will contain bugs.
 

@@ -7,8 +7,9 @@ Item {
 
   FileView {
     id: confFile
-    path: Quickshell.env("MINIMA_CONFIG") || (Quickshell.env("HOME")
-                                              + "/.config/minima/config.json")
+    path: Quickshell.env("MINIMA_CONFIG") || ((Quickshell.env("XDG_CONFIG_HOME")
+                                                || (Quickshell.env("HOME") + "/.config"))
+                                               + "/minima/config.json")
     watchChanges: true
     blockLoading: false
 
