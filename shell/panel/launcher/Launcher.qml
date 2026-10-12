@@ -191,7 +191,7 @@ Item {
             launcherRoot.isExpr = true;
             launcherRoot.mathRes = "";
             const expr = t.slice(1).trim();
-            if (expr.length > 0) {
+            if (expr.length > 0 && Global.config.launcher.qalcPath !== "") {
               mathProc.expr = expr;
               mathProc.running = true;
             }
