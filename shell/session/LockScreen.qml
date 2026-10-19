@@ -20,10 +20,10 @@ Item {
   }
 
   function tryUnlock(response: string): void {
-  if (!pam.responseRequired)
-  return;
-  pam.respond(response);
-}
+    if (!root.locked || !pam.responseRequired)
+      return;
+    pam.respond(response);
+  }
 
   onLockedChanged: {
     if (locked) {
@@ -40,8 +40,8 @@ Item {
     onCompleted: result => {
       if (result === PamResult.Success) {
         root.unlock();
-      } else if (lockSurface.isPrimaryScreen) {
-        passwordInput.forceActiveFocus();
+      } else if (root.locked && result === PamResult.Failed) {
+        pam.start();
       }
     }
   }
@@ -56,6 +56,18 @@ Item {
 
       readonly property bool isPrimaryScreen: Wm.isPrimaryScreen(
                                                   lockSurface.screen.name)
+
+      Connections {
+        target: pam
+
+        function onResponseRequiredChanged() {
+          if (pam.responseRequired) {
+            passwordInput.text = "";
+            if (lockSurface.isPrimaryScreen)
+              passwordInput.forceActiveFocus();
+          }
+        }
+      }
 
       SystemClock {
         id: clock
@@ -106,9 +118,8 @@ Item {
               spacing: Global.format.spacing_medium
 
               StyledText {
-                text: pam.message
-                color: pam.messageIsError ? Global.colors.error :
-                                            Global.colors.on_surface_variant
+                text: "Password:"
+                color: Global.colors.on_surface_variant
               }
 
               TextInput {
@@ -124,15 +135,16 @@ Item {
                 }
                 clip: true
                 focus: true
+                readOnly: !pam.responseRequired
                 verticalAlignment: Text.AlignVCenter
                 Layout.preferredWidth: 220
 
-                onAccepted: {
-                  root.tryUnlock(passwordInput.text);
-                  passwordInput.text = "";
-                }
+                onAccepted: root.tryUnlock(passwordInput.text)
 
-                Keys.onEscapePressed: passwordInput.text = ""
+                Keys.onEscapePressed: {
+                  if (!passwordInput.readOnly)
+                    passwordInput.text = "";
+                }
 
                 Component.onCompleted: {
                   if (lockSurface.isPrimaryScreen)
