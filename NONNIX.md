@@ -7,9 +7,12 @@ terminal, editor, or global theme.
 ## Before You Start
 
 - Use Hyprland, Sway, SwayFX, or Scroll.
-- Install a compatible [QuickShell](https://quickshell.org/) build providing
+- Minima needs a compatible [QuickShell](https://quickshell.org/) build providing
   `qs` and the Wayland, I3, Hyprland, Widgets, DBusMenu, Notifications, PAM,
-  PipeWire, MPRIS, UPower, Bluetooth, and Networking modules.
+  PipeWire, MPRIS, UPower, Bluetooth, and Networking modules. On Ubuntu and
+  Ubuntu-based Mint, the installer offers to install QuickShell if `qs` is
+  missing. On other distributions, install it beforehand unless the installer
+  lists a native QuickShell package.
 - Run from your normal user account, not as root. Optional system packages
   are installed through `sudo`.
 
@@ -44,6 +47,15 @@ icons and layout.
 Review the listed packages before confirming. AUR packages and upstream
 builds/downloads require a separate confirmation:
 
+- On Ubuntu and Ubuntu-based Mint, missing QuickShell is installed from the
+  `ppa:avengemedia/danklinux` repository documented in the
+  [QuickShell installation guide](https://quickshell.org/docs/v0.3.2/guide/install-setup/#ubuntu).
+  Adding this system-wide third-party repository requires its own confirmation.
+  Mint uses its Ubuntu base codename, not the Mint release name. The installer
+  checks that the repository publishes that Ubuntu release before adding it;
+  package availability and compatibility are not guaranteed for every release.
+- On Debian, the installer selects native `quickshell` when it is present in
+  your current APT package lists. It never adds an Ubuntu PPA to Debian.
 - Arch Wallpaper Engine installation requires an existing `yay` or `paru`.
 - Fedora and Debian/Ubuntu build `awww` and Wallpaper Engine from source,
   install `matugen` through Cargo, and download the font from Nerd Fonts.
@@ -52,8 +64,9 @@ builds/downloads require a separate confirmation:
   it does not change your shell profile or default Rust toolchain. Distribution
   Rust packages can be too old, including those on Linux Mint / Ubuntu 24.04.
 
-The installer does not add package repositories, install Steam, or download
-Workshop content.
+The QuickShell PPA is the only repository the installer offers to add. It stays
+configured for future APT updates. The installer does not install Steam or
+download Workshop content.
 
 ## Start Minima
 
@@ -136,8 +149,10 @@ From a source checkout, check available commands without installing anything:
 ./nonnix/install.sh --check
 ```
 
-- If `qs` is missing or reports unavailable QML modules, install a compatible
-  QuickShell build. The installer does not install QuickShell.
+- If `qs` is missing, rerun the installer to accept the QuickShell PPA on
+  Ubuntu/Mint, or follow the QuickShell installation guide for your distribution.
+  If it reports unavailable QML modules, check that your build provides the
+  modules listed above.
 - If icons are missing, install JetBrainsMono Nerd Font.
 - If an older installer fails with `lock file version 4` while installing
   matugen, rerun the current installer. It uses stable Rust rather than the

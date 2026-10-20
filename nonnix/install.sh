@@ -18,6 +18,7 @@ check_only=false
 show_menu=true
 assume_yes=false
 distro=""
+ubuntu_codename=""
 declare -A selected=(
   [calculator]=true
   [clipboard]=true
@@ -66,8 +67,8 @@ Options:
   --bin-home PATH       Override launcher directory (default: ~/.local/bin).
   -h, --help            Show this help.
 
-Native packages are installed only after confirmation. Third-party source builds
-and Arch AUR packages require a separate confirmation.
+Native packages are installed only after confirmation. Third-party actions
+require a separate confirmation, including the Ubuntu/Mint QuickShell PPA.
 EOF
 }
 
@@ -143,13 +144,14 @@ toggle_feature() {
 }
 
 detect_distro() {
-  if [[ -n "$distro" ]]; then
-    return
-  fi
-
   [[ -r /etc/os-release ]] || return
   # shellcheck disable=SC1091
   . /etc/os-release
+  ubuntu_codename="${UBUNTU_CODENAME:-}"
+  if [[ "${ID:-}" == ubuntu ]]; then
+    ubuntu_codename="${VERSION_CODENAME:-$ubuntu_codename}"
+  fi
+  [[ -z "$distro" ]] || return 0
   case "${ID:-}" in
     arch|manjaro|endeavouros) distro=arch ;;
     fedora) distro=fedora ;;
@@ -255,6 +257,17 @@ prepare_actions() {
   source_actions=()
   aur_packages=()
   package_seen=()
+
+  if [[ "$distro" == debian ]] && ! command -v qs >/dev/null 2>&1; then
+    if [[ -n "$ubuntu_codename" ]]; then
+      add_native_package software-properties-common
+      add_native_package curl
+      add_native_package ca-certificates
+      add_source_action quickshell-ppa
+    elif command -v apt-cache >/dev/null 2>&1 && apt-cache show quickshell >/dev/null 2>&1; then
+      add_native_package quickshell
+    fi
+  fi
 
   if [[ "$distro" != arch ]] && { "${selected[wallpapers]}" || "${selected[colors]}"; }; then
     add_native_package curl
@@ -380,6 +393,7 @@ review_actions() {
     local action
     for action in "${source_actions[@]}"; do
       case "$action" in
+        quickshell-ppa) warn "Add ppa:avengemedia/danklinux for Ubuntu $ubuntu_codename and install QuickShell (system-wide)." ;;
         rust-toolchain) note '  - Install/update stable Rust through rustup (https://sh.rustup.rs); leave shell profiles and the default toolchain unchanged.' ;;
         awww) note '  - Clone Codeberg awww and install with Cargo into ~/.local/bin.' ;;
         matugen) note '  - Download the matugen crate with Cargo into ~/.local/bin.' ;;
@@ -416,6 +430,29 @@ require_command() {
   fi
   "$dry_run" && return
   fail "$command_name is required for this selected source action"
+}
+
+install_quickshell_from_ppa() {
+  require_command sudo
+  require_command curl
+  require_command add-apt-repository
+  warn "This adds the third-party ppa:avengemedia/danklinux repository for Ubuntu $ubuntu_codename."
+  if ! confirm 'Add this PPA and install QuickShell?'; then
+    warn 'QuickShell installation skipped. Minima cannot run until qs is installed.'
+    return 0
+  fi
+  if ! "$dry_run"; then
+    curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location --output /dev/null \
+      "https://ppa.launchpadcontent.net/avengemedia/danklinux/ubuntu/dists/$ubuntu_codename/Release" \
+      || fail "could not verify the DankLinux PPA for $ubuntu_codename; no repository was added"
+  fi
+  run sudo add-apt-repository --yes ppa:avengemedia/danklinux
+  run sudo apt-get update
+  run apt-get --simulate install --no-install-recommends quickshell
+  run sudo apt-get install --no-install-recommends quickshell
+  if ! "$dry_run"; then
+    command -v qs >/dev/null 2>&1 || fail 'QuickShell installation finished but qs is not on PATH'
+  fi
 }
 
 install_rust_toolchain() {
@@ -513,6 +550,7 @@ install_source_actions() {
   local action
   for action in "${source_actions[@]}"; do
     case "$action" in
+      quickshell-ppa) install_quickshell_from_ppa ;;
       rust-toolchain) install_rust_toolchain ;;
       awww) install_awww_from_source ;;
       matugen) install_matugen_from_source ;;
@@ -654,7 +692,7 @@ install_selected() {
   review_actions
 
   if ((${#native_packages[@]} + ${#aur_packages[@]} + ${#source_actions[@]})); then
-    confirm 'Install the listed optional dependencies?' || {
+    confirm 'Install the listed dependencies?' || {
       note 'Optional dependency installation cancelled; installing the Minima shell only.'
       native_packages=()
       aur_packages=()
@@ -713,6 +751,11 @@ install_selected() {
     note "Previous config backed up to $config_backup."
   fi
   note
+  if ! "$dry_run" && ! command -v qs >/dev/null 2>&1; then
+    warn 'QuickShell (qs) is missing. Install it before running Minima.'
+    note '  https://quickshell.org/docs/v0.3.2/guide/install-setup/'
+    note
+  fi
   note 'Start Minima:'
   note "  \"$launcher\""
   note
