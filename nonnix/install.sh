@@ -19,6 +19,11 @@ show_menu=true
 assume_yes=false
 distro=""
 ubuntu_codename=""
+wm=sway
+desktop="${XDG_CURRENT_DESKTOP:-}"
+if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" || "${desktop,,}" == *hyprland* ]]; then
+  wm=hyprland
+fi
 declare -A selected=(
   [calculator]=true
   [clipboard]=true
@@ -57,6 +62,7 @@ Options:
   --dry-run             Print planned changes without writing files.
   --check               Check runtime and optional dependencies only.
   --distro NAME         Override detection: arch, fedora, or debian.
+  --wm NAME             Window manager: hyprland or sway (Sway / Scroll).
   --with FEATURE        Select a feature without the menu; may be repeated.
                         Features: calculator, clipboard, wallpapers, colors,
                         wallpaper-engine, font.
@@ -177,6 +183,27 @@ choose_distro() {
       3) distro=debian; return ;;
       0|"") return ;;
       *) note 'Enter 0, 1, 2, or 3.'; menu_pause ;;
+    esac
+  done
+}
+
+choose_wm() {
+  local choice
+  while true; do
+    menu_header 'Window Manager'
+    note "  Current: $wm"
+    note '  Sets system.wm in Minima config; does not configure the compositor.'
+    note
+    note '  1. Hyprland'
+    note '  2. Sway / Scroll'
+    note '  0. Back'
+    note
+    read -r -p 'Select option [0]: ' choice || return 0
+    case "$choice" in
+      1) wm=hyprland; return ;;
+      2) wm=sway; return ;;
+      0|"") return ;;
+      *) note 'Enter a menu number.'; menu_pause ;;
     esac
   done
 }
@@ -410,6 +437,7 @@ review_actions() {
   local feature count=0
   note
   note "Distribution: $distro"
+  note "Window manager: $wm"
   note 'Required: QuickShell, Qt QML/Quick Controls, Wayland, SVG/image support, and shell utilities.'
   if [[ "$distro" == fedora ]]; then
     note 'QuickShell uses enabled Fedora repositories; if unavailable, the errornointernet/quickshell COPR requires separate consent.'
@@ -635,10 +663,8 @@ json_string() {
 }
 
 configure_shell() {
-  local wm=sway qalc_path='' matugen_bin='' matugen_config=''
+  local qalc_path='' matugen_bin='' matugen_config=''
   local engine_path=linux-wallpaperengine wallpaper_enabled=false
-  local desktop="${XDG_CURRENT_DESKTOP:-}"
-  [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" || "${desktop,,}" == *hyprland* ]] && wm=hyprland
   "${selected[calculator]}" && qalc_path=qalc
   [[ "$distro" != arch ]] && engine_path="$bin_home/linux-wallpaperengine"
   if "${selected[wallpapers]}" || "${selected[wallpaper-engine]}"; then
@@ -962,9 +988,10 @@ show_menu_screen() {
   note "  1. Package manager:       ${distro:-not selected}"
   note "  2. Optional dependencies: $count selected"
   note '  3. Installation paths'
+  note "  4. Window manager:        $wm"
   note
-  note '  4. Review and install'
-  note '  5. Check installed dependencies'
+  note '  5. Review and install'
+  note '  6. Check installed dependencies'
   note '  0. Exit'
   note
 }
@@ -979,7 +1006,8 @@ interactive_menu() {
       1) choose_distro ;;
       2) features_menu ;;
       3) paths_menu ;;
-      4)
+      4) choose_wm ;;
+      5)
         if [[ -z "$distro" ]]; then
           note 'Select a package-manager family first.'
           menu_pause
@@ -1002,7 +1030,7 @@ interactive_menu() {
             ;;
         esac
         ;;
-      5)
+      6)
         menu_header 'Installed Dependencies'
         check_dependencies
         menu_pause
@@ -1019,6 +1047,12 @@ while (($#)); do
     --check) check_only=true ;;
     --no-menu) show_menu=false ;;
     --yes) assume_yes=true ;;
+    --wm)
+      (($# >= 2)) || fail "$1 requires hyprland or sway"
+      wm="$2"
+      case "$wm" in hyprland|sway) ;; *) fail "unsupported window manager: $wm" ;; esac
+      shift
+      ;;
     --distro)
       (($# >= 2)) || fail "$1 requires arch, fedora, or debian"
       distro="$2"

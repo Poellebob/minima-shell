@@ -34,7 +34,8 @@ MINIMA_REF=devel/master bash <(curl -fsSL https://raw.githubusercontent.com/Poel
 From an existing source checkout, run `./nonnix/install.sh`.
 
 In the menu, check the detected package-manager family (Arch, Fedora, or
-Debian/Ubuntu), choose optional dependencies, then select **Review and install**.
+Debian/Ubuntu), choose your **Window manager** and optional dependencies, then
+select **Review and install**.
 You can also change installation paths or check installed dependencies.
 
 QuickShell, Qt QML/Quick Controls, the Wayland plugin, SVG/image support, and
@@ -46,7 +47,7 @@ does not remove these dependencies. QuickShell is installed as follows:
 | Arch | Native `quickshell` package |
 | Fedora | Native `quickshell` package; separately confirmed COPR fallback if unavailable |
 | Debian | Native `quickshell` package; requires a release/repository that provides it, such as testing or unstable |
-| Ubuntu / Ubuntu-based Mint | DankLinux PPA when `qs` is missing |
+| Ubuntu / Ubuntu-based | DankLinux PPA when `qs` is missing |
 
 The installer stops instead of reporting success if the required `qs` command
 is still missing. It installs the packaged QuickShell build and its dependencies;
@@ -134,8 +135,12 @@ Edit the files in `~/.config/minima/` (or `$XDG_CONFIG_HOME/minima/`):
 | `colors.json` | Current palette |
 | `matugen.toml` | Palette-generation template and output paths |
 
-The installer detects Hyprland and otherwise defaults to Sway. Set `system.wm`
-in `config.json` to `hyprland`, `sway`, `swayfx`, or `scroll` as needed.
+Choose **Hyprland** or **Sway / Scroll** in the installer's **Window manager**
+menu, or pass `--wm hyprland` or `--wm sway`. This sets `system.wm` in
+`config.json` to `hyprland` or `sway`; Scroll uses the Sway integration.
+It does not install or modify the compositor. The installer detects an active
+Hyprland session and otherwise defaults to Sway / Scroll. You can also edit
+`system.wm` manually afterward.
 Other feature settings are generated from your installation selections.
 
 ### Wallpapers
