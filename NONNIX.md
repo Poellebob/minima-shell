@@ -24,13 +24,13 @@ availability can vary by distribution and release.
 Run in a terminal:
 
 ```sh
-bash -c <(curl -fsSL https://raw.githubusercontent.com/Poellebob/minima-shell/master/nonnix/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/Poellebob/minima-shell/master/nonnix/install.sh)
 ```
 
 To use the development branch instead:
 
 ```sh
-MINIMA_REF=devel/master bash -c <(curl -fsSL https://raw.githubusercontent.com/Poellebob/minima-shell/master/nonnix/install.sh)
+MINIMA_REF=devel/master bash <(curl -fsSL https://raw.githubusercontent.com/Poellebob/minima-shell/master/nonnix/install.sh)
 ```
 
 From an existing source checkout, run `./nonnix/install.sh`.
