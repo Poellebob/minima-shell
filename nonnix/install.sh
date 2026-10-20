@@ -29,6 +29,7 @@ declare -A selected=(
 declare -A package_seen=()
 native_packages=()
 source_actions=()
+rustup_command=""
 aur_packages=()
 menu_active=false
 generated_config=""
@@ -255,6 +256,16 @@ prepare_actions() {
   aur_packages=()
   package_seen=()
 
+  if [[ "$distro" != arch ]] && { "${selected[wallpapers]}" || "${selected[colors]}"; }; then
+    add_native_package curl
+    add_native_package ca-certificates
+    case "$distro" in
+      debian) add_native_package build-essential ;;
+      fedora) add_native_package gcc ;;
+    esac
+    add_source_action rust-toolchain
+  fi
+
   if "${selected[calculator]}"; then
     case "$distro" in
       arch) add_native_package libqalculate ;;
@@ -273,9 +284,6 @@ prepare_actions() {
       add_native_package awww
     else
       add_native_package git
-      add_native_package cargo
-      [[ "$distro" == debian ]] && add_native_package rustc
-      [[ "$distro" == fedora ]] && add_native_package rust
       add_source_action awww
     fi
   fi
@@ -284,9 +292,6 @@ prepare_actions() {
     if [[ "$distro" == arch ]]; then
       add_native_package matugen
     else
-      add_native_package cargo
-      [[ "$distro" == debian ]] && add_native_package rustc
-      [[ "$distro" == fedora ]] && add_native_package rust
       add_source_action matugen
     fi
   fi
@@ -375,6 +380,7 @@ review_actions() {
     local action
     for action in "${source_actions[@]}"; do
       case "$action" in
+        rust-toolchain) note '  - Install/update stable Rust through rustup (https://sh.rustup.rs); leave shell profiles and the default toolchain unchanged.' ;;
         awww) note '  - Clone Codeberg awww and install with Cargo into ~/.local/bin.' ;;
         matugen) note '  - Download the matugen crate with Cargo into ~/.local/bin.' ;;
         wallpaper-engine) note '  - Clone GitHub linux-wallpaperengine and compile it into the selected bin directory.' ;;
@@ -412,24 +418,41 @@ require_command() {
   fail "$command_name is required for this selected source action"
 }
 
+install_rust_toolchain() {
+  local installer_dir
+  require_command curl
+  rustup_command="${CARGO_HOME:-$HOME/.cargo}/bin/rustup"
+  if command -v rustup >/dev/null 2>&1; then
+    rustup_command="$(command -v rustup)"
+  elif [[ ! -x "$rustup_command" ]]; then
+    if "$dry_run"; then
+      note '+ download https://sh.rustup.rs and run sh rustup-init.sh -y --no-modify-path --profile minimal --default-toolchain none'
+    else
+      installer_dir="$(mktemp -d "${TMPDIR:-/tmp}/minima-rustup.XXXXXX")"
+      temporary_dirs+=("$installer_dir")
+      run curl --proto '=https' --tlsv1.2 --fail --location --output "$installer_dir/rustup-init.sh" https://sh.rustup.rs
+      run sh "$installer_dir/rustup-init.sh" -y --no-modify-path --profile minimal --default-toolchain none
+    fi
+  fi
+  run "$rustup_command" toolchain install stable --profile minimal
+}
+
 install_awww_from_source() {
   local source_dir="$BUILD_ROOT/awww"
   require_command git
-  require_command cargo
   if "$dry_run"; then
     note '+ git clone --depth 1 https://codeberg.org/LGFae/awww.git <build>/awww'
-    note "+ cargo install --path <build>/awww --root $HOME/.local"
+    note "+ $rustup_command run stable cargo install --path <build>/awww --root $HOME/.local"
     return
   fi
   run rm -rf "$source_dir"
   run install -d "$BUILD_ROOT"
   run git clone --depth 1 https://codeberg.org/LGFae/awww.git "$source_dir"
-  run cargo install --path "$source_dir" --root "$HOME/.local"
+  run "$rustup_command" run stable cargo install --path "$source_dir" --root "$HOME/.local"
 }
 
 install_matugen_from_source() {
-  require_command cargo
-  run cargo install --locked matugen --root "$HOME/.local"
+  run "$rustup_command" run stable cargo install --locked matugen --root "$HOME/.local"
 }
 
 install_wallpaper_engine_from_source() {
@@ -490,6 +513,7 @@ install_source_actions() {
   local action
   for action in "${source_actions[@]}"; do
     case "$action" in
+      rust-toolchain) install_rust_toolchain ;;
       awww) install_awww_from_source ;;
       matugen) install_matugen_from_source ;;
       wallpaper-engine) install_wallpaper_engine_from_source ;;
@@ -627,9 +651,7 @@ EOF
 
 install_selected() {
   prepare_actions
-  if ! "$menu_active"; then
-    review_actions
-  fi
+  review_actions
 
   if ((${#native_packages[@]} + ${#aur_packages[@]} + ${#source_actions[@]})); then
     confirm 'Install the listed optional dependencies?' || {
