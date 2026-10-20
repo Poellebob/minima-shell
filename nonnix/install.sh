@@ -67,8 +67,8 @@ Options:
   --bin-home PATH       Override launcher directory (default: ~/.local/bin).
   -h, --help            Show this help.
 
-Native packages are installed only after confirmation. Third-party actions
-require a separate confirmation, including the Ubuntu/Mint QuickShell PPA.
+QuickShell and its Qt runtime are required. Native packages are installed only
+after confirmation. Third-party repositories and builds require separate consent.
 EOF
 }
 
@@ -195,6 +195,10 @@ check_command() {
 check_dependencies() {
   note 'Dependency check:'
   check_command qs 'required QuickShell runtime'
+  check_command systemd-inhibit 'required power-key inhibitor'
+  check_command loginctl 'session actions'
+  check_command ip 'network status fallback'
+  check_command nmcli 'network controls (NetworkManager)'
   check_command qalc 'optional calculator'
   check_command wl-copy 'optional clipboard support'
   check_command wl-paste 'optional clipboard support'
@@ -253,21 +257,47 @@ add_source_action() {
 }
 
 prepare_actions() {
+  local package
+  local runtime_packages=()
   native_packages=()
   source_actions=()
   aur_packages=()
   package_seen=()
 
-  if [[ "$distro" == debian ]] && ! command -v qs >/dev/null 2>&1; then
-    if [[ -n "$ubuntu_codename" ]]; then
-      add_native_package software-properties-common
-      add_native_package curl
-      add_native_package ca-certificates
-      add_source_action quickshell-ppa
-    elif command -v apt-cache >/dev/null 2>&1 && apt-cache show quickshell >/dev/null 2>&1; then
-      add_native_package quickshell
-    fi
-  fi
+  case "$distro" in
+    arch)
+      runtime_packages=(
+        quickshell qt6-declarative qt6-wayland qt6-svg qt6-imageformats
+        bash coreutils findutils systemd iproute2
+      )
+      ;;
+    fedora)
+      runtime_packages=(
+        quickshell qt6-qtdeclarative qt6-qtwayland qt6-qtsvg qt6-qtimageformats
+        bash coreutils findutils systemd iproute
+      )
+      ;;
+    debian)
+      runtime_packages=(
+        qml6-module-qtqml qml6-module-qtqml-models qml6-module-qtqml-workerscript
+        qml6-module-qtquick qml6-module-qtquick-layouts qml6-module-qtquick-controls
+        qml6-module-qtquick-templates qml6-module-qtquick-window
+        qt6-wayland libqt6svg6 qt6-image-formats-plugins
+        bash coreutils findutils systemd iproute2
+      )
+      if [[ -n "$ubuntu_codename" ]]; then
+        if ! command -v qs >/dev/null 2>&1; then
+          runtime_packages+=(software-properties-common curl ca-certificates)
+          add_source_action quickshell-ppa
+        fi
+      else
+        runtime_packages+=(quickshell)
+      fi
+      ;;
+  esac
+  for package in "${runtime_packages[@]}"; do
+    add_native_package "$package"
+  done
 
   if [[ "$distro" != arch ]] && { "${selected[wallpapers]}" || "${selected[colors]}"; }; then
     add_native_package curl
@@ -280,6 +310,7 @@ prepare_actions() {
   fi
 
   if "${selected[calculator]}"; then
+    add_native_package wl-clipboard
     case "$distro" in
       arch) add_native_package libqalculate ;;
       fedora) add_native_package qalculate ;;
@@ -292,11 +323,27 @@ prepare_actions() {
     add_native_package cliphist
   fi
 
+  if "${selected[wallpapers]}" || "${selected[wallpaper-engine]}"; then
+    add_native_package psmisc
+  fi
+
   if "${selected[wallpapers]}"; then
     if [[ "$distro" == arch ]]; then
       add_native_package awww
     else
       add_native_package git
+      case "$distro" in
+        debian)
+          for package in pkg-config liblz4-dev libwayland-dev wayland-protocols libxkbcommon-dev; do
+            add_native_package "$package"
+          done
+          ;;
+        fedora)
+          for package in pkgconf-pkg-config lz4-devel wayland-devel wayland-protocols-devel libxkbcommon-devel; do
+            add_native_package "$package"
+          done
+          ;;
+      esac
       add_source_action awww
     fi
   fi
@@ -363,6 +410,10 @@ review_actions() {
   local feature count=0
   note
   note "Distribution: $distro"
+  note 'Required: QuickShell, Qt QML/Quick Controls, Wayland, SVG/image support, and shell utilities.'
+  if [[ "$distro" == fedora ]]; then
+    note 'QuickShell uses enabled Fedora repositories; if unavailable, the errornointernet/quickshell COPR requires separate consent.'
+  fi
   note 'Selected optional features:'
   for feature in calculator clipboard wallpapers colors wallpaper-engine font; do
     if "${selected[$feature]}"; then
@@ -370,7 +421,7 @@ review_actions() {
       count=$((count + 1))
     fi
   done
-  ((count)) || note '  None (shell only).'
+  ((count)) || note '  None (required runtime only).'
   if ! "${selected[font]}"; then
     warn 'Skipping the font can break UI icons and layout. Only skip it if JetBrainsMono Nerd Font is already installed.'
   fi
@@ -413,6 +464,18 @@ install_native_packages() {
       run sudo pacman -S --needed "${native_packages[@]}"
       ;;
     fedora)
+      if "$dry_run"; then
+        note 'If quickshell is unavailable, offer to install the matching DNF COPR plugin and enable errornointernet/quickshell.'
+      elif ! dnf -q list --available quickshell >/dev/null 2>&1 && ! dnf -q list --installed quickshell >/dev/null 2>&1; then
+        warn 'QuickShell was not found in enabled Fedora repositories. The upstream-documented fallback is the third-party errornointernet/quickshell COPR.'
+        confirm 'Enable this COPR to install the required QuickShell runtime?' || fail 'QuickShell is required; installation cancelled'
+        local dnf_plugins=dnf-plugins-core
+        if [[ "$(dnf --version)" == *dnf5* ]]; then
+          dnf_plugins=dnf5-plugins
+        fi
+        run sudo dnf --setopt=install_weak_deps=False install "$dnf_plugins"
+        run sudo dnf copr enable -y errornointernet/quickshell
+      fi
       run sudo dnf --setopt=install_weak_deps=False install "${native_packages[@]}"
       ;;
     debian)
@@ -438,8 +501,7 @@ install_quickshell_from_ppa() {
   require_command add-apt-repository
   warn "This adds the third-party ppa:avengemedia/danklinux repository for Ubuntu $ubuntu_codename."
   if ! confirm 'Add this PPA and install QuickShell?'; then
-    warn 'QuickShell installation skipped. Minima cannot run until qs is installed.'
-    return 0
+    fail 'QuickShell is required; installation cancelled'
   fi
   if ! "$dry_run"; then
     curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location --output /dev/null \
@@ -479,13 +541,15 @@ install_awww_from_source() {
   require_command git
   if "$dry_run"; then
     note '+ git clone --depth 1 https://codeberg.org/LGFae/awww.git <build>/awww'
-    note "+ $rustup_command run stable cargo install --path <build>/awww --root $HOME/.local"
+    note "+ $rustup_command run stable cargo install --locked --path <build>/awww/client --root $HOME/.local"
+    note "+ $rustup_command run stable cargo install --locked --path <build>/awww/daemon --root $HOME/.local"
     return
   fi
   run rm -rf "$source_dir"
   run install -d "$BUILD_ROOT"
   run git clone --depth 1 https://codeberg.org/LGFae/awww.git "$source_dir"
-  run "$rustup_command" run stable cargo install --path "$source_dir" --root "$HOME/.local"
+  run "$rustup_command" run stable cargo install --locked --path "$source_dir/client" --root "$HOME/.local"
+  run "$rustup_command" run stable cargo install --locked --path "$source_dir/daemon" --root "$HOME/.local"
 }
 
 install_matugen_from_source() {
@@ -692,23 +756,13 @@ install_selected() {
   review_actions
 
   if ((${#native_packages[@]} + ${#aur_packages[@]} + ${#source_actions[@]})); then
-    confirm 'Install the listed dependencies?' || {
-      note 'Optional dependency installation cancelled; installing the Minima shell only.'
-      native_packages=()
-      aur_packages=()
-      source_actions=()
-      local feature
-      for feature in "${!selected[@]}"; do
-        selected["$feature"]=false
-      done
-    }
+    confirm 'Install the listed dependencies?' || fail 'dependency installation cancelled'
   fi
 
   bootstrap_source_tree
   if ! "$dry_run"; then
     source_tree_ready || fail 'run this script from a complete Minima source or release archive'
   fi
-  install_shell
   install_native_packages
   if ((${#aur_packages[@]} + ${#source_actions[@]})); then
     confirm 'Proceed with third-party actions?' || {
@@ -737,6 +791,10 @@ install_selected() {
     fi
   fi
   install_source_actions
+  if ! "$dry_run"; then
+    command -v qs >/dev/null 2>&1 || fail 'QuickShell (qs) is required; Minima was not installed. See https://quickshell.org/docs/v0.3.2/guide/install-setup/'
+  fi
+  install_shell
   configure_shell
 
   if "$menu_active" && ! "$dry_run"; then
@@ -751,11 +809,6 @@ install_selected() {
     note "Previous config backed up to $config_backup."
   fi
   note
-  if ! "$dry_run" && ! command -v qs >/dev/null 2>&1; then
-    warn 'QuickShell (qs) is missing. Install it before running Minima.'
-    note '  https://quickshell.org/docs/v0.3.2/guide/install-setup/'
-    note
-  fi
   note 'Start Minima:'
   note "  \"$launcher\""
   note
@@ -832,7 +885,7 @@ features_menu() {
     warn 'Skipping the font can break UI icons and layout. Only skip it if JetBrainsMono Nerd Font is already installed.'
     note
     note '  7. Select all'
-    note '  8. Clear all (shell only)'
+    note '  8. Clear all (keep required runtime)'
     note '  0. Back'
     note
     read -r -p 'Select option [0]: ' choice || return 0
@@ -904,7 +957,7 @@ show_menu_screen() {
     fi
   done
   menu_header 'Configuration'
-  note '  Requires QuickShell (qs). Your window-manager config is not changed.'
+  note '  Installs QuickShell and its Qt runtime. Your window-manager config is not changed.'
   note
   note "  1. Package manager:       ${distro:-not selected}"
   note "  2. Optional dependencies: $count selected"
