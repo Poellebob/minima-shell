@@ -32,6 +32,7 @@ source_actions=()
 aur_packages=()
 menu_active=false
 generated_config=""
+config_backup=""
 temporary_dirs=()
 
 cleanup() {
@@ -48,9 +49,7 @@ usage() {
   cat <<'EOF'
 Usage: ./nonnix/install.sh [options]
 
-Install Minima's QuickShell shell without installing or changing window-manager,
-terminal, editor, or global desktop configuration. With an interactive terminal,
-the installer displays a menu to configure and review the installation.
+Install the Minima shell. Opens a configuration menu in an interactive terminal.
 
 Options:
   --dry-run             Print planned changes without writing files.
@@ -78,6 +77,15 @@ fail() {
 
 note() {
   printf '%s\n' "$*"
+}
+
+warn() {
+  local yellow='' reset=''
+  if [[ -t 1 && "${TERM:-dumb}" != dumb && ! -v NO_COLOR ]]; then
+    yellow=$'\033[1;33m'
+    reset=$'\033[0m'
+  fi
+  printf '%sWARNING: %s%s\n' "$yellow" "$*" "$reset"
 }
 
 run() {
@@ -346,8 +354,10 @@ review_actions() {
   done
   ((count)) || note '  None (shell only).'
   if ! "${selected[font]}"; then
-    note 'WARNING: Skipping the font can break UI icons and layout.'
-    note 'Only skip it if JetBrainsMono Nerd Font is already installed.'
+    warn 'Skipping the font can break UI icons and layout. Only skip it if JetBrainsMono Nerd Font is already installed.'
+  fi
+  if [[ -e "$config_home/minima/config.json" || -e "$config_home/minima/matugen.toml" ]]; then
+    warn 'Existing config.json and matugen.toml will be replaced; .bak files keep only the latest backup.'
   fi
 
   if ((${#native_packages[@]})); then
@@ -512,13 +522,17 @@ configure_shell() {
   if "${selected[colors]}"; then
     matugen_bin=matugen
     [[ "$distro" != arch ]] && matugen_bin="$HOME/.local/bin/matugen"
-    matugen_config="$config_dir/matugen.toml"
-    run install -m 600 "$SOURCE_ROOT/config/matugen/quickshell.template.json" "$data_dir/matugen.template.json"
-    if [[ ! -e "$matugen_config" ]]; then
-      if "$dry_run"; then
-        note "+ write matugen config $matugen_config (template: $data_dir/matugen.template.json; output: $config_dir/colors.json)"
-      else
-        cat >"$matugen_config" <<EOF
+  fi
+  matugen_config="$config_dir/matugen.toml"
+  run install -m 600 "$SOURCE_ROOT/config/matugen/quickshell.template.json" "$data_dir/matugen.template.json"
+  if [[ -e "$matugen_config" ]]; then
+    note "Backing up $matugen_config to $matugen_config.bak"
+    run install -m 600 "$matugen_config" "$matugen_config.bak"
+  fi
+  if "$dry_run"; then
+    note "+ write matugen config $matugen_config (template: $data_dir/matugen.template.json; output: $config_dir/colors.json)"
+  else
+    cat >"$matugen_config" <<EOF
 [config]
 mode = "color"
 
@@ -526,13 +540,15 @@ mode = "color"
 input_path = $(json_string "$data_dir/matugen.template.json")
 output_path = $(json_string "$config_dir/colors.json")
 EOF
-        chmod 600 "$matugen_config"
-      fi
-    fi
+    chmod 600 "$matugen_config"
   fi
 
   generated_config="$config_dir/config.json"
-  [[ -e "$generated_config" ]] && generated_config="$config_dir/config.json.new"
+  if [[ -e "$generated_config" ]]; then
+    config_backup="$generated_config.bak"
+    note "Backing up $generated_config to $config_backup"
+    run install -m 600 "$generated_config" "$config_backup"
+  fi
   note "Generating dependency-based config: $generated_config"
   if "$dry_run"; then
     note "+ write config: wm=$wm calculator=${selected[calculator]} clipboard=${selected[clipboard]} wallpapers=$wallpaper_enabled colors=${selected[colors]} wallpaper-engine=${selected[wallpaper-engine]}"
@@ -588,10 +604,6 @@ install_shell() {
   fi
   run mv "$stage_dir" "$data_dir"
 
-  if [[ -e "$config_dir/config.json" ]]; then
-    note "Keeping existing $config_dir/config.json"
-  fi
-
   if [[ ! -e "$config_dir/colors.json" ]]; then
     note "Seeding $config_dir/colors.json"
     run install -m 600 "$SOURCE_ROOT/colors.json" "$config_dir/colors.json"
@@ -615,7 +627,9 @@ EOF
 
 install_selected() {
   prepare_actions
-  review_actions
+  if ! "$menu_active"; then
+    review_actions
+  fi
 
   if ((${#native_packages[@]} + ${#aur_packages[@]} + ${#source_actions[@]})); then
     confirm 'Install the listed optional dependencies?' || {
@@ -637,7 +651,6 @@ install_selected() {
   install_shell
   install_native_packages
   if ((${#aur_packages[@]} + ${#source_actions[@]})); then
-    note 'The next actions use AUR packages or upstream source/downloads. Review their output carefully.'
     confirm 'Proceed with third-party actions?' || {
       note 'Third-party actions skipped; installing the Minima shell with any native packages already selected.'
       local action
@@ -674,35 +687,38 @@ install_selected() {
   else
     note "Installed launcher: $launcher"
   fi
-  note "Config: $config_dir/config.json"
-  if [[ "$generated_config" != "$config_dir/config.json" ]]; then
-    note "Existing config preserved. Review and merge dependency settings from $generated_config."
+  if [[ -n "$config_backup" ]]; then
+    note "Previous config backed up to $config_backup."
   fi
   note
-  note 'Next steps:'
-  note '  1. Install a compatible QuickShell runtime (qs) if it is not already installed.'
-  note "  2. Start Minima in your Wayland session: \"$launcher\""
-  note "  3. Set system.wm in $config_dir/config.json to sway or hyprland."
+  note 'Start Minima:'
+  note "  \"$launcher\""
   note
-  note 'Add the following to your compositor config (choose one):'
-  note '  Hyprland (~/.config/hypr/hyprland.conf):'
-  note "    exec-once = \"$launcher\""
-  "${selected[wallpapers]}" && note '    exec-once = awww-daemon'
-  "${selected[clipboard]}" && note '    exec-once = wl-paste --watch cliphist store'
+  note "Add $bin_home to PATH by putting this line in your ~/.bashrc or ~/.zshrc:"
+  note "  export PATH=\"$bin_home:\$PATH\""
   note
-  note '  Sway / SwayFX / Scroll (~/.config/sway/config or your compositor config):'
+  note 'Open a new terminal, then launch with:'
+  note '  minima-shell'
+  note
+  note 'Start automatically with your compositor:'
+  note
+  note '  Hyprland (~/.config/hypr/hyprland.lua):'
+  note '    hl.on("hyprland.start", function()'
+  note "      hl.exec_cmd($(json_string "env PATH=\"$bin_home:\$HOME/.local/bin:\$PATH\" \"$launcher\""))"
+  "${selected[clipboard]}" && note '      hl.exec_cmd("wl-paste --watch cliphist store")'
+  "${selected[wallpapers]}" && note "      hl.exec_cmd($(json_string 'env PATH="$HOME/.local/bin:$PATH" awww-daemon'))"
+  note '    end)'
+  note
+  note '  Sway / SwayFX / Scroll (your compositor config):'
   note "    exec \"$launcher\""
-  "${selected[wallpapers]}" && note '    exec awww-daemon'
   "${selected[clipboard]}" && note '    exec wl-paste --watch cliphist store'
+  "${selected[wallpapers]}" && note '    exec awww-daemon'
   note
-  note "Ensure $bin_home and $HOME/.local/bin are in your compositor's PATH."
-  if "${selected[wallpapers]}"; then
-    note "Put static wallpaper images in $HOME/Wallpapers."
-  fi
-  if "${selected[wallpaper-engine]}"; then
-    note 'Set wallpaper.workshopPath to your Steam Workshop 431960 directory, including a trailing /.'
-  fi
-  note 'No window-manager configuration was installed or changed.'
+  note 'Settings:'
+  note "  $config_dir/config.json"
+  note
+  note 'Full guide:'
+  note '  https://github.com/Poellebob/minima-shell/blob/master/NONNIX.md'
 }
 
 menu_header() {
@@ -739,8 +755,7 @@ features_menu() {
   local choice feature
   while true; do
     menu_header 'Optional Dependencies'
-    note '  Toggle individual features. All are optional.'
-    note '  QuickShell (qs) must already be installed separately.'
+    note '  Toggle features to install.'
     note
     note "  1. $(feature_name calculator) [$(feature_state calculator)]"
     note "  2. $(feature_name clipboard) [$(feature_state clipboard)]"
@@ -749,8 +764,7 @@ features_menu() {
     note "  5. $(feature_name wallpaper-engine) [$(feature_state wallpaper-engine)]"
     note "  6. $(feature_name font) [$(feature_state font)]"
     note
-    note '  WARNING: Skipping the font can break UI icons and layout.'
-    note '  Only skip it if JetBrainsMono Nerd Font is already installed.'
+    warn 'Skipping the font can break UI icons and layout. Only skip it if JetBrainsMono Nerd Font is already installed.'
     note
     note '  7. Select all'
     note '  8. Clear all (shell only)'
@@ -825,9 +839,7 @@ show_menu_screen() {
     fi
   done
   menu_header 'Configuration'
-  note '  Installs the Minima shell only, not a window manager.'
-  note '  Existing Minima config is kept; installed shell data is replaced.'
-  note '  QuickShell (qs) must already be installed separately.'
+  note '  Requires QuickShell (qs). Your window-manager config is not changed.'
   note
   note "  1. Package manager:       ${distro:-not selected}"
   note "  2. Optional dependencies: $count selected"
@@ -857,8 +869,9 @@ interactive_menu() {
         fi
         menu_header 'Review Installation'
         note "  Shell data: $data_home/minima-shell"
-        note "  Config:     $config_home/minima (existing files kept)"
+        note "  Config:     $config_home/minima (config.json backed up, then replaced)"
         note "  Launcher:   $bin_home/minima-shell"
+        note '  Shell data is replaced; existing palette colors are kept.'
         prepare_actions
         review_actions
         note
