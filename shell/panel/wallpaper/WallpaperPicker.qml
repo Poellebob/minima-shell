@@ -207,10 +207,12 @@ Item {
         const matugenBin = Global.config.system.matugenBin;
         const matugenConfig = Global.config.system.matugenConfigPath;
         if (matugenBin !== "" && matugenConfig !== "") {
-          Quickshell.execDetached(["/bin/sh", "-c", matugenBin + " -c "
-                                   + matugenConfig + " -j hex image \""
-                                   + confFile._previewPath
-                                   + "\" --source-color-index 0 && hyprctl reload"]);
+          Quickshell.execDetached([
+            "/bin/sh", "-c",
+            '"$1" -c "$2" -j hex image "$3" --source-color-index 0 && { [ "$4" != hyprland ] || hyprctl reload; }',
+            "minima-matugen", matugenBin, matugenConfig,
+            confFile._previewPath, Global.config.system.wm
+          ]);
         }
       }
       if (!confFile._isBackgroundApply)
