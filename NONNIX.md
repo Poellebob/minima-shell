@@ -47,6 +47,10 @@ builds/downloads require a separate confirmation:
 - Arch Wallpaper Engine installation requires an existing `yay` or `paru`.
 - Fedora and Debian/Ubuntu build `awww` and Wallpaper Engine from source,
   install `matugen` through Cargo, and download the font from Nerd Fonts.
+- Building `awww` or `matugen` installs or updates stable Rust through
+  [rustup](https://rustup.rs/). The installer uses this toolchain explicitly;
+  it does not change your shell profile or default Rust toolchain. Distribution
+  Rust packages can be too old, including those on Linux Mint / Ubuntu 24.04.
 
 The installer does not add package repositories, install Steam, or download
 Workshop content.
@@ -135,6 +139,10 @@ From a source checkout, check available commands without installing anything:
 - If `qs` is missing or reports unavailable QML modules, install a compatible
   QuickShell build. The installer does not install QuickShell.
 - If icons are missing, install JetBrainsMono Nerd Font.
+- If an older installer fails with `lock file version 4` while installing
+  matugen, rerun the current installer. It uses stable Rust rather than the
+  distribution's older Cargo. Reinstalling backs up and replaces settings as
+  described above.
 - If clipboard history is empty, make sure `wl-paste --watch cliphist store`
   is running in your Wayland session.
 - Network controls need NetworkManager and `nmcli`; audio needs PipeWire and a
