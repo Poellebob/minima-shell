@@ -27,10 +27,12 @@ MINIMA_REF=devel/master bash -c <(curl -fsSL https://raw.githubusercontent.com/P
 uses the stable installer bootstrap and retrieves the `devel/master` source
 tree.
 
-The downloaded installer retrieves Minima into a temporary directory, shows the
-optional dependency menu, installs the shell, then removes that temporary
-source tree. It uses a shallow Git clone when available and otherwise downloads
-the GitHub source archive with `curl` and `tar`. To inspect the installer before
+The downloaded installer opens the configuration menu first. After you review
+and confirm installation, it retrieves Minima into a temporary directory,
+installs the shell, then removes that temporary source tree. Exiting the menu
+does not download or install anything. It uses a shallow Git clone when
+available and otherwise downloads the GitHub source archive with `curl` and
+`tar`. To inspect the installer before
 running anything, download it instead:
 
 ```sh
@@ -48,8 +50,8 @@ The installer is user-local and does not require root. It installs:
 
 | Path | Contents |
 | --- | --- |
-| `${XDG_DATA_HOME:-~/.local/share}/minima-shell` | Minima's QML shell |
-| `${XDG_CONFIG_HOME:-~/.config}/minima/config.json` | Minima settings, seeded only if missing |
+| `${XDG_DATA_HOME:-~/.local/share}/minima-shell/` | Contents of `shell/`, with `shell.qml` directly here |
+| `${XDG_CONFIG_HOME:-~/.config}/minima/config.json` | Settings generated from selected dependencies, created if missing |
 | `${XDG_CONFIG_HOME:-~/.config}/minima/colors.json` | Default palette, seeded only if missing |
 | `~/.local/bin/minima-shell` | Launcher |
 
@@ -57,10 +59,39 @@ The installer is user-local and does not require root. It installs:
 runtime and optional commands. Use `--data-home`, `--config-home`, or
 `--bin-home` to use non-default locations.
 
-## Optional Dependency Menu
+The launcher starts `qs -p ~/.local/share/minima-shell/shell.qml` using the
+chosen installation paths. It defaults `MINIMA_CONFIG` to the installed
+configuration, preserving a nonempty override from the environment. It also
+sets `XDG_CONFIG_HOME` so the palette follows the chosen config home.
 
-When run from a terminal, the installer shows a menu for selecting only the
-optional features you want:
+## Terminal Menu
+
+When run from a terminal, the installer shows a full-screen, numbered menu:
+
+```text
+1. Package manager:       <detected family>
+2. Optional dependencies: 0 selected
+3. Installation paths
+
+4. Review and install
+5. Check installed dependencies
+0. Exit
+```
+
+Enter a number and press Enter to navigate. Submenus return with `0` or an
+empty selection. You can override the detected package-manager family and edit
+installation paths before reviewing the complete plan. The review screen
+requires an explicit `y` to proceed. Dry-run is only enabled with the
+`--dry-run` flag, which opens
+the same menu in dry-run mode; add `--no-menu` to print a plan directly.
+Color is disabled when `NO_COLOR` is set, and dumb terminals use plain output.
+After a successful install, the menu is cleared and the installer exits with
+next steps left on screen. These include Hyprland and Sway startup examples,
+plus clipboard history and wallpaper daemon commands when selected. It does
+not wait for another Enter or reopen the menu.
+
+The optional dependency submenu lets you toggle individual features, select
+all, or clear all for a shell-only installation. All features start deselected:
 
 ```text
 1. Calculator (qalc)
@@ -70,6 +101,10 @@ optional features you want:
 5. Wallpaper Engine (linux-wallpaperengine)
 6. JetBrainsMono Nerd Font
 ```
+
+Skipping the font can break Minima's UI icons and layout. The option is
+provided so you can skip installation if JetBrainsMono Nerd Font is already
+installed; otherwise, select it.
 
 The menu supports Arch Linux, Fedora, and Debian/Ubuntu package families. It
 shows the exact package transaction before asking for confirmation. Only the
@@ -95,7 +130,8 @@ requires a second confirmation before these actions:
   compiled with CMake after installing its documented development dependencies.
 - On Fedora and Debian/Ubuntu, the font selection downloads the latest
   JetBrainsMono Nerd Font archive to the user font directory and refreshes the
-  font cache.
+  font cache. Its download, extraction, and font-cache prerequisites are
+  included in the native package selection.
 
 The installer does not add COPR, PPA, backports, RPM Fusion, or other
 repositories. It also never installs Steam or downloads Wallpaper Engine
@@ -135,10 +171,11 @@ mechanism you trust before running Minima.
 | Bluetooth controls | BlueZ |
 | Battery and power profiles | UPower and power-profiles-daemon |
 
-Wallpaper Engine is disabled in the seeded configuration. To enable it, set
-`wallpaper.engineEnabled` to `true`, set `wallpaper.workshopPath` to your local
-Steam Workshop `431960` directory, and keep `wallpaper.enginePath` pointed at
-the executable. Minima will not install Steam or download Workshop content.
+Selecting Wallpaper Engine enables it in the generated configuration and sets
+its executable path. Set `wallpaper.workshopPath` to your local Steam Workshop
+`431960` directory, including a trailing `/`. If configuring it manually, also
+set `wallpaper.engineEnabled` to `true` and `wallpaper.enginePath` to the
+executable. Minima will not install Steam or download Workshop content.
 The current shell stops existing `linux-wallpaperengine` processes before it
 starts one, so do not enable this feature alongside independently managed
 Wallpaper Engine instances.
@@ -146,22 +183,40 @@ Wallpaper Engine instances.
 ## Configuration
 
 Set `system.wm` in `config.json` to `hyprland`, `sway`, `swayfx`, or `scroll`
-to match your existing compositor. The default is `sway`.
+to match your existing compositor. The installer detects an active Hyprland
+session from `HYPRLAND_INSTANCE_SIGNATURE` or `XDG_CURRENT_DESKTOP` and
+otherwise defaults to `sway`.
 
 To enable calculator results, set `launcher.qalcPath` to the path of `qalc`.
 It is empty by default so a missing optional calculator is never started.
 
-When the installer creates a new `config.json`, selecting the calculator sets
-`launcher.qalcPath` to `qalc`. Selecting Wallpaper Engine enables it and sets
-its executable path. Existing configuration is never edited automatically.
+The installer generates settings from the dependencies actually installed:
 
-Keep `MINIMA_CONFIG` set to use a different configuration file. The launcher
-sets it to the installed `config.json` only when it is otherwise unset.
+| Selection | Generated Settings |
+| --- | --- |
+| Calculator | Sets `launcher.qalcPath` to `qalc`, otherwise empty |
+| Clipboard | Sets `clipboard.enabled` according to selection |
+| Static wallpapers or Wallpaper Engine | Enables `wallpaper.enabled`, otherwise false |
+| Wallpaper Engine | Enables `wallpaper.engineEnabled` and sets its executable path |
+| Palette generation | Sets matugen executable and configuration paths; installs a shell-only palette template |
+| Font | Installs the UI's hardcoded JetBrainsMono Nerd Font; no font setting is needed |
 
-Changing the wallpaper can invoke `matugen` when both `system.matugenBin` and
-`system.matugenConfigPath` are configured. The current shell also runs
-`hyprctl reload` after a successful palette generation; leave matugen unset on
-non-Hyprland sessions until that behavior is made compositor-aware.
+Declined third-party actions are not enabled in the generated config.
+Existing `config.json` is never overwritten: a selection-based
+`config.json.new` is written alongside it for you to review and merge. Existing
+`colors.json` and `matugen.toml` are also preserved.
+
+The matugen configuration writes to Minima's `colors.json`, without adding
+global theme templates. Successful generation reloads Hyprland only in a
+Hyprland session; Sway sessions do not run `hyprctl`.
+
+To run a different config manually, override `MINIMA_CONFIG`:
+
+```sh
+MINIMA_CONFIG=/path/to/config.json ~/.local/bin/minima-shell
+```
+
+Or just edit `$HOME/.config/minima/config.json`
 
 ## Current Limitations
 

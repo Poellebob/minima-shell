@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Install Minima's QuickShell application and explicitly selected dependencies.
 set -euo pipefail
 
 SOURCE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." 2>/dev/null && pwd || true)"
@@ -20,24 +19,27 @@ show_menu=true
 assume_yes=false
 distro=""
 declare -A selected=(
-  [calculator]=false
-  [clipboard]=false
+  [calculator]=true
+  [clipboard]=true
   [wallpapers]=false
-  [colors]=false
+  [colors]=true
   [wallpaper-engine]=false
-  [font]=false
+  [font]=true
 )
 declare -A package_seen=()
 native_packages=()
 source_actions=()
 aur_packages=()
-config_seeded=false
+menu_active=false
+generated_config=""
 temporary_dirs=()
 
 cleanup() {
   local directory
   for directory in "${temporary_dirs[@]}"; do
-    [[ -d "$directory" ]] && rm -rf "$directory"
+    if [[ -d "$directory" ]]; then
+      rm -rf "$directory"
+    fi
   done
 }
 trap cleanup EXIT
@@ -48,7 +50,7 @@ Usage: ./nonnix/install.sh [options]
 
 Install Minima's QuickShell shell without installing or changing window-manager,
 terminal, editor, or global desktop configuration. With an interactive terminal,
-the installer displays a menu to select optional dependencies.
+the installer displays a menu to configure and review the installation.
 
 Options:
   --dry-run             Print planned changes without writing files.
@@ -148,17 +150,22 @@ detect_distro() {
 
 choose_distro() {
   local choice
-  while [[ -z "$distro" ]]; do
-    note 'Select your package-manager family:'
+  while true; do
+    menu_header 'Package Manager'
+    note "  Current family: ${distro:-not selected}"
+    note
     note '  1. Arch Linux'
     note '  2. Fedora'
     note '  3. Debian / Ubuntu'
-    read -r -p 'Selection: ' choice
+    note '  0. Back'
+    note
+    read -r -p 'Select option [0]: ' choice || return 0
     case "$choice" in
-      1) distro=arch ;;
-      2) distro=fedora ;;
-      3) distro=debian ;;
-      *) note 'Enter 1, 2, or 3.' ;;
+      1) distro=arch; return ;;
+      2) distro=fedora; return ;;
+      3) distro=debian; return ;;
+      0|"") return ;;
+      *) note 'Enter 0, 1, 2, or 3.'; menu_pause ;;
     esac
   done
 }
@@ -314,19 +321,34 @@ prepare_actions() {
     if [[ "$distro" == arch ]]; then
       add_native_package ttf-jetbrains-mono-nerd
     else
+      add_native_package curl
+      add_native_package tar
+      add_native_package fontconfig
+      case "$distro" in
+        debian) add_native_package xz-utils ;;
+        fedora) add_native_package xz ;;
+      esac
       add_source_action font
     fi
   fi
 }
 
 review_actions() {
-  local feature
+  local feature count=0
   note
   note "Distribution: $distro"
   note 'Selected optional features:'
-  for feature in "${!selected[@]}"; do
-    "${selected[$feature]}" && note "  - $(feature_name "$feature")"
+  for feature in calculator clipboard wallpapers colors wallpaper-engine font; do
+    if "${selected[$feature]}"; then
+      note "  - $(feature_name "$feature")"
+      count=$((count + 1))
+    fi
   done
+  ((count)) || note '  None (shell only).'
+  if ! "${selected[font]}"; then
+    note 'WARNING: Skipping the font can break UI icons and layout.'
+    note 'Only skip it if JetBrainsMono Nerd Font is already installed.'
+  fi
 
   if ((${#native_packages[@]})); then
     note 'Native packages:'
@@ -466,18 +488,85 @@ install_source_actions() {
   done
 }
 
-configure_seeded_config() {
-  "$config_seeded" || return 0
-  if "${selected[calculator]}"; then
-    run sed -i 's/"qalcPath": ""/"qalcPath": "qalc"/' "$config_dir/config.json"
+json_string() {
+  local value="$1"
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  value="${value//$'\n'/\\n}"
+  value="${value//$'\r'/\\r}"
+  value="${value//$'\t'/\\t}"
+  printf '"%s"' "$value"
+}
+
+configure_shell() {
+  local wm=sway qalc_path='' matugen_bin='' matugen_config=''
+  local engine_path=linux-wallpaperengine wallpaper_enabled=false
+  local desktop="${XDG_CURRENT_DESKTOP:-}"
+  [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" || "${desktop,,}" == *hyprland* ]] && wm=hyprland
+  "${selected[calculator]}" && qalc_path=qalc
+  [[ "$distro" != arch ]] && engine_path="$bin_home/linux-wallpaperengine"
+  if "${selected[wallpapers]}" || "${selected[wallpaper-engine]}"; then
+    wallpaper_enabled=true
   fi
-  if "${selected[wallpaper-engine]}"; then
-    local engine_path=linux-wallpaperengine
-    [[ "$distro" != arch ]] && engine_path="$bin_home/linux-wallpaperengine"
-    run sed -i 's/"engineEnabled": false/"engineEnabled": true/' "$config_dir/config.json"
-    run sed -i "s|\"enginePath\": \"linux-wallpaperengine\"|\"enginePath\": \"$engine_path\"|" "$config_dir/config.json"
-    note 'Wallpaper Engine still needs wallpaper.workshopPath configured with your own Steam Workshop content.'
+
+  if "${selected[colors]}"; then
+    matugen_bin=matugen
+    [[ "$distro" != arch ]] && matugen_bin="$HOME/.local/bin/matugen"
+    matugen_config="$config_dir/matugen.toml"
+    run install -m 600 "$SOURCE_ROOT/config/matugen/quickshell.template.json" "$data_dir/matugen.template.json"
+    if [[ ! -e "$matugen_config" ]]; then
+      if "$dry_run"; then
+        note "+ write matugen config $matugen_config (template: $data_dir/matugen.template.json; output: $config_dir/colors.json)"
+      else
+        cat >"$matugen_config" <<EOF
+[config]
+mode = "color"
+
+[templates.quickshell]
+input_path = $(json_string "$data_dir/matugen.template.json")
+output_path = $(json_string "$config_dir/colors.json")
+EOF
+        chmod 600 "$matugen_config"
+      fi
+    fi
   fi
+
+  generated_config="$config_dir/config.json"
+  [[ -e "$generated_config" ]] && generated_config="$config_dir/config.json.new"
+  note "Generating dependency-based config: $generated_config"
+  if "$dry_run"; then
+    note "+ write config: wm=$wm calculator=${selected[calculator]} clipboard=${selected[clipboard]} wallpapers=$wallpaper_enabled colors=${selected[colors]} wallpaper-engine=${selected[wallpaper-engine]}"
+    return
+  fi
+  cat >"$generated_config" <<EOF
+{
+  "system": {
+    "wm": "$wm",
+    "matugenConfigPath": $(json_string "$matugen_config"),
+    "matugenBin": $(json_string "$matugen_bin"),
+    "primaryOutput": ""
+  },
+  "theme": { "darkTheme": true },
+  "panel": { "enabled": true },
+  "calendar": { "weekStart": "monday" },
+  "launcher": {
+    "enabled": true,
+    "qalcPath": $(json_string "$qalc_path")
+  },
+  "clipboard": { "enabled": ${selected[clipboard]} },
+  "wallpaper": {
+    "enabled": $wallpaper_enabled,
+    "engineEnabled": ${selected[wallpaper-engine]},
+    "enginePath": $(json_string "$engine_path"),
+    "workshopPath": "",
+    "fps": 25,
+    "fill": true,
+    "matureContent": false,
+    "volume": 50
+  }
+}
+EOF
+  chmod 600 "$generated_config"
 }
 
 install_shell() {
@@ -491,7 +580,7 @@ install_shell() {
   note "Installing Minima shell data to $data_dir"
   run install -d "$data_home" "$config_dir" "$bin_home"
   run mkdir -p "$stage_dir"
-  run cp -a "$SOURCE_ROOT/shell" "$stage_dir/shell"
+  run cp -a "$SOURCE_ROOT/shell/." "$stage_dir/"
 
   if [[ -e "$data_dir" ]]; then
     note "Replacing previously installed shell data at $data_dir"
@@ -499,11 +588,7 @@ install_shell() {
   fi
   run mv "$stage_dir" "$data_dir"
 
-  if [[ ! -e "$config_dir/config.json" ]]; then
-    note "Seeding $config_dir/config.json"
-    config_seeded=true
-    run install -m 600 "$SOURCE_ROOT/nonnix/config.json" "$config_dir/config.json"
-  else
+  if [[ -e "$config_dir/config.json" ]]; then
     note "Keeping existing $config_dir/config.json"
   fi
 
@@ -520,8 +605,9 @@ install_shell() {
     umask 077
     cat >"$launcher" <<EOF
 #!/usr/bin/env sh
+export XDG_CONFIG_HOME="$config_home"
 export MINIMA_CONFIG="\${MINIMA_CONFIG:-$config_dir/config.json}"
-exec qs -p "$data_dir/shell/shell.qml" "\$@"
+exec qs -p "$data_dir/shell.qml" "\$@"
 EOF
     chmod 700 "$launcher"
   fi
@@ -544,12 +630,24 @@ install_selected() {
     }
   fi
 
+  bootstrap_source_tree
+  if ! "$dry_run"; then
+    source_tree_ready || fail 'run this script from a complete Minima source or release archive'
+  fi
   install_shell
   install_native_packages
   if ((${#aur_packages[@]} + ${#source_actions[@]})); then
     note 'The next actions use AUR packages or upstream source/downloads. Review their output carefully.'
     confirm 'Proceed with third-party actions?' || {
       note 'Third-party actions skipped; installing the Minima shell with any native packages already selected.'
+      local action
+      for action in "${source_actions[@]}"; do
+        case "$action" in
+          awww) selected[wallpapers]=false ;;
+          matugen) selected[colors]=false ;;
+          wallpaper-engine|font) selected["$action"]=false ;;
+        esac
+      done
       aur_packages=()
       source_actions=()
       selected[wallpaper-engine]=false
@@ -566,37 +664,99 @@ install_selected() {
     fi
   fi
   install_source_actions
-  configure_seeded_config
+  configure_shell
 
-  note "Installed launcher: $launcher"
-  note 'Start Minima from your existing Wayland session with: minima-shell'
+  if "$menu_active" && ! "$dry_run"; then
+    menu_header 'Installation Complete'
+  fi
+  if "$dry_run"; then
+    note "Dry run complete. Planned launcher: $launcher"
+  else
+    note "Installed launcher: $launcher"
+  fi
+  note "Config: $config_dir/config.json"
+  if [[ "$generated_config" != "$config_dir/config.json" ]]; then
+    note "Existing config preserved. Review and merge dependency settings from $generated_config."
+  fi
+  note
+  note 'Next steps:'
+  note '  1. Install a compatible QuickShell runtime (qs) if it is not already installed.'
+  note "  2. Start Minima in your Wayland session: \"$launcher\""
+  note "  3. Set system.wm in $config_dir/config.json to sway or hyprland."
+  note
+  note 'Add the following to your compositor config (choose one):'
+  note '  Hyprland (~/.config/hypr/hyprland.conf):'
+  note "    exec-once = \"$launcher\""
+  "${selected[wallpapers]}" && note '    exec-once = awww-daemon'
+  "${selected[clipboard]}" && note '    exec-once = wl-paste --watch cliphist store'
+  note
+  note '  Sway / SwayFX / Scroll (~/.config/sway/config or your compositor config):'
+  note "    exec \"$launcher\""
+  "${selected[wallpapers]}" && note '    exec awww-daemon'
+  "${selected[clipboard]}" && note '    exec wl-paste --watch cliphist store'
+  note
+  note "Ensure $bin_home and $HOME/.local/bin are in your compositor's PATH."
+  if "${selected[wallpapers]}"; then
+    note "Put static wallpaper images in $HOME/Wallpapers."
+  fi
+  if "${selected[wallpaper-engine]}"; then
+    note 'Set wallpaper.workshopPath to your Steam Workshop 431960 directory, including a trailing /.'
+  fi
   note 'No window-manager configuration was installed or changed.'
 }
 
-show_menu_screen() {
+menu_header() {
+  local title="$1"
+  local cyan='' bold='' reset=''
+  if [[ -t 1 && "${TERM:-dumb}" != dumb ]]; then
+    printf '\033[H\033[2J'
+    if [[ ! -v NO_COLOR ]]; then
+      cyan=$'\033[36m'
+      bold=$'\033[1m'
+      reset=$'\033[0m'
+    fi
+  fi
+  printf '%s%s' "$bold" "$cyan"
+  note '  m i n i m a'
+  note '  ------------------------------------------------------------'
+  printf '  Non-Nix Shell Installer%s\n' "$reset"
   note
-  note 'Minima Non-Nix Installer'
-  note "Distribution: ${distro:-not selected}"
+  printf '  %s%s%s\n' "$bold" "$title" "$reset"
   note
-  note "  1. $(feature_name calculator) [$(feature_state calculator)]"
-  note "  2. $(feature_name clipboard) [$(feature_state clipboard)]"
-  note "  3. $(feature_name wallpapers) [$(feature_state wallpapers)]"
-  note "  4. $(feature_name colors) [$(feature_state colors)]"
-  note "  5. $(feature_name wallpaper-engine) [$(feature_state wallpaper-engine)]"
-  note "  6. $(feature_name font) [$(feature_state font)]"
-  note
-  note '  7. Review and install'
-  note '  8. Check installed dependencies'
-  note '  0. Exit'
+  if "$dry_run"; then
+    note '  DRY RUN: No changes will be made.'
+    note
+  fi
 }
 
-interactive_menu() {
-  local choice
-  detect_distro
-  choose_distro
+menu_pause() {
+  local answer
+  note
+  read -r -p 'Press Enter to continue...' answer || true
+}
+
+features_menu() {
+  local choice feature
   while true; do
-    show_menu_screen
-    read -r -p 'Selection: ' choice
+    menu_header 'Optional Dependencies'
+    note '  Toggle individual features. All are optional.'
+    note '  QuickShell (qs) must already be installed separately.'
+    note
+    note "  1. $(feature_name calculator) [$(feature_state calculator)]"
+    note "  2. $(feature_name clipboard) [$(feature_state clipboard)]"
+    note "  3. $(feature_name wallpapers) [$(feature_state wallpapers)]"
+    note "  4. $(feature_name colors) [$(feature_state colors)]"
+    note "  5. $(feature_name wallpaper-engine) [$(feature_state wallpaper-engine)]"
+    note "  6. $(feature_name font) [$(feature_state font)]"
+    note
+    note '  WARNING: Skipping the font can break UI icons and layout.'
+    note '  Only skip it if JetBrainsMono Nerd Font is already installed.'
+    note
+    note '  7. Select all'
+    note '  8. Clear all (shell only)'
+    note '  0. Back'
+    note
+    read -r -p 'Select option [0]: ' choice || return 0
     case "$choice" in
       1) toggle_feature calculator ;;
       2) toggle_feature clipboard ;;
@@ -604,10 +764,120 @@ interactive_menu() {
       4) toggle_feature colors ;;
       5) toggle_feature wallpaper-engine ;;
       6) toggle_feature font ;;
-      7) install_selected; return ;;
-      8) check_dependencies ;;
-      0) return ;;
-      *) note 'Enter a menu number.' ;;
+      7|8)
+        for feature in "${!selected[@]}"; do
+          if [[ "$choice" == 7 ]]; then
+            selected["$feature"]=true
+          else
+            selected["$feature"]=false
+          fi
+        done
+        ;;
+      0|"") return ;;
+      *) note 'Enter a menu number.'; menu_pause ;;
+    esac
+  done
+}
+
+paths_menu() {
+  local choice path
+  while true; do
+    menu_header 'Installation Paths'
+    note "  1. Data home:   $data_home"
+    note "  2. Config home: $config_home"
+    note "  3. Bin home:    $bin_home"
+    note
+    note '  4. Reset to XDG defaults'
+    note '  0. Back'
+    note
+    read -r -p 'Select option [0]: ' choice || return 0
+    case "$choice" in
+      1|2|3)
+        read -r -p 'Absolute path (Enter to keep current): ' path || return 0
+        [[ -n "$path" ]] || continue
+        if [[ "$path" != /* ]]; then
+          note 'Use an absolute path, starting with /.'
+          menu_pause
+          continue
+        fi
+        case "$choice" in
+          1) data_home="$path" ;;
+          2) config_home="$path" ;;
+          3) bin_home="$path" ;;
+        esac
+        ;;
+      4)
+        data_home="$DEFAULT_DATA_HOME"
+        config_home="$DEFAULT_CONFIG_HOME"
+        bin_home="$DEFAULT_BIN_HOME"
+        ;;
+      0|"") return ;;
+      *) note 'Enter a menu number.'; menu_pause ;;
+    esac
+  done
+}
+
+show_menu_screen() {
+  local feature count=0
+  for feature in "${!selected[@]}"; do
+    if "${selected[$feature]}"; then
+      count=$((count + 1))
+    fi
+  done
+  menu_header 'Configuration'
+  note '  Installs the Minima shell only, not a window manager.'
+  note '  Existing Minima config is kept; installed shell data is replaced.'
+  note '  QuickShell (qs) must already be installed separately.'
+  note
+  note "  1. Package manager:       ${distro:-not selected}"
+  note "  2. Optional dependencies: $count selected"
+  note '  3. Installation paths'
+  note
+  note '  4. Review and install'
+  note '  5. Check installed dependencies'
+  note '  0. Exit'
+  note
+}
+
+interactive_menu() {
+  local choice answer
+  menu_active=true
+  while true; do
+    show_menu_screen
+    read -r -p 'Select option [0]: ' choice || return 0
+    case "$choice" in
+      1) choose_distro ;;
+      2) features_menu ;;
+      3) paths_menu ;;
+      4)
+        if [[ -z "$distro" ]]; then
+          note 'Select a package-manager family first.'
+          menu_pause
+          continue
+        fi
+        menu_header 'Review Installation'
+        note "  Shell data: $data_home/minima-shell"
+        note "  Config:     $config_home/minima (existing files kept)"
+        note "  Launcher:   $bin_home/minima-shell"
+        prepare_actions
+        review_actions
+        note
+        read -r -p 'Proceed with this plan? [y/N] ' answer || return 0
+        case "$answer" in
+          y|Y|yes|YES)
+            menu_header 'Installation Output'
+            install_selected
+            return
+            ;;
+        esac
+        ;;
+      5)
+        menu_header 'Installed Dependencies'
+        check_dependencies
+        menu_pause
+        ;;
+      0|"") return ;;
+      *) note 'Enter a menu number.'; menu_pause ;;
     esac
   done
 }
@@ -649,11 +919,6 @@ detect_distro
 if "$check_only"; then
   check_dependencies
   exit 0
-fi
-
-bootstrap_source_tree
-if ! "$dry_run"; then
-  source_tree_ready || fail 'run this script from a complete Minima source or release archive'
 fi
 
 if "$show_menu" && [[ -t 0 ]]; then
