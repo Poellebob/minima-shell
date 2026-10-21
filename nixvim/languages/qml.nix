@@ -8,7 +8,14 @@
 {
   config = lib.mkIf config.minima.vim.enable {
     programs.nixvim.plugins = {
-      lsp.servers.qmlls.enable = true;
+      lsp.servers.qmlls = {
+        enable = true;
+        cmd = [
+          "${pkgs.kdePackages.qtdeclarative}/bin/qmlls"
+          "-I"
+          "${pkgs.kdePackages.qtdeclarative}/lib/qt-6/qml"
+        ];
+      };
 
       conform-nvim.settings.formatters_by_ft.qml = [ "qmlformat" ];
       conform-nvim.settings.formatters.qmlformat = {

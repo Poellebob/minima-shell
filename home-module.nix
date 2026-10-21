@@ -287,14 +287,14 @@ in
       };
     };
 
-    programs.kitty = mkIf cfg.kitty.enable {
+    programs.kitty = mkIf cfg.terminal.enable {
       enable = true;
       settings = {
         clear_all_shortcuts = true;
-        shell_integration = "enabled";
-        background_opacity = "0.8";
+        shell_integration = cfg.terminal.shellIntegration;
+        background_opacity = toString cfg.terminal.backgroundOpacity;
         font_family = "JetBrainsMono Nerd Font";
-        font_size = "13.0";
+        font_size = toString cfg.terminal.fontSize;
       };
       keybindings = {
         "ctrl+shift+c" = "copy_to_clipboard";
@@ -329,9 +329,6 @@ in
       {
         MINIMA_CONFIG = cfg.minimaConfigFile;
         MATUGEN_CONFIG = cfg.matugenConfigFile;
-        TERM = cfg.programs.terminal.name;
-        TERM_PROGRAM = cfg.programs.terminal.name;
-        TERMINAL = cfg.programs.terminal.name;
       }
       (mkIf (cfg.sway.enable || cfg.scroll.enable || cfg.hyprland.enable) {
         XDG_CURRENT_DESKTOP =

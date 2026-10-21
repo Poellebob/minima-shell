@@ -84,6 +84,11 @@ let
       };
     };
   };
+
+  keybindOption = default: description: mkOption {
+    type = types.listOf types.str;
+    inherit default description;
+  };
 in
 {
   options.minima = {
@@ -210,32 +215,131 @@ in
       default = false;
       internal = true;
     };
-    keybinds = mkOption {
-      type = types.listOf keybindType;
-      default = [ ];
-      description = "Global keybindings using common modifier names (Main, Shift, Ctrl, Alt).";
-    };
-
-    kitty = {
+    keybinds = {
       enable = mkOption {
         type = types.bool;
         default = true;
-        description = "Enable kitty terminal config";
+        description = "Enable Minima's built-in keybindings";
+      };
+      custom = mkOption {
+        type = types.listOf keybindType;
+        default = [ ];
+        description = "Custom keybindings using common modifier names (Main, Shift, Ctrl, Alt)";
+      };
+
+      terminal = keybindOption [ "Main" "Return" ] "Open Kitty";
+      window = {
+        close = keybindOption [ "Main" "q" ] "Close the focused window";
+        floating = keybindOption [ "Main" "space" ] "Toggle floating for the focused window";
+        fullscreen = keybindOption [ "Main" "f" ] "Toggle fullscreen for the focused window";
+        sticky = keybindOption [ "Main" "Shift" "s" ] "Toggle pin or sticky state for the focused window";
+      };
+      session = {
+        lock = keybindOption [ "Main" "Alt" "Delete" ] "Open the lock screen";
+        reload = keybindOption [ "Main" "Shift" "c" ] "Reload the compositor configuration";
+        clipboard = keybindOption [ "Main" "v" ] "Open the clipboard manager";
+        launcher = keybindOption [ "Main" "d" ] "Open the application launcher";
+        logout = keybindOption [ "XF86PowerOff" ] "Open the logout menu";
+      };
+      focus = {
+        left = keybindOption [ "Main" "h" ] "Focus the window to the left";
+        right = keybindOption [ "Main" "l" ] "Focus the window to the right";
+        up = keybindOption [ "Main" "k" ] "Focus the window above";
+        down = keybindOption [ "Main" "j" ] "Focus the window below";
+      };
+      move = {
+        left = keybindOption [ "Main" "Ctrl" "h" ] "Move the focused window left";
+        right = keybindOption [ "Main" "Ctrl" "l" ] "Move the focused window right";
+        up = keybindOption [ "Main" "Ctrl" "k" ] "Move the focused window up";
+        down = keybindOption [ "Main" "Ctrl" "j" ] "Move the focused window down";
+      };
+      resize = {
+        shrinkWidth = keybindOption [ "Main" "Shift" "h" ] "Shrink the focused window's width";
+        growWidth = keybindOption [ "Main" "Shift" "l" ] "Grow the focused window's width";
+        shrinkHeight = keybindOption [ "Main" "Shift" "k" ] "Shrink the focused window's height";
+        growHeight = keybindOption [ "Main" "Shift" "j" ] "Grow the focused window's height";
+      };
+      layout = {
+        toggleSplit = keybindOption [ "Main" "Shift" "a" ] "Toggle split or group orientation";
+        vertical = keybindOption [ "Main" "Alt" "j" ] "Create a vertical split or group";
+        horizontal = keybindOption [ "Main" "Alt" "k" ] "Create a horizontal split or group";
+        stacking = keybindOption [ "Main" "Alt" "h" ] "Select stacking or tab grouping";
+        tabbed = keybindOption [ "Main" "Alt" "l" ] "Select tabbed or tab grouping";
+        default = keybindOption [ "Main" "Escape" ] "Restore the default layout";
+      };
+      tree = {
+        parent = keybindOption [ "Main" "a" ] "Focus the parent container or group";
+        child = keybindOption [ "Main" "Ctrl" "a" ] "Focus the child container or group";
+      };
+      hy3 = {
+        nextTab = keybindOption [ "Main" "Tab" ] "Focus the next hy3 tab";
+        previousTab = keybindOption [ "Main" "Shift" "Tab" ] "Focus the previous hy3 tab";
+        equalize = keybindOption [ "Main" "Shift" "e" ] "Equalize the hy3 group";
+        expand = keybindOption [ "Main" "o" ] "Expand the hy3 group";
+        shrink = keybindOption [ "Main" "i" ] "Shrink the hy3 group";
+        resetExpansion = keybindOption [ "Main" "p" ] "Reset hy3 group expansion";
+      };
+      scroll = {
+        fullHeight = keybindOption [ "Main" "Alt" "l" ] "Set Scroll window height to 100 percent";
+        halfHeight = keybindOption [ "Main" "Alt" "h" ] "Set Scroll window height to 50 percent";
+        columnLeft = keybindOption [ "Main" "Alt" "j" ] "Move the window into the left Scroll column";
+        columnRight = keybindOption [ "Main" "Alt" "k" ] "Move the window into the right Scroll column";
+        overview = keybindOption [ "Main" "Tab" ] "Open the Scroll workspace overview";
+        toggleDirection = keybindOption [ "Main" "Shift" "a" ] "Toggle Scroll direction mode";
+      };
+      scratchpad = {
+        send = keybindOption [ "Main" "Shift" "minus" ] "Send the focused window to the scratchpad";
+        toggle = keybindOption [ "Main" "minus" ] "Show or toggle the scratchpad";
+      };
+      screenshot = {
+        selection = keybindOption [ "Print" ] "Capture a selected area to the clipboard";
+        fullscreen = keybindOption [ "Shift" "Print" ] "Capture the full screen to the clipboard";
+        editSelection = keybindOption [ "Main" "Print" ] "Capture a selected area for editing";
+        editFullscreen = keybindOption [ "Main" "Shift" "Print" ] "Capture the full screen for editing";
+      };
+      audio = {
+        volumeUp = keybindOption [ "XF86AudioRaiseVolume" ] "Raise audio volume";
+        volumeDown = keybindOption [ "XF86AudioLowerVolume" ] "Lower audio volume";
+        mute = keybindOption [ "XF86AudioMute" ] "Toggle audio mute";
+        microphoneMute = keybindOption [ "XF86AudioMicMute" ] "Toggle microphone mute";
+      };
+      brightness = {
+        up = keybindOption [ "XF86MonBrightnessUp" ] "Raise display brightness";
+        down = keybindOption [ "XF86MonBrightnessDown" ] "Lower display brightness";
+      };
+      media = {
+        next = keybindOption [ "XF86AudioNext" ] "Play the next media item";
+        previous = keybindOption [ "XF86AudioPrev" ] "Play the previous media item";
+        play = keybindOption [ "XF86AudioPlay" ] "Toggle media playback";
+        pause = keybindOption [ "XF86AudioPause" ] "Toggle media playback";
+      };
+      mouse.enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable Minima's static mouse move, resize, and close bindings";
       };
     };
 
-    programs = {
-      terminal = {
-        name = mkOption {
-          type = types.str;
-          default = "kitty";
-          description = "Terminal application name (used for KDE defaults and env vars)";
-        };
-        package = mkOption {
-          type = types.package;
-          default = pkgs.kitty;
-          description = "Terminal application package";
-        };
+    terminal = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable Kitty terminal";
+      };
+      fontSize = mkOption {
+        type = types.float;
+        default = 13.0;
+        description = "Kitty font size";
+      };
+      backgroundOpacity = mkOption {
+        type = types.float;
+        default = 0.8;
+        description = "Kitty background opacity";
+      };
+      shellIntegration = mkOption {
+        type = types.enum [ "enabled" "disabled" "no-cursor" ];
+        default = "enabled";
+        description = "Kitty shell integration mode";
       };
     };
 
