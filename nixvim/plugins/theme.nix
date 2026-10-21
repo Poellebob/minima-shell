@@ -29,9 +29,6 @@
             warnings = [ "underline" ];
             information = [ "underline" ];
           };
-          inlay_hints = {
-            background = true;
-          };
         };
         treesitter = true;
       };

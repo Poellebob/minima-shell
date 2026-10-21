@@ -238,7 +238,7 @@ check_dependencies() {
 }
 
 source_tree_ready() {
-  [[ -f "$SOURCE_ROOT/shell/shell.qml" && -f "$SOURCE_ROOT/colors.json" && -f "$SOURCE_ROOT/nonnix/config.json" ]]
+  [[ -f "$SOURCE_ROOT/shell/shell.qml" && -f "$SOURCE_ROOT/colors.json" && -f "$SOURCE_ROOT/nonnix/install.sh" ]]
 }
 
 bootstrap_source_tree() {

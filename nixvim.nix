@@ -100,12 +100,6 @@ with lib;
       default = [ ];
       description = "Extra autocommands";
     };
-
-    plugins = mkOption {
-      type = types.attrsOf types.anything;
-      default = { };
-      description = "Extra nixvim plugins";
-    };
   };
 
   imports = [
