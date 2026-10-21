@@ -142,8 +142,10 @@ with lib;
     LastUsedCustomAccentColor=232,203,45
     ColorScheme=BreezeDark
     UseSystemBell=true
-    TerminalApplication=${config.minima.programs.terminal.name}
-    TerminalService=${config.minima.programs.terminal.package}/share/applications/${config.minima.programs.terminal.name}.desktop
+    ${optionalString config.minima.terminal.enable ''
+    TerminalApplication=kitty
+    TerminalService=${pkgs.kitty}/share/applications/kitty.desktop
+    ''}
 
     [Icons]
     Theme=Papirus-Dark

@@ -7,7 +7,8 @@ Item {
 
   FileView {
     id: colorFile
-    path: Quickshell.env("HOME") + "/.config/minima/colors.json"
+    path: (Quickshell.env("XDG_CONFIG_HOME")
+           || (Quickshell.env("HOME") + "/.config")) + "/minima/colors.json"
     watchChanges: true
     blockLoading: false
 

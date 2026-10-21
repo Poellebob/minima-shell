@@ -2,6 +2,8 @@
 
 A NixOS/home-manager flake providing a Wayland-focused desktop environment with [Hyprland](https://hyprland.org/), [Sway](https://swaywm.org/), [SwayFX](https://github.com/Ericmorgenta/swayfx), and [Scroll](https://github.com/dawsers/scroll/) support.
 
+For the early shell-only, non-Nix installation path, see [NONNIX.md](./NONNIX.md).
+
 > [!WARNING]
 > This project is not done and is still **alpha**; it will contain bugs.
 
@@ -183,14 +185,20 @@ Keybindings use common modifier names that work across all window managers:
 | `Alt`     |
 
 ```nix
-minima.keybinds = [
-  { exec = "kitty";   bind = [ "Main" "Return" ]; }
-  { exec = "firefox"; bind = [ "Main" "B" ]; }
-  { exec = "dolphin"; bind = [ "Main" "E" ]; }
-];
+minima.keybinds = {
+  session.launcher = [ "Main" "Space" ];
+  custom = [
+    { exec = "firefox"; bind = [ "Main" "B" ]; }
+    { exec = "dolphin"; bind = [ "Main" "E" ]; }
+  ];
+};
 ```
 
-### General (Hardcoded)
+### Built-In
+
+All built-in bindings are configurable through `minima.keybinds`; set a binding
+to `[]` to disable it. `Main + Return` opens Kitty while `minima.terminal.enable`
+is enabled. `minima.keybinds.custom` adds executable or raw compositor bindings.
 
 > hy3 actions only apply if the layout is hy3
 

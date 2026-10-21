@@ -21,32 +21,35 @@ let
         scale ${toString d.scale}
       }'';
 
-  commonToSway = {
-    "Main" = cfg.sway.modifier;
+  commonToSway = modifier: {
+    "Main" = modifier;
     "Shift" = "Shift";
     "Ctrl" = "Control";
     "Alt" = "Mod1";
   };
 
-  swayBindExpr = binds:
+  swayBindExpr = modifier: binds:
     concatStringsSep "+" (map (b:
-      if commonToSway ? ${b} then commonToSway.${b}
+      if commonToSway modifier ? ${b} then (commonToSway modifier).${b}
       else b
     ) binds);
 
   swayKeybind =
-    kb:
+    modifier: kb:
     if kb.raw then
       ''
-        ${kb.type} ${swayBindExpr kb.bind} ${kb.exec}
+        ${kb.type} ${swayBindExpr modifier kb.bind} ${kb.exec}
       ''
     else
       ''
-        ${kb.type} ${swayBindExpr kb.bind} exec ${kb.exec}
+        ${kb.type} ${swayBindExpr modifier kb.bind} exec ${kb.exec}
       '';
 
+  swayDefaultBind = modifier: binds: action:
+    optionalString (cfg.keybinds.enable && binds != [ ]) "bindsym ${swayBindExpr modifier binds} ${action}";
+
   swaySpecialWs =
-    wm: name: ws:
+    modifier: wm: name: ws:
     let
       ruleStrings = lib.mapAttrsToList (k: vs: ''${k}="${lib.concatStringsSep "|" vs}"'') ws.rule;
       assigns = lib.concatMapStringsSep "\n      " (r: "assign [${r}] workspace $ws_${name}") ruleStrings;
@@ -57,7 +60,7 @@ let
       ${optionalString ws.autostart "exec ${ws.startCommand}"}
       ${assigns}
       ${optionalString (wm == "scroll") setSize}
-      bindsym ${swayBindExpr ws.keybind} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}
+      ${optionalString (ws.keybind != [ ]) "bindsym ${swayBindExpr modifier ws.keybind} [workspace=$ws_${name}] move workspace to output current, workspace $ws_${name}"}
     '';
 
   swayfxConfig = ''
@@ -88,7 +91,10 @@ let
         in map toString (range start end);
     in concatMap expandRange wsList;
 
-  swayConfText = wm: ''
+  swayConfText = wm:
+    let
+      modifier = if wm == "scroll" then cfg.scroll.modifier else cfg.sway.modifier;
+    in ''
     set $qs_config ${qsConfigName}
 
     ${concatMapStringsSep "\n" (x: swayOutputBlock x.name x.value) (
@@ -106,9 +112,9 @@ let
 
     ${concatMapStringsSep "\n" (a: "exec ${a}") cfg.autostart}
 
-    ${concatStringsSep "\n" (map swayKeybind (filter (kb: kb.bind != [ ]) cfg.keybinds))}
+    ${concatStringsSep "\n" (map (swayKeybind modifier) (filter (kb: kb.bind != [ ]) cfg.keybinds.custom))}
 
-    ${concatMapStringsSep "\n" (x: swaySpecialWs wm x.name x.value) (
+    ${concatMapStringsSep "\n" (x: swaySpecialWs modifier wm x.name x.value) (
       mapAttrsToList (n: v: {
         name = n;
         value = v;
@@ -125,8 +131,17 @@ in
 pkgs.writeText "${wm}-config" ''
   ${swayConfText wm}
 
-  ${import ./config.d/keybinds.nix { inherit wm pkgs; modifier = cfg.sway.modifier; }}
-  ${import ./config.d/workspace.nix { modifier = cfg.sway.modifier; }}
+   ${import ./config.d/keybinds.nix {
+     inherit wm pkgs;
+     modifier = if wm == "scroll" then cfg.scroll.modifier else cfg.sway.modifier;
+     keybinds = cfg.keybinds;
+     terminalEnabled = cfg.terminal.enable;
+     bind = swayDefaultBind (if wm == "scroll" then cfg.scroll.modifier else cfg.sway.modifier);
+     bindExpr = swayBindExpr (if wm == "scroll" then cfg.scroll.modifier else cfg.sway.modifier);
+   }}
+   ${import ./config.d/workspace.nix {
+     modifier = if wm == "scroll" then cfg.scroll.modifier else cfg.sway.modifier;
+   }}
   ${import ./config.d/application-behavior.nix { inherit wm; }}
   ${builtins.readFile ./config.d/env}
   ${builtins.readFile ./config.d/input}
