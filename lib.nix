@@ -393,11 +393,6 @@ in
     };
 
     desktop = {
-      enable = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Enable desktop integration (Dolphin, XDG portals, KDE packages)";
-      };
       xdgPortal = mkOption {
         type = types.bool;
         default = true;
@@ -504,12 +499,6 @@ in
     };
 
     matugenConfigFile = mkOption {
-      type = types.nullOr types.package;
-      default = null;
-      internal = true;
-    };
-
-    matugenTemplateFile = mkOption {
       type = types.nullOr types.package;
       default = null;
       internal = true;

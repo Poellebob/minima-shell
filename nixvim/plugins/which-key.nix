@@ -27,10 +27,6 @@
             group = "Git";
           }
           {
-            __unkeyed-1 = "<leader>i";
-            group = "Inlay";
-          }
-          {
             __unkeyed-1 = "<leader>m";
             group = "Misc";
           }

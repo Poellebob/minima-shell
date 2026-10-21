@@ -6,7 +6,6 @@ let
 in {
   imports = [
     ./lib.nix
-    ./lib-system.nix
     ./config.nix
   ];
 
@@ -105,7 +104,6 @@ in {
             scrollConfigFile  = mkDefault cfg.scrollConfigFile;
             quickshellStoreDir = mkDefault cfg.quickshellStoreDir;
             matugenConfigFile = mkDefault cfg.matugenConfigFile;
-            matugenTemplateFile = mkDefault cfg.matugenTemplateFile;
           };
         }
       ];

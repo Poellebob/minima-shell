@@ -75,8 +75,6 @@ let
     for_window [class=".*"] blur enable
   '';
 
-  primaryDisplay = findFirst (d: d.primary) null (attrValues cfg.displays);
-
   expandWorkspace = d:
     let
       wsList = if d.workspaces != null then d.workspaces
