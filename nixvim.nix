@@ -51,6 +51,32 @@ with lib;
       };
     };
 
+    vimtex.viewer = {
+      method = mkOption {
+        type = types.str;
+        default = "general";
+        example = "zathura";
+        description = "VimTeX PDF viewer method (e.g. general, zathura, mupdf, skim).";
+      };
+      package = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        description = "Optional PDF viewer package added to Neovim's PATH. Nixvim installs Zathura and MuPDF automatically for their viewer methods.";
+      };
+      executable = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        example = "okular";
+        description = "Executable for the general viewer method; null uses VimTeX's system PDF opener.";
+      };
+      options = mkOption {
+        type = types.str;
+        default = "@pdf";
+        example = "--unique @pdf#src:@line@tex";
+        description = "Arguments for the general viewer method, supporting VimTeX's @pdf, @tex, @line and @col placeholders.";
+      };
+    };
+
     keybinds = mkOption {
       type = types.listOf (
         types.submodule {
