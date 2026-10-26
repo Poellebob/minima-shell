@@ -1,5 +1,0 @@
-{ lib, pkgs, ... }:
-
-with lib;
-{
-}
