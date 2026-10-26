@@ -238,7 +238,7 @@ check_dependencies() {
 }
 
 source_tree_ready() {
-  [[ -f "$SOURCE_ROOT/shell/shell.qml" && -f "$SOURCE_ROOT/colors.json" && -f "$SOURCE_ROOT/nonnix/config.json" ]]
+  [[ -f "$SOURCE_ROOT/shell/shell.qml" && -f "$SOURCE_ROOT/colors.json" && -f "$SOURCE_ROOT/nonnix/install.sh" ]]
 }
 
 bootstrap_source_tree() {
@@ -676,20 +676,20 @@ configure_shell() {
     [[ "$distro" != arch ]] && matugen_bin="$HOME/.local/bin/matugen"
   fi
   matugen_config="$config_dir/matugen.toml"
-  run install -m 600 "$SOURCE_ROOT/config/matugen/quickshell.template.json" "$data_dir/matugen.template.json"
+  run install -m 600 "$SOURCE_ROOT/config/matugen/quickshell.template.json" "$data_dir/colors.template.json"
   if [[ -e "$matugen_config" ]]; then
     note "Backing up $matugen_config to $matugen_config.bak"
     run install -m 600 "$matugen_config" "$matugen_config.bak"
   fi
   if "$dry_run"; then
-    note "+ write matugen config $matugen_config (template: $data_dir/matugen.template.json; output: $config_dir/colors.json)"
+    note "+ write matugen config $matugen_config (template: $data_dir/colors.template.json; output: $config_dir/colors.json)"
   else
     cat >"$matugen_config" <<EOF
 [config]
 mode = "color"
 
 [templates.quickshell]
-input_path = $(json_string "$data_dir/matugen.template.json")
+input_path = $(json_string "$data_dir/colors.template.json")
 output_path = $(json_string "$config_dir/colors.json")
 EOF
     chmod 600 "$matugen_config"
@@ -738,23 +738,23 @@ EOF
 }
 
 install_shell() {
-  readonly data_dir="$data_home/minima-shell"
+  readonly data_dir="$data_home/minima"
   readonly config_dir="$config_home/minima"
   readonly launcher="$bin_home/minima-shell"
   readonly stage_dir="$data_home/.minima-shell-install.$$"
 
   temporary_dirs+=("$stage_dir")
 
-  note "Installing Minima shell data to $data_dir"
-  run install -d "$data_home" "$config_dir" "$bin_home"
+  note "Installing Minima shell data to $data_dir/shell"
+  run install -d "$data_dir" "$config_dir" "$bin_home"
   run mkdir -p "$stage_dir"
   run cp -a "$SOURCE_ROOT/shell/." "$stage_dir/"
 
-  if [[ -e "$data_dir" ]]; then
-    note "Replacing previously installed shell data at $data_dir"
-    run rm -rf "$data_dir"
+  if [[ -e "$data_dir/shell" ]]; then
+    note "Replacing previously installed shell data at $data_dir/shell"
+    run rm -rf "$data_dir/shell"
   fi
-  run mv "$stage_dir" "$data_dir"
+  run mv "$stage_dir" "$data_dir/shell"
 
   if [[ ! -e "$config_dir/colors.json" ]]; then
     note "Seeding $config_dir/colors.json"
@@ -771,7 +771,7 @@ install_shell() {
 #!/usr/bin/env sh
 export XDG_CONFIG_HOME="$config_home"
 export MINIMA_CONFIG="\${MINIMA_CONFIG:-$config_dir/config.json}"
-exec qs -p "$data_dir/shell.qml" "\$@"
+exec qs -p "$data_dir/shell/shell.qml" "\$@"
 EOF
     chmod 700 "$launcher"
   fi
@@ -1014,7 +1014,7 @@ interactive_menu() {
           continue
         fi
         menu_header 'Review Installation'
-        note "  Shell data: $data_home/minima-shell"
+        note "  Shell data: $data_home/minima/shell"
         note "  Config:     $config_home/minima (config.json backed up, then replaced)"
         note "  Launcher:   $bin_home/minima-shell"
         note '  Shell data is replaced; existing palette colors are kept.'

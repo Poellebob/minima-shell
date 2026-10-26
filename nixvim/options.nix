@@ -25,16 +25,9 @@
       };
 
       globals = {
-        vimtex_syntax_enabled = 1;
         loaded_ruby_provider = 0;
         loaded_perl_provider = 0;
         loaded_python_provider = 0;
-
-        disable_diagnostics = false;
-        disable_autoformat = false;
-        spell_enabled = true;
-        colorizing_enabled = 1;
-        first_buffer_opened = false;
       };
 
       opts = {

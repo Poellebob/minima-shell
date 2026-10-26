@@ -13,7 +13,6 @@
           },
           shadow = {
               enabled = false,
-              color = _rgba(COLORS.shadow),
           },
       },
       general = {

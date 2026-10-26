@@ -125,6 +125,5 @@ in
     minima.quickshellStoreDir = quickshellStoreDir;
     minima.minimaConfigFile = "${minimaConfigJson}";
     minima.matugenConfigFile = matugenConfigFile;
-    minima.matugenTemplateFile = matugenTemplateFile;
   };
 }

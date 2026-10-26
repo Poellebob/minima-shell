@@ -302,7 +302,6 @@ already match Hyprland's example. Minima retains its other enabled shortcuts.
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `minima.desktop.enable` | bool | `true` | Enable desktop integration |
 | `minima.desktop.xdgPortal` | bool | `true` | Enable XDG desktop portals |
 
 ---
@@ -453,12 +452,6 @@ automatically.
 | `minima.vim.autocmd[].pattern` | string/list | File pattern |
 | `minima.vim.autocmd[].command` | string | Command to run |
 | `minima.vim.autocmd[].desc` | string | Description |
-
-### Plugins
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `minima.vim.plugins` | attrs | `{}` | Extra nixvim plugins |
 
 ### Example
 
