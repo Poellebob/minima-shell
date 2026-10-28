@@ -10,7 +10,8 @@
 }:
 let
   grim = "${pkgs.grim}/bin/grim";
-  slurp = "${pkgs.slurp}/bin/slurp";
+  slurp = "${pkgs.slurp}/bin/slurp -b '#\" .. COLORS.scrim .. \"88' -c '#\" .. COLORS.primary .. \"ff' -s '#\" .. COLORS.primary .. \"22'";
+  windowBoxes = lib.escape [ "\\" "\"" ] ''hyprctl -j clients | ${pkgs.jq}/bin/jq -r --argjson monitors "$(hyprctl -j monitors)" '.[] | select(.mapped and (.hidden | not)) | select(.workspace.id as $id | any($monitors[]; .activeWorkspace.id == $id or .specialWorkspace.id == $id)) | [(.at | join(",")), (.size | join("x"))] | join(" ")' '';
   magick = "${pkgs.imagemagick}/bin/magick";
   swappy = "${pkgs.swappy}/bin/swappy";
   wlCopy = "${pkgs.wl-clipboard}/bin/wl-copy";
@@ -33,9 +34,9 @@ in
   ${bind b.session.clipboard "hl.dsp.exec_cmd(\"qs -c \" .. qsConfigName .. \" ipc call clipboard open\")"}
   ${bind b.session.launcher "hl.dsp.exec_cmd(\"qs -c \" .. qsConfigName .. \" ipc call launcher open\")"}
 
-  ${bind b.screenshot.selection "hl.dsp.exec_cmd(\"${grim} -g \\\"$(${slurp} -o -d)\\\" - | ${magick} - -shave 1x1 PNG:- | ${wlCopy}\")"}
+  ${bind b.screenshot.selection "hl.dsp.exec_cmd(\"${grim} -g \\\"$(${windowBoxes}| ${slurp} -o -d)\\\" - | ${magick} - -shave 1x1 PNG:- | ${wlCopy}\")"}
   ${bind b.screenshot.fullscreen "hl.dsp.exec_cmd(\"${grim} - | ${wlCopy}\")"}
-  ${bind b.screenshot.editSelection "hl.dsp.exec_cmd(\"${grim} -g \\\"$(${slurp} -o -d)\\\" - | ${swappy} -f -\")"}
+  ${bind b.screenshot.editSelection "hl.dsp.exec_cmd(\"${grim} -g \\\"$(${windowBoxes}| ${slurp} -o -d)\\\" - | ${swappy} -f -\")"}
   ${bind b.screenshot.editFullscreen "hl.dsp.exec_cmd(\"${grim} - | ${swappy} -f -\")"}
 
   ${lib.optionalString (layout == "hy3") ''
