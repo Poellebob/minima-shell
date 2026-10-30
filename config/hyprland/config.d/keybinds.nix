@@ -119,7 +119,14 @@ in
   for i = 1, 10 do
     local key = i % 10
     hl.bind(${modifier} .. " + " .. key, hl.dsp.focus({ workspace = i }))
-    hl.bind(${modifier} .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
+    ${lib.optionalString (layout == "hy3") ''
+      if hl.plugin.hy3 ~= nil then
+        hl.bind(${modifier} .. " + SHIFT + " .. key, hl.plugin.hy3.move_to_workspace(tostring(i), { follow = false }))
+      end
+    ''}
+    ${lib.optionalString (layout != "hy3") ''
+      hl.bind(${modifier} .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
+    ''}
   end
   hl.bind(${modifier} .. " + CTRL + RIGHT", hl.dsp.focus({ workspace = "e+1" }))
   hl.bind(${modifier} .. " + CTRL + LEFT", hl.dsp.focus({ workspace = "e-1" }))
