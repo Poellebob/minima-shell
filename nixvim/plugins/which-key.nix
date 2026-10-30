@@ -27,6 +27,10 @@
             group = "Git";
           }
           {
+            __unkeyed-1 = "<localleader>l";
+            group = "LaTeX";
+          }
+          {
             __unkeyed-1 = "<leader>m";
             group = "Misc";
           }

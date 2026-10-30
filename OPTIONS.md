@@ -433,6 +433,62 @@ bufferline + noice. Any file dropped into `nixvim/plugins/*.nix` or
 `nixvim/languages/*.nix` is imported
 automatically.
 
+### LaTeX / PDF Viewer
+
+VimTeX is enabled with latexmk compilation and Nixvim's `texliveMedium` toolchain.
+This is independent of the optional `minima.tex` installation.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `minima.vim.vimtex.viewer.method` | string | `"general"` | VimTeX viewer integration, e.g. `general`, `zathura`, `mupdf`, or `skim` |
+| `minima.vim.vimtex.viewer.package` | package/null | `null` | Optional viewer package added to Neovim's PATH; Zathura and MuPDF methods install their packages automatically |
+| `minima.vim.vimtex.viewer.executable` | string/null | `null` | General viewer executable; null uses the system PDF opener |
+| `minima.vim.vimtex.viewer.options` | string | `"@pdf"` | General viewer arguments; supports `@pdf`, `@tex`, `@line`, `@col` |
+
+Use a native viewer method for SyncTeX integration. The general system opener
+does not provide forward/inverse search by itself. Skim must be installed separately
+on macOS. Executable and argument options apply only to the `general` method.
+
+```nix
+minima.vim.vimtex.viewer.method = "zathura";
+```
+
+For a custom general viewer:
+
+```nix
+minima.vim.vimtex.viewer = {
+  method = "general";
+  package = pkgs.kdePackages.okular;
+  executable = "okular";
+  options = "--unique @pdf#src:@line@tex";
+};
+```
+
+### Writing Keymaps
+
+Leader and local leader are both Space. LaTeX mappings are buffer-local to TeX files.
+VimTeX's other default mappings remain available.
+
+| Key | Action |
+|-----|--------|
+| `<localleader>ll` | Toggle continuous LaTeX compilation |
+| `<localleader>lv` | Open PDF / forward search |
+| `<localleader>le` | Show compilation errors |
+| `<localleader>lt` | Toggle table of contents |
+| `<localleader>lk` | Stop compilation |
+| `<localleader>lc` | Clean auxiliary files |
+| `<localleader>li` | Show project information |
+| `<leader>ui` | Toggle image rendering |
+| `<leader>um` | Toggle Markdown browser preview |
+
+markdown-preview opens a live preview in the default web browser, with synchronized
+scrolling. Use `<leader>um` in a Markdown buffer to open or close it.
+
+image.nvim uses the Kitty graphics backend and ImageMagick CLI processor, with
+Markdown integration enabled. It requires a terminal supporting the Kitty graphics
+protocol. For tmux, enable `allow-passthrough` and disable `visual-activity`.
+Other backends can be selected through `programs.nixvim.plugins.image.settings.backend`.
+
 ### Keybindings
 
 | Option | Type | Description |
@@ -509,7 +565,8 @@ The following settings are enabled by default in `nixvim/options.nix`:
 - **LSP**: nvim-lsp (inlay hints), lsp-lines, lsp-signature, lspkind, trouble
 - **Formatting/Linting**: conform-nvim, nvim-lint
 - **Editing**: flash (disabled by default), smart-splits, toggleterm, comment via mini.ai/surround
-- **Markdown**: render-markdown, image.nvim (kitty backend)
+- **Markdown**: markdown-preview (browser preview), image.nvim (kitty backend)
+- **LaTeX**: VimTeX (latexmk, configurable PDF viewer)
 - **Nix**: direnv, nix, nix-develop
 - **Misc**: trouble diagnostics, lint, performance byte-compilation
 
