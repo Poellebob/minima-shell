@@ -154,96 +154,6 @@ in
 ''
   local qsConfigName = ${luaStr qsConfigName}
 
-  local function setXftDpi(monitorName)
-    local mon = hl.get_monitor(monitorName)
-    if mon == nil then
-      local mons = hl.get_monitors()
-      if #mons == 0 then
-        return false
-      end
-      mon = mons[1]
-    end
-
-    local scale = tonumber(mon.scale) or 1.0
-
-    -- The +0.5 is to always round the float instead of flooring it.
-    local dpi = math.floor(96 * scale + 0.5)
-    hl.exec_cmd("printf 'Xft.dpi: %d\\n' " .. dpi .. " | xrdb -merge")
-    return true
-  end
-
-  local function getCursorPos()
-    local h = io.popen("hyprctl cursorpos 2>/dev/null")
-    local out = h:read("*a")
-    h:close()
-    return tonumber(out:match("^%s*(%-?%d+)")), tonumber(out:match(",%s*(%-?%d+)"))
-  end
-
-  -- Geometry comes from hyprctl (layout coordinates, same space as cursorpos).
-  -- hl.get_monitor() alone is not enough: a monitor that exists but has not
-  -- rendered its first frame yet silently drops focus/cursor dispatches, so
-  -- success is only declared once the cursor is actually inside the monitor.
-  local function monitorRect(name)
-    local h = io.popen("hyprctl monitors -j 2>/dev/null")
-    local json = h:read("*a")
-    h:close()
-    local idx = json:find('"name":"' .. name .. '"', nil, true)
-    if idx == nil then
-      return nil
-    end
-    local block = json:sub(idx, math.min(#json, idx + 4096))
-    local x = tonumber(block:match('"x":%s*(%-?%d+)'))
-    local y = tonumber(block:match('"y":%s*(%-?%d+)'))
-    local w = tonumber(block:match('"width":%s*(%d+)'))
-    local hgt = tonumber(block:match('"height":%s*(%d+)'))
-    if x == nil or y == nil or w == nil or hgt == nil or w == 0 or hgt == 0 then
-      return nil
-    end
-    return x, y, w, hgt
-  end
-
-  local function placeCursorOnMonitor(name)
-    local x, y, w, hgt = monitorRect(name)
-    if x == nil then
-      return false
-    end
-
-    local cx, cy = getCursorPos()
-    if cx ~= nil and cy ~= nil
-      and cx >= x and cx < x + w
-      and cy >= y and cy < y + hgt then
-      return true
-    end
-
-    hl.exec_cmd("hyprctl dispatch movecursor "
-      .. tostring(math.floor(x + w / 2)) .. " " .. tostring(math.floor(y + hgt / 2)))
-    return false
-  end
-
-  local function activatePrimaryWhenReady(monitorName, attempts)
-    -- DPI is independent of cursor placement: fall back to the first monitor
-    -- when the primary is missing or not ready.
-    setXftDpi(monitorName)
-
-    local done = true
-    if monitorName ~= nil and monitorName ~= "" then
-      local mon = hl.get_monitor(monitorName)
-      if mon == nil then
-        done = false
-      else
-        hl.dsp.focus({ monitor = monitorName })
-        done = placeCursorOnMonitor(monitorName)
-      end
-    end
-
-    if done or attempts <= 0 then
-      return
-    end
-    hl.timer(function()
-      activatePrimaryWhenReady(monitorName, attempts - 1)
-    end, { timeout = 500, type = "oneshot" })
-  end
-
   ${concatStringsSep "\n" (mapAttrsToList hyprMonitor cfg.displays)}
 
   ${concatStringsSep "\n" (
@@ -287,12 +197,16 @@ in
   ${concatStringsSep "\n" (mapAttrsToList hyprSpecialWs cfg.specialWorkspaces)}
 
   hl.on("hyprland.start", function()
-    activatePrimaryWhenReady(${
-      if primaryDisplayName != null then luaStr primaryDisplayName else "nil"
-    }, 40)
-
     ${startupLua}
   end)
+
+  ${optionalString (primaryDisplayName != null) ''
+    hl.on("monitor.added", function(m)
+      if m.name == ${luaStr primaryDisplayName} then
+        hl.dispatch(hl.dsp.focus({ monitor = ${luaStr primaryDisplayName} }))
+      end
+    end)
+  ''}
 
   local _kbLayoutHandle = io.popen("localectl status | sed -n 's/^[[:space:]]*X11 Layout:[[:space:]]*//p'")
   local kbLayout = _kbLayoutHandle:read("*l")
