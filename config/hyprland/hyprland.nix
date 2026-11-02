@@ -201,19 +201,13 @@ in
   end)
 
   ${optionalString (primaryDisplayName != null) ''
-    hl.on("monitor.added", function(m)
-      if m.name == ${luaStr primaryDisplayName} then
-        hl.dispatch(hl.dsp.focus({ monitor = ${luaStr primaryDisplayName} }))
-      end
-    end)
+    hl.config({ cursor = { default_monitor = ${luaStr primaryDisplayName} } })
   ''}
 
-  local _kbLayoutHandle = io.popen("localectl status | sed -n 's/^[[:space:]]*X11 Layout:[[:space:]]*//p'")
-  local kbLayout = _kbLayoutHandle:read("*l")
-  _kbLayoutHandle:close()
-  if kbLayout ~= nil and kbLayout ~= "" then
-    hl.config({ input = { kb_layout = kbLayout } })
-  end
+  hl.config({ input = { kb_layout = ${luaStr cfg.hyprland.keyboardLayout} } })
+
+  -- Keep startup stalls diagnosable with timestamped compositor logs.
+  hl.config({ debug = { disable_logs = false, disable_time = false } })
 
   hl.config({
     xwayland = {
