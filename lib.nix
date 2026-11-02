@@ -105,6 +105,11 @@ in
         default = "SUPER";
         description = "Hyprland modifier key";
       };
+      keyboardLayout = mkOption {
+        type = types.str;
+        default = "us";
+        description = "Hyprland XKB keyboard layout. The NixOS module defaults this to services.xserver.xkb.layout.";
+      };
       layout = mkOption {
         type = types.enum [ "dwindle" "master" "scrolling" "hy3" ];
         default = "dwindle";

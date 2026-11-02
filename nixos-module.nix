@@ -12,6 +12,7 @@ in {
   config = mkMerge [
     (mkIf cfg.enable {
       security.pam.services.login = { };
+      minima.hyprland.keyboardLayout = mkDefault config.services.xserver.xkb.layout;
 
       programs.hyprland = mkIf cfg.hyprland.enable {
         enable = true;
@@ -84,6 +85,7 @@ in {
             hyprland = {
               enable = cfg.hyprland.enable;
               modifier = mkDefault cfg.hyprland.modifier;
+              keyboardLayout = mkDefault cfg.hyprland.keyboardLayout;
               layout = mkDefault cfg.hyprland.layout;
               extraLua = mkDefault cfg.hyprland.extraLua;
               plugins = mkDefault cfg.hyprland.plugins;
