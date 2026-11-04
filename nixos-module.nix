@@ -14,6 +14,12 @@ in {
       security.pam.services.login = { };
       minima.hyprland.keyboardLayout = mkDefault config.services.xserver.xkb.layout;
 
+      # Keep shell diagnostics across reboots, with journald managing rotation.
+      services.journald.extraConfig = mkIf cfg.session.systemd.enable ''
+        Storage=persistent
+      '';
+      systemd.coredump.enable = mkIf cfg.session.systemd.enable (mkDefault true);
+
       programs.hyprland = mkIf cfg.hyprland.enable {
         enable = true;
       };
