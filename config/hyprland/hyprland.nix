@@ -154,6 +154,20 @@ in
 ''
   local qsConfigName = ${luaStr qsConfigName}
 
+  local function setXftDpi()
+    local mon = hl.get_monitor(${if primaryDisplayName != null then luaStr primaryDisplayName else "nil"})
+    if mon == nil then
+      mon = hl.get_monitors()[1]
+    end
+    if mon == nil then
+      return
+    end
+
+    -- XWayland uses one global DPI; prefer the primary monitor's scale.
+    local dpi = math.floor(96 * (tonumber(mon.scale) or 1.0) + 0.5)
+    hl.exec_cmd("printf 'Xft.dpi: %d\\n' " .. dpi .. " | ${pkgs.xrdb}/bin/xrdb -merge")
+  end
+
   ${concatStringsSep "\n" (mapAttrsToList hyprMonitor cfg.displays)}
 
   ${concatStringsSep "\n" (
@@ -197,6 +211,7 @@ in
   ${concatStringsSep "\n" (mapAttrsToList hyprSpecialWs cfg.specialWorkspaces)}
 
   hl.on("hyprland.start", function()
+    setXftDpi()
     ${startupLua}
   end)
 
