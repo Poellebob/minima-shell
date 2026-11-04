@@ -8,6 +8,23 @@
 with lib;
 let
   cfg = config.minima;
+  sharePicker = pkgs.writeShellApplication {
+    name = "minima-share-picker";
+    runtimeInputs = [
+      (
+        if config.wayland.windowManager.hyprland.finalPackage != null then
+          config.wayland.windowManager.hyprland.finalPackage
+        else
+          pkgs.hyprland
+      )
+      pkgs.jq
+      pkgs.slurp
+    ];
+    text = ''
+      export MINIMA_CONFIG=${lib.escapeShellArg cfg.minimaConfigFile}
+      ${builtins.readFile ./config/hyprland/share-picker.sh}
+    '';
+  };
 in
 {
   imports = [
@@ -351,6 +368,14 @@ in
 
     home.file.".config/scroll/config" = mkIf cfg.scroll.enable {
       text = "include ${cfg.scrollConfigFile}";
+    };
+
+    xdg.configFile."hypr/xdph.conf" = mkIf (cfg.hyprland.enable && cfg.desktop.xdgPortal) {
+      text = ''
+        screencopy {
+            custom_picker_binary = ${lib.getExe sharePicker}
+        }
+      '';
     };
 
     wayland.windowManager.hyprland = mkIf cfg.hyprland.enable {

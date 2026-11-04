@@ -12,6 +12,13 @@ in {
   config = mkMerge [
     (mkIf cfg.enable {
       security.pam.services.login = { };
+      minima.hyprland.keyboardLayout = mkDefault config.services.xserver.xkb.layout;
+
+      # Keep shell diagnostics across reboots, with journald managing rotation.
+      services.journald.extraConfig = mkIf cfg.session.systemd.enable ''
+        Storage=persistent
+      '';
+      systemd.coredump.enable = mkIf cfg.session.systemd.enable (mkDefault true);
 
       programs.hyprland = mkIf cfg.hyprland.enable {
         enable = true;
@@ -84,6 +91,7 @@ in {
             hyprland = {
               enable = cfg.hyprland.enable;
               modifier = mkDefault cfg.hyprland.modifier;
+              keyboardLayout = mkDefault cfg.hyprland.keyboardLayout;
               layout = mkDefault cfg.hyprland.layout;
               extraLua = mkDefault cfg.hyprland.extraLua;
               plugins = mkDefault cfg.hyprland.plugins;
