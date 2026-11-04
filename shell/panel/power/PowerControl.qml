@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.UPower
 import qs.components.widget
 import qs.components.text
@@ -15,6 +16,35 @@ Item {
   readonly property real columnWidth: (width - Global.format.spacing_large) / 2
   readonly property bool hasBattery: battery.ready && battery.isLaptopBattery
   property bool showUnknown: false
+  property bool powerProfilesAvailable: false
+
+  // Do not touch the singleton until the daemon owns its name: QS 0.3.0
+  // does not retry if its initial D-Bus activation fails.
+  Process {
+    id: powerProfilesCheck
+
+    command: ["busctl", "--system", "--timeout=2s", "call", "org.freedesktop.DBus",
+      "/org/freedesktop/DBus", "org.freedesktop.DBus", "NameHasOwner", "s",
+      "org.freedesktop.UPower.PowerProfiles"]
+    running: true
+    stdout: StdioCollector {
+      onStreamFinished: root.powerProfilesAvailable = text.trim() === "b true"
+    }
+    onExited: (exitCode, exitStatus) => {
+      if (exitCode !== 0 || exitStatus !== 0)
+        root.powerProfilesAvailable = false;
+    }
+  }
+
+  Timer {
+    interval: 2000
+    repeat: true
+    running: true
+    onTriggered: {
+      if (!powerProfilesCheck.running)
+        powerProfilesCheck.running = true;
+    }
+  }
 
   function formatDuration(seconds) {
     if (seconds <= 0)
@@ -79,18 +109,49 @@ Item {
         Layout.fillWidth: true
       }
 
+      Loader {
+        id: profileControls
+
+        active: root.powerProfilesAvailable
+        visible: false
+        sourceComponent: QtObject {
+
+          // Like dux-shell's PowerProfileWatcher, only offer supported profiles
+          // and validate requests again when applying them.
+          readonly property var availableProfiles: [PowerProfile.PowerSaver, PowerProfile.Balanced]
+            .concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : [])
+          readonly property int currentProfile: PowerProfiles.profile
+          readonly property string degradationText: PowerProfiles.degradationReason
+            !== PerformanceDegradationReason.None
+            ? PerformanceDegradationReason.toString(PowerProfiles.degradationReason) : ""
+
+          function applyProfile(profile) {
+            if (!root.powerProfilesAvailable || availableProfiles.indexOf(profile) === -1)
+              return;
+            PowerProfiles.profile = profile;
+          }
+        }
+      }
+
       Repeater {
         model: [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
 
         delegate: ClickableText {
-          property bool isActive: modelData === PowerProfiles.profile
           required property var modelData
+          readonly property bool isAvailable: root.powerProfilesAvailable && profileControls.item !== null
+            && profileControls.item.availableProfiles.indexOf(modelData) !== -1
+          readonly property bool isActive: isAvailable && modelData === profileControls.item.currentProfile
 
-          baseColor: isActive ? Global.colors.primary : Global.colors.on_surface_variant
+          baseColor: !isAvailable ? Global.colors.outline
+            : isActive ? Global.colors.primary : Global.colors.on_surface_variant
+          mouseEnabled: isAvailable
+          opacity: isAvailable ? 1 : 0.5
           text: PowerProfile.toString(modelData)
-          visible: PowerProfiles.hasPerformanceProfile
 
-          onClicked: PowerProfiles.profile = modelData
+          onClicked: {
+            if (isAvailable)
+              profileControls.item.applyProfile(modelData);
+          }
         }
       }
 
@@ -107,8 +168,8 @@ Item {
 
     StyledText {
       color: Global.colors.error
-      text: PerformanceDegradationReason.toString(PowerProfiles.degradationReason)
-      visible: PowerProfiles.degradationReason !== PerformanceDegradationReason.None
+      text: profileControls.item ? profileControls.item.degradationText : ""
+      visible: text !== ""
     }
 
     RowLayout {

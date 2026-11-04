@@ -156,6 +156,33 @@ All configuration options are documented in [OPTIONS.md](./OPTIONS.md).
 
 ---
 
+## Shell Diagnostics
+
+The shell starts independently of power-profiles-daemon. The power panel checks
+for its system D-Bus name asynchronously and loads profile controls only when
+the daemon is running. If it is absent, battery information remains available
+and the panel continues checking without delaying shell startup.
+
+The NixOS module enables persistent journal storage and systemd core-dump
+handling for systemd sessions. Home Manager-only installations must configure
+these on the host. Persistent journal storage is a system-wide setting;
+journald handles rotation and retention limits.
+
+Shell stdout and stderr, including internal INFO-level QuickShell messages, go
+to the journal and survive service restarts. Inspect them with:
+
+```sh
+journalctl --user -u minima-shell.service -b
+journalctl --user -u minima-shell.service -b -1
+journalctl --user -u minima-shell.service --since "1 hour ago" -o short-precise
+journalctl --user -u minima-shell.service --since "1 hour ago" > minima-shell.log
+```
+
+For native crashes, inspect `coredumpctl list` and then `coredumpctl info <PID>`.
+Core dumps depend on host storage limits and may contain sensitive process data;
+inspect them before sharing. QML warnings and normal exits do not produce core
+dumps.
+
 ## Features
 
 - **Hyprland / Sway / SwayFX / Scroll** — pick your window manager with `minima.hyprland.enable`, `minima.sway.enable` (+ `minima.sway.fx`), or `minima.scroll.enable`; Hyprland layouts include dwindle, master, scrolling, and hy3
