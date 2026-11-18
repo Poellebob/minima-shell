@@ -140,7 +140,7 @@ let
     hl.exec_cmd(${luaStr "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"})
     hl.exec_cmd(${luaStr "${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface gtk-theme Breeze-Dark"})
     ${optionalString (!cfg.session.systemd.enable) ''
-      hl.exec_cmd(${luaStr (dropCaps "${pkgs.quickshell}/bin/qs -c ${qsConfigName}")})
+      hl.exec_cmd(${luaStr (dropCaps "${cfg.quickshellPackage}/bin/qs -c ${qsConfigName}")})
       hl.exec_cmd(${luaStr "${pkgs.awww}/bin/awww-daemon"})
       hl.exec_cmd(${luaStr "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store"})
     ''}

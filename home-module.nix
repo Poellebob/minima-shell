@@ -67,7 +67,7 @@ in
         xdg-utils
         cliphist
         wl-clipboard
-        quickshell
+        cfg.quickshellPackage
         wireplumber
         jq
         bc
