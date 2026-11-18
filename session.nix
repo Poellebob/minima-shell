@@ -77,7 +77,7 @@ let
         # when it is up and serialize restarts.
         Type = "dbus";
         BusName = "org.freedesktop.Notifications";
-        ExecStart = "${pkgs.quickshell}/bin/qs -c ${qsConfigName} --no-color --log-times -v";
+        ExecStart = "${cfg.quickshellPackage}/bin/qs -c ${qsConfigName} --no-color --log-times -v";
         StandardOutput = "journal";
         StandardError = "journal";
         SyslogIdentifier = "minima-shell";

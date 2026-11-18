@@ -68,6 +68,7 @@
         softtabstop = 2;
         expandtab = true;
         autoindent = true;
+        listchars.tab = "  ";
 
         foldlevel = 99;
         foldcolumn = "1";

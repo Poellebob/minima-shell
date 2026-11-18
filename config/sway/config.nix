@@ -156,7 +156,7 @@ pkgs.writeText "${wm}-config" ''
   exec ${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1
   ${optionalString (!cfg.session.systemd.enable) ''
     exec awww-daemon
-    exec ${pkgs.quickshell}/bin/qs -c $qs_config
+    exec ${cfg.quickshellPackage}/bin/qs -c $qs_config
     exec wl-paste --watch cliphist store
   ''}
 

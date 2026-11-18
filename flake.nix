@@ -22,28 +22,49 @@
       url = "github:Diax170/scroll-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    quickshell = {
+      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, stylix, scroll-flake, ... }@inputs: {
-    homeModules.minima = { ... }: {
-      _module.args.minimaFlakeSrc = self;
-      imports = [
-        stylix.homeModules.stylix
-        nixvim.homeModules.nixvim
-        ./home-module.nix
-      ];
-    };
-    homeModules.default = self.homeModules.minima;
-
-    nixosModules.minima = { ... }: {
-      imports = [
-        scroll-flake.nixosModules.default
-        ./nixos-module.nix
-      ];
-      _module.args = {
-        inherit scroll-flake;
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      nixvim,
+      stylix,
+      scroll-flake,
+      ...
+    }@inputs:
+    {
+      homeModules.minima = { lib, pkgs, ... }: {
+        options.minima.quickshellPackage = lib.mkOption {
+          default = inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        };
+        config._module.args.minimaFlakeSrc = self;
+        imports = [
+          stylix.homeModules.stylix
+          nixvim.homeModules.nixvim
+          ./home-module.nix
+        ];
       };
+      homeModules.default = self.homeModules.minima;
+
+      nixosModules.minima = { lib, pkgs, ... }: {
+        options.minima.quickshellPackage = lib.mkOption {
+          default = inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        };
+        imports = [
+          scroll-flake.nixosModules.default
+          ./nixos-module.nix
+        ];
+        config._module.args = {
+          inherit scroll-flake;
+        };
+      };
+      nixosModules.default = self.nixosModules.minima;
     };
-    nixosModules.default = self.nixosModules.minima;
-  };
 }

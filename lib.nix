@@ -192,6 +192,11 @@ in
       internal = true;
     };
 
+    quickshellPackage = mkOption {
+      type = types.package;
+      description = "Quickshell package used to run the Minima shell";
+    };
+
     quickshellStoreDir = mkOption {
       type = types.nullOr types.package;
       default = null;

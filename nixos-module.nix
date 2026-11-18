@@ -110,6 +110,7 @@ in {
 
             swayConfigFile    = mkDefault cfg.swayConfigFile;
             scrollConfigFile  = mkDefault cfg.scrollConfigFile;
+            quickshellPackage = mkDefault cfg.quickshellPackage;
             quickshellStoreDir = mkDefault cfg.quickshellStoreDir;
             matugenConfigFile = mkDefault cfg.matugenConfigFile;
           };
