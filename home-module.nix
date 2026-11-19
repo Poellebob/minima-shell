@@ -374,6 +374,7 @@ in
       text = ''
         screencopy {
             custom_picker_binary = ${lib.getExe sharePicker}
+            cursor_mode = 2
         }
       '';
     };

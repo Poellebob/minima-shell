@@ -11,14 +11,47 @@
 let
   grim = "${pkgs.grim}/bin/grim";
   slurp = "${pkgs.slurp}/bin/slurp -b '#\" .. COLORS.scrim .. \"88' -c '#\" .. COLORS.primary .. \"ff' -s '#\" .. COLORS.primary .. \"22'";
-  windowBoxes = lib.escape [ "\\" "\"" ] ''hyprctl -j clients | ${pkgs.jq}/bin/jq -r --argjson monitors "$(hyprctl -j monitors)" '.[] | select(.mapped and (.hidden | not)) | select(.workspace.id as $id | any($monitors[]; .activeWorkspace.id == $id or .specialWorkspace.id == $id)) | [(.at | join(",")), (.size | join("x"))] | join(" ")' '';
+  windowBoxes =
+    let
+      filter = lib.replaceStrings [ "\n" ] [ " " ] ''
+        def fullscreen:
+          .fullscreen == true or ((.fullscreen // 0) | numbers > 0);
+
+        map(select(.mapped and (.hidden | not))) as $windows
+        | ($windows | map(select(fullscreen) | .workspace.id)) as $fullscreenWorkspaces
+        | $windows[]
+        | .workspace.id as $id
+        | select(any($monitors[];
+            .activeWorkspace.id == $id or .specialWorkspace.id == $id))
+        | select(.visible != false)
+        | select(
+            ($fullscreenWorkspaces | index($id)) == null
+            or fullscreen
+            or .pinned == true
+            or .allowedOverFullscreen == true
+            or .overFullscreen == true
+          )
+        | "\(.at | join(",")) \(.size | join("x"))"
+      '';
+
+      command = lib.concatStringsSep " " [
+        "hyprctl -j clients"
+        "| ${pkgs.jq}/bin/jq -r"
+        ''--argjson monitors "$(hyprctl -j monitors)"''
+        (lib.escapeShellArg filter)
+      ];
+    in
+    lib.escape [ "\\" "\"" ] command;
+
   magick = "${pkgs.imagemagick}/bin/magick";
   swappy = "${pkgs.swappy}/bin/swappy";
   wlCopy = "${pkgs.wl-clipboard}/bin/wl-copy";
   b = keybinds;
 in
 ''
-  ${lib.optionalString terminalEnabled (bind b.terminal "hl.dsp.exec_cmd(\"${pkgs.kitty}/bin/kitty\")")}
+  ${lib.optionalString terminalEnabled (
+    bind b.terminal "hl.dsp.exec_cmd(\"${pkgs.kitty}/bin/kitty\")"
+  )}
   ${lib.optionalString (layout == "hy3") ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3
@@ -75,7 +108,9 @@ in
   ${bind b.resize.shrinkHeight "hl.dsp.window.resize({ x = 0, y = -100, relative = true })"}
   ${bind b.resize.growHeight "hl.dsp.window.resize({ x = 0, y = 100, relative = true })"}
 
-  ${lib.optionalString (layout == "dwindle") (bind b.layout.toggleSplit "hl.dsp.layout(\"togglesplit\")")}
+  ${lib.optionalString (layout == "dwindle") (
+    bind b.layout.toggleSplit "hl.dsp.layout(\"togglesplit\")"
+  )}
   ${lib.optionalString (layout == "hy3") ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3
@@ -102,7 +137,9 @@ in
       ${bind b.scratchpad.send "hy3.move_to_workspace(\"special:scratchpad\")"}
     end
   ''}
-  ${lib.optionalString (layout != "hy3") (bind b.scratchpad.send "hl.dsp.window.move({ workspace = \"special:scratchpad\" })")}
+  ${lib.optionalString (layout != "hy3") (
+    bind b.scratchpad.send "hl.dsp.window.move({ workspace = \"special:scratchpad\" })"
+  )}
   ${bind b.scratchpad.toggle "hl.dsp.workspace.toggle_special(\"scratchpad\")"}
 
   ${bind b.session.logout "hl.dsp.exec_cmd(\"qs -c \" .. qsConfigName .. \" ipc call logout open\")"}

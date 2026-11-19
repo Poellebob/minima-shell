@@ -9,7 +9,7 @@ fi
 monitors=$(hyprctl -j monitors)
 clients=$(hyprctl -j clients)
 
-# XDPH's decimal window addresses are distinct from its shareable handles.
+# XDPH provides a decimal address and a separate shareable handle.
 declare -A handles
 windows=${XDPH_WINDOW_SHARING_LIST:-}
 while [[ $windows == *'[HA>]'* ]]; do
@@ -23,10 +23,22 @@ while [[ $windows == *'[HA>]'* ]]; do
 done
 
 visible=$(jq -r --argjson monitors "$monitors" '
-    .[]
-    | select(.mapped and (.hidden | not))
-    | select(.workspace.id as $id | any($monitors[];
+    def fullscreen: .fullscreen == true or ((.fullscreen // 0) | numbers > 0);
+
+    map(select(.mapped and (.hidden | not))) as $windows
+    | ($windows | map(select(fullscreen) | .workspace.id)) as $fullscreenWorkspaces
+    | $windows[]
+    | .workspace.id as $id
+    | select(any($monitors[];
         .activeWorkspace.id == $id or .specialWorkspace.id == $id))
+    | select(.visible != false)
+    | select(
+        ($fullscreenWorkspaces | index($id)) == null
+        or fullscreen
+        or .pinned == true
+        or .allowedOverFullscreen == true
+        or .overFullscreen == true
+      )
     | [.address, .at[], .size[]] | @tsv
 ' <<< "$clients")
 
@@ -38,6 +50,15 @@ while read -r address x y width height; do
         regions+="$x,$y ${width}x${height} window:${handles[$address]}"$'\n'
     fi
 done <<< "$visible"
+
+screen_regions=$(jq -r '
+    .[]
+    | select(.disabled != true and (.mirrorOf == null or .mirrorOf == "none"))
+    | .scale as $scale
+    | (if (.transform % 2) == 1 then [.height, .width] else [.width, .height] end
+       | map((. / $scale) | round)) as [$width, $height]
+    | "\(.x),\(.y) \($width)x\($height) \(.name)"
+' <<< "$monitors")
 
 colors=()
 branch=dark
@@ -55,9 +76,15 @@ if palette=$(jq -er --arg branch "$branch" '
     colors=(-b "${scrim}88" -c "${primary}ff" -s "${primary}22" -B "${primary}11")
 fi
 
-# Avoid blank stdin records, including when there are no shareable windows.
-# Global geometry also lets slurp select windows whose top-left is off-screen.
-selection=$(printf '%s' "$regions" | slurp "${colors[@]}" -o -d -f '%o|%x|%y|%w|%h|%l') || exit 1
+# Put window boxes last so they win ties with identical monitor boxes.
+selection=$(
+    {
+        if [[ -n $screen_regions ]]; then
+            printf '%s\n' "$screen_regions"
+        fi
+        printf '%s' "$regions"
+    } | slurp "${colors[@]}" -d -f '%o|%x|%y|%w|%h|%l'
+) || exit 1
 IFS='|' read -r output x y width height label <<< "$selection"
 
 case $label in
@@ -68,7 +95,8 @@ case $label in
         [[ $x =~ ^-?[0-9]+$ && $y =~ ^-?[0-9]+$ &&
             $width =~ ^[0-9]+$ && $height =~ ^[0-9]+$ ]] || exit 1
         (( width > 0 && height > 0 )) || exit 1
-        # Portal regions are local to one output. Clip cross-output drags to it.
+
+        # Clip the drag to the output containing its top-left corner.
         geometry=$(jq -er --arg output "$output" \
             --argjson x "$x" --argjson y "$y" \
             --argjson width "$width" --argjson height "$height" '
