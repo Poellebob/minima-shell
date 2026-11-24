@@ -48,11 +48,12 @@ let
   wlCopy = "${pkgs.wl-clipboard}/bin/wl-copy";
   b = keybinds;
 in
+/* lua */
 ''
   ${lib.optionalString terminalEnabled (
     bind b.terminal "hl.dsp.exec_cmd(\"${pkgs.kitty}/bin/kitty\")"
   )}
-  ${lib.optionalString (layout == "hy3") ''
+  ${lib.optionalString (layout == "hy3") /* lua */ ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3
       ${bind b.window.close "hy3.kill_active()"}
@@ -72,7 +73,7 @@ in
   ${bind b.screenshot.editSelection "hl.dsp.exec_cmd(\"${grim} -g \\\"$(${windowBoxes}| ${slurp} -o -d)\\\" - | ${swappy} -f -\")"}
   ${bind b.screenshot.editFullscreen "hl.dsp.exec_cmd(\"${grim} - | ${swappy} -f -\")"}
 
-  ${lib.optionalString (layout == "hy3") ''
+  ${lib.optionalString (layout == "hy3") /* lua */ ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3
       ${bind b.focus.left "hy3.move_focus(\"left\")"}
@@ -81,14 +82,14 @@ in
       ${bind b.focus.down "hy3.move_focus(\"down\")"}
     end
   ''}
-  ${lib.optionalString (layout != "hy3") ''
+  ${lib.optionalString (layout != "hy3") /* lua */ ''
     ${bind b.focus.left "hl.dsp.focus({ direction = \"left\" })"}
     ${bind b.focus.right "hl.dsp.focus({ direction = \"right\" })"}
     ${bind b.focus.up "hl.dsp.focus({ direction = \"up\" })"}
     ${bind b.focus.down "hl.dsp.focus({ direction = \"down\" })"}
   ''}
 
-  ${lib.optionalString (layout == "hy3") ''
+  ${lib.optionalString (layout == "hy3") /* lua */ ''
     if hl.plugin.hy3 ~= nil then
       ${bind b.move.left "hl.plugin.hy3.move_window(\"left\", { once = true })"}
       ${bind b.move.right "hl.plugin.hy3.move_window(\"right\", { once = true })"}
@@ -96,7 +97,7 @@ in
       ${bind b.move.down "hl.plugin.hy3.move_window(\"down\", { once = true })"}
     end
   ''}
-  ${lib.optionalString (layout != "hy3") ''
+  ${lib.optionalString (layout != "hy3") /* lua */ ''
     ${bind b.move.left "hl.dsp.window.move({ direction = \"left\" })"}
     ${bind b.move.right "hl.dsp.window.move({ direction = \"right\" })"}
     ${bind b.move.up "hl.dsp.window.move({ direction = \"up\" })"}
@@ -111,7 +112,7 @@ in
   ${lib.optionalString (layout == "dwindle") (
     bind b.layout.toggleSplit "hl.dsp.layout(\"togglesplit\")"
   )}
-  ${lib.optionalString (layout == "hy3") ''
+  ${lib.optionalString (layout == "hy3") /* lua */ ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3
       ${bind b.layout.toggleSplit "hy3.make_group(\"opposite\", { toggle = true })"}
@@ -131,7 +132,7 @@ in
     end
   ''}
 
-  ${lib.optionalString (layout == "hy3") ''
+  ${lib.optionalString (layout == "hy3") /* lua */ ''
     if hl.plugin.hy3 ~= nil then
       local hy3 = hl.plugin.hy3
       ${bind b.scratchpad.send "hy3.move_to_workspace(\"special:scratchpad\")"}
@@ -157,28 +158,28 @@ in
   for i = 1, 10 do
     local key = i % 10
     hl.bind(${modifier} .. " + " .. key, hl.dsp.focus({ workspace = i }))
-    ${lib.optionalString (layout == "hy3") ''
+    ${lib.optionalString (layout == "hy3") /* lua */ ''
       if hl.plugin.hy3 ~= nil then
         hl.bind(${modifier} .. " + SHIFT + " .. key, hl.plugin.hy3.move_to_workspace(tostring(i), { follow = false }))
       end
     ''}
-    ${lib.optionalString (layout != "hy3") ''
+    ${lib.optionalString (layout != "hy3") /* lua */ ''
       hl.bind(${modifier} .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
     ''}
   end
   hl.bind(${modifier} .. " + CTRL + RIGHT", hl.dsp.focus({ workspace = "e+1" }))
   hl.bind(${modifier} .. " + CTRL + LEFT", hl.dsp.focus({ workspace = "e-1" }))
 
-  ${lib.optionalString (b.mouse.enable && b.enable) ''
+  ${lib.optionalString (b.mouse.enable && b.enable) /* lua */ ''
     hl.bind(${mouseModifier} .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
     hl.bind(${mouseModifier} .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
-    ${lib.optionalString (layout == "hy3") ''
+    ${lib.optionalString (layout == "hy3") /* lua */ ''
       if hl.plugin.hy3 ~= nil then
         local hy3 = hl.plugin.hy3
         hl.bind(${mouseModifier} .. " + mouse:274", hy3.kill_active(), { mouse = true })
       end
     ''}
-    ${lib.optionalString (layout != "hy3") ''
+    ${lib.optionalString (layout != "hy3") /* lua */ ''
       hl.bind(${mouseModifier} .. " + mouse:274", hl.dsp.window.close(), { mouse = true })
     ''}
   ''}

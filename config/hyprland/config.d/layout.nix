@@ -2,28 +2,28 @@
 let
   layoutConfig =
     {
-      dwindle = ''
+      dwindle = /* lua */ ''
         hl.config({
             dwindle = {
                 preserve_split = true,
             },
         })
       '';
-      master = ''
+      master = /* lua */ ''
         hl.config({
             master = {
                 new_status = "master",
             },
         })
       '';
-      scrolling = ''
+      scrolling = /* lua */ ''
         hl.config({
             scrolling = {
                 fullscreen_on_one_column = true,
             },
         })
       '';
-      hy3 = ''
+      hy3 = /* lua */ ''
         if hl.plugin.hy3 ~= nil then
           hl.config({
               plugin = {
@@ -67,6 +67,7 @@ let
     }
     .${layout};
 in
+/* lua */
 ''
   hl.config({
       general = {

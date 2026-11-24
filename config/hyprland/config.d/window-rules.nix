@@ -1,3 +1,4 @@
+/* lua */
 ''
   hl.window_rule({
     match = { class = "nmtui|bluedevil-wizard" },

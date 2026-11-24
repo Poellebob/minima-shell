@@ -1,3 +1,4 @@
+/* lua */
 ''
   hl.layer_rule({
     name = "no-anim-awww",

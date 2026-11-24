@@ -1,3 +1,4 @@
+/* lua */
 ''
   hl.config({
       gestures = {

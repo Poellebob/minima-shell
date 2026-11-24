@@ -21,7 +21,7 @@ let
 
   monitorMode = d: if d.hz != null && hasInfix "x" d.res then "${d.res}@${toString d.hz}" else d.res;
 
-  hyprMonitor = name: d: ''
+  hyprMonitor = name: d: /* lua */ ''
     hl.monitor({
       output = ${luaStr (if name == "*" then "" else name)},
       mode = ${luaStr (monitorMode d)},
@@ -59,7 +59,7 @@ let
     let
       defaultWs = if d.workspace != null then toString d.workspace else null;
     in
-    map (ws: ''
+    map (ws: /* lua */ ''
       hl.workspace_rule({
         workspace = ${luaStr ws},
         monitor = ${luaStr name},
@@ -99,7 +99,7 @@ let
       [
         "hl.bind(${hyprBindExpr ws.keybind}, hl.dsp.workspace.toggle_special(${luaStr name}))"
       ]
-      ++ mapAttrsToList (k: vs: ''
+      ++ mapAttrsToList (k: vs: /* lua */ ''
         hl.window_rule({
           match = { ${matchKey k} = ${luaStr (concatStringsSep "|" vs)} },
           workspace = ${luaStr "special:${name} silent"},
@@ -133,7 +133,7 @@ let
 
   # systemd-managed daemons are exec'd directly from here only when
   # session.systemd.enable is false.
-  startupLua = ''
+  startupLua = /* lua */ ''
     ${optionalString cfg.session.systemd.enable ''
       hl.exec_cmd(${luaStr systemdSessionStart})
     ''}
@@ -151,11 +151,13 @@ let
   primaryDisplays = filter (n: cfg.displays.${n}.primary) (attrNames cfg.displays);
   primaryDisplayName = if primaryDisplays != [ ] then head primaryDisplays else null;
 in
-''
+/* lua */ ''
   local qsConfigName = ${luaStr qsConfigName}
 
   local function setXftDpi()
-    local mon = hl.get_monitor(${if primaryDisplayName != null then luaStr primaryDisplayName else "nil"})
+    local mon = hl.get_monitor(${
+      if primaryDisplayName != null then luaStr primaryDisplayName else "nil"
+    })
     if mon == nil then
       mon = hl.get_monitors()[1]
     end
@@ -215,7 +217,7 @@ in
     ${startupLua}
   end)
 
-  ${optionalString (primaryDisplayName != null) ''
+  ${optionalString (primaryDisplayName != null) /* lua */ ''
     hl.config({ cursor = { default_monitor = ${luaStr primaryDisplayName} } })
   ''}
 
