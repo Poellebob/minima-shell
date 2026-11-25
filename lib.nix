@@ -85,10 +85,12 @@ let
     };
   };
 
-  keybindOption = default: description: mkOption {
-    type = types.listOf types.str;
-    inherit default description;
-  };
+  keybindOption =
+    default: description:
+    mkOption {
+      type = types.listOf types.str;
+      inherit default description;
+    };
 in
 {
   options.minima = {
@@ -111,7 +113,12 @@ in
         description = "Hyprland XKB keyboard layout. The NixOS module defaults this to services.xserver.xkb.layout.";
       };
       layout = mkOption {
-        type = types.enum [ "dwindle" "master" "scrolling" "hy3" ];
+        type = types.enum [
+          "dwindle"
+          "master"
+          "scrolling"
+          "hy3"
+        ];
         default = "dwindle";
         description = "Hyprland layout";
       };
@@ -347,7 +354,11 @@ in
         description = "Kitty background opacity";
       };
       shellIntegration = mkOption {
-        type = types.enum [ "enabled" "disabled" "no-cursor" ];
+        type = types.enum [
+          "enabled"
+          "disabled"
+          "no-cursor"
+        ];
         default = "enabled";
         description = "Kitty shell integration mode";
       };

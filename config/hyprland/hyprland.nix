@@ -13,10 +13,10 @@ let
   qsConfigName = cfg.quickshellConfigName;
 
   commonToHypr = {
-    "Main" = luaStr cfg.hyprland.modifier;
-    "Shift" = luaStr "SHIFT";
-    "Ctrl" = luaStr "CTRL";
-    "Alt" = luaStr "ALT";
+    "Main" = cfg.hyprland.modifier;
+    "Shift" = "SHIFT";
+    "Ctrl" = "CTRL";
+    "Alt" = "ALT";
   };
 
   monitorMode = d: if d.hz != null && hasInfix "x" d.res then "${d.res}@${toString d.hz}" else d.res;
@@ -26,7 +26,7 @@ let
       output = ${luaStr (if name == "*" then "" else name)},
       mode = ${luaStr (monitorMode d)},
       position = ${luaStr "${toString d.position.x}x${toString d.position.y}"},
-      scale = ${toString d.scale},
+      scale = ${builtins.toJSON d.scale},
     })
   '';
 
@@ -76,11 +76,7 @@ let
     else
       k;
 
-  hyprBindExpr =
-    binds:
-    concatStringsSep " .. \" + \" .. " (
-      map (b: if commonToHypr ? ${b} then commonToHypr.${b} else luaStr b) binds
-    );
+  hyprBindExpr = binds: luaStr (concatStringsSep " + " (map (b: commonToHypr.${b} or b) binds));
 
   hyprKeybind =
     kb:
@@ -95,9 +91,9 @@ let
 
   hyprSpecialWs =
     name: ws:
-    concatStringsSep "\n" (
+    concatStrings (
       [
-        "hl.bind(${hyprBindExpr ws.keybind}, hl.dsp.workspace.toggle_special(${luaStr name}))"
+        "hl.bind(${hyprBindExpr ws.keybind}, hl.dsp.workspace.toggle_special(${luaStr name}))\n"
       ]
       ++ mapAttrsToList (k: vs: /* lua */ ''
         hl.window_rule({
@@ -117,11 +113,8 @@ let
     "${pkgs.util-linux}/bin/setpriv --ambient-caps=-all --inh-caps=-all sh -c ${escapeShellArg cmd}";
 
   specialWorkspaceAutostarts = mapAttrsToList (
-    name: ws:
-    optionalString (
-      ws.autostart && ws.startCommand != ""
-    ) "hl.exec_cmd(${luaStr (dropCaps ws.startCommand)})"
-  ) cfg.specialWorkspaces;
+    _: ws: "hl.exec_cmd(${luaStr (dropCaps ws.startCommand)})"
+  ) (filterAttrs (_: ws: ws.autostart && ws.startCommand != "") cfg.specialWorkspaces);
 
   # systemd-managed daemons (session.nix) are started from here: the units are
   # deliberately not bound to graphical-session.target, because that target is
@@ -133,104 +126,98 @@ let
 
   # systemd-managed daemons are exec'd directly from here only when
   # session.systemd.enable is false.
-  startupLua = /* lua */ ''
-    ${optionalString cfg.session.systemd.enable ''
-      hl.exec_cmd(${luaStr systemdSessionStart})
-    ''}
-    hl.exec_cmd(${luaStr "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"})
-    hl.exec_cmd(${luaStr "${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface gtk-theme Breeze-Dark"})
-    ${optionalString (!cfg.session.systemd.enable) ''
-      hl.exec_cmd(${luaStr (dropCaps "${cfg.quickshellPackage}/bin/qs -c ${qsConfigName}")})
-      hl.exec_cmd(${luaStr "${pkgs.awww}/bin/awww-daemon"})
-      hl.exec_cmd(${luaStr "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store"})
-    ''}
-    ${concatStringsSep "\n    " (map (a: "hl.exec_cmd(${luaStr (dropCaps a)})") cfg.autostart)}
-    ${concatStringsSep "\n    " specialWorkspaceAutostarts}
-  '';
+  startupLua = concatStringsSep "\n  " (
+    filter (l: l != "") [
+      (optionalString cfg.session.systemd.enable "hl.exec_cmd(${luaStr systemdSessionStart})")
+      "hl.exec_cmd(${luaStr "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"})"
+      "hl.exec_cmd(${luaStr "${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface gtk-theme Breeze-Dark"})"
+      (optionalString (!cfg.session.systemd.enable) (
+        concatStringsSep "\n  " [
+          "hl.exec_cmd(${luaStr (dropCaps "${cfg.quickshellPackage}/bin/qs -c ${qsConfigName}")})"
+          "hl.exec_cmd(${luaStr "${pkgs.awww}/bin/awww-daemon"})"
+          "hl.exec_cmd(${luaStr "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store"})"
+        ]
+      ))
+      (concatStringsSep "\n  " (map (a: "hl.exec_cmd(${luaStr (dropCaps a)})") cfg.autostart))
+      (concatStringsSep "\n  " specialWorkspaceAutostarts)
+    ]
+  );
 
   primaryDisplays = filter (n: cfg.displays.${n}.primary) (attrNames cfg.displays);
   primaryDisplayName = if primaryDisplays != [ ] then head primaryDisplays else null;
-in
-/* lua */ ''
-  local qsConfigName = ${luaStr qsConfigName}
 
-  local function setXftDpi()
-    local mon = hl.get_monitor(${
-      if primaryDisplayName != null then luaStr primaryDisplayName else "nil"
+  prelude = /* lua */ ''
+    local qsConfigName = ${luaStr qsConfigName}
+
+    local function setXftDpi()
+      local mon = hl.get_monitor(${
+        if primaryDisplayName != null then luaStr primaryDisplayName else "nil"
+      })
+      if mon == nil then
+        mon = hl.get_monitors()[1]
+      end
+      if mon == nil then
+        return
+      end
+
+      -- XWayland uses one global DPI; prefer the primary monitor's scale.
+      local dpi = math.floor(96 * (tonumber(mon.scale) or 1.0) + 0.5)
+      hl.exec_cmd("printf 'Xft.dpi: %d\\n' " .. dpi .. " | ${pkgs.xrdb}/bin/xrdb -merge")
+    end
+  '';
+  startup = /* lua */ ''
+    hl.on("hyprland.start", function()
+      setXftDpi()
+      ${startupLua}
+    end)
+  '';
+  settings = /* lua */ ''
+    hl.config({ input = { kb_layout = ${luaStr cfg.hyprland.keyboardLayout} } })
+
+    -- Keep startup stalls diagnosable with timestamped compositor logs.
+    hl.config({ debug = { disable_logs = false, disable_time = false } })
+
+    hl.config({
+      xwayland = {
+        force_zero_scaling = true,
+      },
     })
-    if mon == nil then
-      mon = hl.get_monitors()[1]
-    end
-    if mon == nil then
-      return
-    end
-
-    -- XWayland uses one global DPI; prefer the primary monitor's scale.
-    local dpi = math.floor(96 * (tonumber(mon.scale) or 1.0) + 0.5)
-    hl.exec_cmd("printf 'Xft.dpi: %d\\n' " .. dpi .. " | ${pkgs.xrdb}/bin/xrdb -merge")
-  end
-
-  ${concatStringsSep "\n" (mapAttrsToList hyprMonitor cfg.displays)}
-
-  ${concatStringsSep "\n" (
-    concatMap (n: hyprWorkspaceRules n cfg.displays.${n}) (
-      attrNames (filterAttrs (n: v: (v.workspace != null || v.workspaces != null)) cfg.displays)
-    )
-  )}
-
-  ${builtins.readFile ./config.d/colors.lua}
-
-  ${builtins.readFile ./config.d/animations.lua}
-
-  ${import ./config.d/decorations.nix}
-
-  ${import ./config.d/layout.nix {
-    layout = cfg.hyprland.layout;
-  }}
-
-  ${import ./config.d/window-rules.nix}
-
-  ${import ./config.d/layer-rules.nix}
-
-  ${import ./config.d/gestures.nix}
-
-  ${import ./config.d/input.nix}
-
-  ${import ./config.d/misc.nix}
-
-   ${import ./config.d/keybinds.nix {
-     inherit lib pkgs;
-     layout = cfg.hyprland.layout;
-     keybinds = cfg.keybinds;
-     terminalEnabled = cfg.terminal.enable;
-     bind = hyprDefaultBind;
-     mouseModifier = luaStr cfg.hyprland.modifier;
-     modifier = luaStr cfg.hyprland.modifier;
-   }}
-
-   ${concatStringsSep "\n" (map hyprKeybind (filter (kb: kb.bind != [ ]) cfg.keybinds.custom))}
-
-  ${concatStringsSep "\n" (mapAttrsToList hyprSpecialWs cfg.specialWorkspaces)}
-
-  hl.on("hyprland.start", function()
-    setXftDpi()
-    ${startupLua}
-  end)
-
-  ${optionalString (primaryDisplayName != null) /* lua */ ''
-    hl.config({ cursor = { default_monitor = ${luaStr primaryDisplayName} } })
-  ''}
-
-  hl.config({ input = { kb_layout = ${luaStr cfg.hyprland.keyboardLayout} } })
-
-  -- Keep startup stalls diagnosable with timestamped compositor logs.
-  hl.config({ debug = { disable_logs = false, disable_time = false } })
-
-  hl.config({
-    xwayland = {
-      force_zero_scaling = true
-    }
-  })
-
-  ${cfg.hyprland.extraLua}
-''
+  '';
+in
+# Each section includes its final newline; joining nonempty sections adds one blank line.
+concatStringsSep "\n" (
+  filter (section: section != "") (
+    [ prelude ]
+    ++ mapAttrsToList hyprMonitor cfg.displays
+    ++ concatLists (mapAttrsToList hyprWorkspaceRules cfg.displays)
+    ++ [
+      (builtins.readFile ./config.d/colors.lua)
+      (builtins.readFile ./config.d/animations.lua)
+      (import ./config.d/decorations.nix)
+      (import ./config.d/layout.nix { layout = cfg.hyprland.layout; })
+      (import ./config.d/window-rules.nix)
+      (import ./config.d/layer-rules.nix)
+      (import ./config.d/gestures.nix)
+      (import ./config.d/input.nix)
+      (import ./config.d/misc.nix)
+      (import ./config.d/keybinds.nix {
+        inherit lib pkgs;
+        layout = cfg.hyprland.layout;
+        keybinds = cfg.keybinds;
+        terminalEnabled = cfg.terminal.enable;
+        bind = hyprDefaultBind;
+        mouseModifier = cfg.hyprland.modifier;
+      })
+      (concatMapStrings (kb: hyprKeybind kb + "\n") (filter (kb: kb.bind != [ ]) cfg.keybinds.custom))
+    ]
+    ++ mapAttrsToList hyprSpecialWs cfg.specialWorkspaces
+    ++ [
+      startup
+      (optionalString (primaryDisplayName != null) /* lua */ ''
+        hl.config({ cursor = { default_monitor = ${luaStr primaryDisplayName} } })
+      '')
+      settings
+      cfg.hyprland.extraLua
+    ]
+  )
+)
