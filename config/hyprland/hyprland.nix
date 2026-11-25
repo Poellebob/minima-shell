@@ -146,6 +146,10 @@ let
   primaryDisplays = filter (n: cfg.displays.${n}.primary) (attrNames cfg.displays);
   primaryDisplayName = if primaryDisplays != [ ] then head primaryDisplays else null;
 
+  xwaylandAutostart = optionalString (cfg.hyprland.xwaylandAutostart != [ ]) (
+    " && { " + concatMapStrings (cmd: "${dropCaps cmd} & ") cfg.hyprland.xwaylandAutostart + "}"
+  );
+
   prelude = /* lua */ ''
     local qsConfigName = ${luaStr qsConfigName}
 
@@ -162,12 +166,13 @@ let
 
       -- XWayland uses one global DPI; prefer the primary monitor's scale.
       local dpi = math.floor(96 * (tonumber(mon.scale) or 1.0) + 0.5)
-      hl.exec_cmd("printf 'Xft.dpi: %d\\n' " .. dpi .. " | ${pkgs.xrdb}/bin/xrdb -merge")
+      hl.exec_cmd("printf 'Xft.dpi: %d\\n' " .. dpi .. ${luaStr " | ${pkgs.xrdb}/bin/xrdb -merge${xwaylandAutostart}"})
     end
   '';
   startup = /* lua */ ''
     hl.on("hyprland.start", function()
-      setXftDpi()
+      -- The event loop starts after the initial output batch is registered.
+      hl.timer(setXftDpi, { timeout = 3, type = "oneshot" })
       ${startupLua}
     end)
   '';

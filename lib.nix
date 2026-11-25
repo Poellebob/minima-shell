@@ -127,6 +127,11 @@ in
         default = "";
         description = "Extra Lua appended to the generated Hyprland config";
       };
+      xwaylandAutostart = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "Shell commands to run at Hyprland startup only after Xft.dpi is set successfully. Use this instead of minima.autostart for DPI-sensitive XWayland apps.";
+      };
       plugins = mkOption {
         type = types.listOf (types.either types.package (types.strMatching "/.*"));
         default = [ ];

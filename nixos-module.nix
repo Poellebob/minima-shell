@@ -94,6 +94,7 @@ in {
               keyboardLayout = mkDefault cfg.hyprland.keyboardLayout;
               layout = mkDefault cfg.hyprland.layout;
               extraLua = mkDefault cfg.hyprland.extraLua;
+              xwaylandAutostart = mkDefault cfg.hyprland.xwaylandAutostart;
               plugins = mkDefault cfg.hyprland.plugins;
             };
             sway = {
